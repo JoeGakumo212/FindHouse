@@ -1,0 +1,450 @@
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { parseCookies } from 'nookies';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import NextofKin from './NextofKin';
+import EmergencyContact from './EmergencyContact';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
+
+const TenantsDetails = () => {
+  const [tenant_type, setTenant_Type] = useState('');
+  const [first_name, setFirst_name] = useState('');
+  const [middle_name, setMiddle_name] = useState('');
+  const [last_name, setLast_name] = useState('');
+  const [gender, setGender] = useState('');
+  const [date_of_birth, setDate_of_birth] = useState('');
+  const [id_passport_number, setId_passport_number] = useState('');
+  const [marital_status, setMarital_status] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [country, setCountry] = useState('');
+  const [city, setCity] = useState('');
+  const [postal_code, setPostal_code] = useState('');
+  const [postal_address, setPostal_address] = useState('');
+  const [physical_address, setPhysical_address] = useState('');
+  const [password, setPassword] = useState('');
+  const [password_confirmation, setPasswordConfirmation] = useState('');
+  const [showNextOfKin, setShowNextOfKin] = useState(false);
+  const [stagedTenantData, setStagedTenantData] = useState({});
+  const [showTenants, setShowTenants] = useState(true);
+
+  const tenantData = {
+    tenant_type,
+    first_name,
+    middle_name,
+    last_name,
+    gender,
+    date_of_birth,
+    id_passport_number,
+    marital_status,
+    phone,
+    email,
+    country,
+    city,
+    postal_code,
+    postal_address,
+    physical_address,
+    password,
+    password_confirmation,
+  };
+
+  const handleNextClick = () => {
+    setStagedTenantData(tenantData);
+    setStagedTenantData({
+      tenant_type,
+      first_name,
+      middle_name,
+      last_name,
+      gender,
+      date_of_birth,
+      id_passport_number,
+      marital_status,
+      phone,
+      email,
+      country,
+      city,
+      postal_code,
+      postal_address,
+      physical_address,
+      password,
+      password_confirmation,
+    });
+    setShowNextOfKin(true);
+  };
+  console.log('staged data:', stagedTenantData);
+
+  const handleBackClick = () => {
+    setShowTenants(true);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Perform validation for each input field
+    if (!tenant_type.trim()) {
+      alert('Please select the tenant type');
+      return;
+    }
+
+    if (!first_name.trim()) {
+      alert('Please enter your first name');
+      return;
+    }
+
+    if (!last_name.trim()) {
+      alert('Please enter your last name');
+      return;
+    }
+
+    if (!gender.trim()) {
+      alert('Please select your gender');
+      return;
+    }
+
+    if (!date_of_birth.trim()) {
+      alert('Please enter your date of birth');
+      return;
+    }
+
+    if (!id_passport_number.trim()) {
+      alert('Please enter either the ID number or passport number');
+      return;
+    }
+
+    if (!marital_status.trim()) {
+      alert('Please select your marital status');
+      return;
+    }
+
+    if (!phone.trim()) {
+      alert('Please enter your phone number');
+      return;
+    }
+
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      alert('Please enter a valid email address');
+      return;
+    }
+
+    if (!country.trim()) {
+      alert('Please enter your country');
+      return;
+    }
+
+    if (!city.trim()) {
+      alert('Please enter your city');
+      return;
+    }
+
+    if (!postal_code.trim()) {
+      alert('Please enter your postal code');
+      return;
+    }
+
+    if (!postal_address.trim()) {
+      alert('Please enter your postal address');
+      return;
+    }
+
+    if (!physical_address.trim()) {
+      alert('Please enter your physical address');
+      return;
+    }
+
+    if (!password.trim()) {
+      alert('Please enter your password');
+      return;
+    }
+
+    if (!password_confirmation.trim()) {
+      alert('Please enter your password confirmation');
+      return;
+    }
+
+    if (password !== password_confirmation) {
+      alert('Password and password confirmation do not match');
+      return;
+    }
+
+    // All input fields are filled, proceed to the next step
+    setStagedTenantData(tenantData);
+    setShowNextOfKin(true);
+  };
+  return (
+    <>
+      {showTenants && (
+        <div className="profile-section">
+          <div className="row">
+            <div className="col-lg-4">
+              <div className="my_profile_setting_input ui_kit_select_search form-group">
+                <label>Property Type</label>
+                <select
+                  className="selectpicker form-select"
+                  data-live-search="true"
+                  data-width="100%"
+                  value={tenant_type}
+                  onChange={(e) => setTenant_Type(e.target.value)}
+                >
+                  <option value="" disabled selected>
+                    Tenant Type
+                  </option>
+                  <option data-tokens="Individual">Individual</option>
+                  <option data-tokens="Bussiness">Bussiness</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="col-lg-4 col-xl-0">
+              <div className="my_profile_setting_input form-group">
+                <label htmlFor="formGroupExampleInput1">First Name</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="formGroupExampleInput1"
+                  placeholder="First Name"
+                  value={first_name}
+                  onChange={({ target }) => setFirst_name(target?.value)}
+                />
+              </div>
+            </div>
+            <div className="col-lg-4 col-xl-0">
+              <div className="my_profile_setting_input form-group">
+                <label htmlFor="formGroupExampleInput2">Middle Name</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="formGroupExampleInput2"
+                  placeholder="Middle Name"
+                  value={middle_name}
+                  onChange={({ target }) => setMiddle_name(target?.value)}
+                />
+              </div>
+            </div>
+            <div className="col-lg-4 col-xl-0">
+              <div className="my_profile_setting_input form-group">
+                <label htmlFor="formGroupExampleInput3">Last Name</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="formGroupExampleInput3"
+                  placeholder="Last Name"
+                  value={last_name}
+                  onChange={({ target }) => setLast_name(target?.value)}
+                />
+              </div>
+            </div>
+            <div className="col-lg-4 col-xl-0">
+              <div className="my_profile_setting_input ui_kit_select_search  form-group">
+                <label htmlFor="formGroupExampleInput4">Gender</label>
+                <select
+                  className="selectpicker form-select"
+                  id="formGroupExampleInput4"
+                  value={gender}
+                  onChange={({ target }) => setGender(target.value)}
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Female">Female</option>
+                  <option value="Male">Male</option>
+                  <option value="Others">Others</option>
+                </select>
+              </div>
+            </div>
+            <div className="col-lg-4 ">
+              <div className="my_profile_setting_input form-group">
+                <label htmlFor="formGroupExampleInput7">Date of Birth</label>
+                <div className="input-group">
+                  <DatePicker
+                    className="form-control"
+                    id="formGroupExampleInput7"
+                    placeholderText="MM/DD/YYYY"
+                    selected={date_of_birth}
+                    onChange={(date) => setDate_of_birth(date)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="col-lg-4 col-xl-0">
+              <div className="my_profile_setting_input form-group">
+                <label htmlFor="formGroupExampleInput6">
+                  ID/Passport Number
+                </label>
+                <input
+                  type="number"
+                  className="form-control"
+                  id="formGroupExampleInput6"
+                  placeholder="ID/Passport Number"
+                  value={id_passport_number}
+                  onChange={({ target }) =>
+                    setId_passport_number(target?.value)
+                  }
+                />
+              </div>
+            </div>
+            <div className="col-lg-4 col-xl-0">
+              <div className="my_profile_setting_input form-group">
+                <label htmlFor="formGroupExampleInput7">Marital Status</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="formGroupExampleInput7"
+                  placeholder="Marital Status"
+                  value={marital_status}
+                  onChange={({ target }) => setMarital_status(target?.value)}
+                />
+              </div>
+            </div>
+            <div className="col-lg-4 col-xl-0">
+              <div className="my_profile_setting_input form-group">
+                <label htmlFor="formGroupExampleInput8">Phone</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  id="formGroupExampleInput8"
+                  placeholder="Phone"
+                  value={phone}
+                  onChange={({ target }) => setPhone(target?.value)}
+                />
+              </div>
+            </div>
+            <div className="col-lg-4 col-xl-0">
+              <div className="my_profile_setting_input form-group">
+                <label htmlFor="formGroupExampleInput9">Email</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="formGroupExampleInput9"
+                  placeholder="Email"
+                  value={email}
+                  onChange={({ target }) => setEmail(target?.value)}
+                />
+              </div>
+            </div>
+            <div className="col-lg-4 col-xl-0">
+              <div className="my_profile_setting_input form-group">
+                <label htmlFor="formGroupExampleInput10">Country</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="formGroupExampleInput10"
+                  placeholder="Country"
+                  value={country}
+                  onChange={({ target }) => setCountry(target?.value)}
+                />
+              </div>
+            </div>
+            <div className="col-lg-4 col-xl-0">
+              <div className="my_profile_setting_input form-group">
+                <label htmlFor="formGroupExampleInput11">City</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="formGroupExampleInput11"
+                  placeholder="City"
+                  value={city}
+                  onChange={({ target }) => setCity(target?.value)}
+                />
+              </div>
+            </div>
+            <div className="col-lg-4 col-xl-0">
+              <div className="my_profile_setting_input form-group">
+                <label htmlFor="formGroupExampleInput12">Postal Code</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="formGroupExampleInput12"
+                  placeholder="Postal Code"
+                  value={postal_code}
+                  onChange={({ target }) => setPostal_code(target?.value)}
+                />
+              </div>
+            </div>
+            <div className="col-lg-4 col-xl-0">
+              <div className="my_profile_setting_input form-group">
+                <label htmlFor="formGroupExampleInput13">Postal Address</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="formGroupExampleInput13"
+                  placeholder="Postal Address"
+                  value={postal_address}
+                  onChange={({ target }) => setPostal_address(target?.value)}
+                />
+              </div>
+            </div>
+            <div className="col-lg-4 col-xl-0">
+              <div className="my_profile_setting_input form-group">
+                <label htmlFor="formGroupExampleInput14">
+                  Physical Address
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="formGroupExampleInput14"
+                  placeholder="Physical Address"
+                  value={physical_address}
+                  onChange={({ target }) => setPhysical_address(target?.value)}
+                />
+              </div>
+            </div>
+            <div className="col-lg-6 col-xl-0">
+              <div className="my_profile_setting_input form-group">
+                <label htmlFor="formGroupExampleInput15">Password</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  id="formGroupExampleInput15"
+                  placeholder="Password"
+                  value={password}
+                  onChange={({ target }) => setPassword(target.value)}
+                />
+              </div>
+            </div>
+            <div className="col-lg-6 col-xl-0">
+              <div className="my_profile_setting_input form-group">
+                <label htmlFor="formGroupExampleInput16">
+                  Confirm Password
+                </label>
+                <input
+                  type="password"
+                  className="form-control"
+                  id="formGroupExampleInput16"
+                  placeholder="Confirm Password"
+                  value={password_confirmation}
+                  onChange={({ target }) =>
+                    setPasswordConfirmation(target.value)
+                  }
+                />
+              </div>
+            </div>
+            
+            {/* Next button */}
+            <div className="my_profile_setting_input float-end fn-520">
+              <button
+                className="btn btn2"
+                onClick={() => {
+                  setStagedTenantData(tenantData);
+                  setShowTenants(false);
+                }}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
+        
+      )}
+
+      {/* Next of Kin section */}
+      {!showTenants && (
+        <NextofKin
+          handleBackClick={handleBackClick}
+          handleSubmit={handleSubmit}
+        />
+      )}
+    </>
+  );
+};
+export default TenantsDetails;
