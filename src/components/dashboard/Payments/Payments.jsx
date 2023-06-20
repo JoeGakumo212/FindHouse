@@ -18,7 +18,7 @@ const Payments = () => {
   const [paid_by, setPaidBy] = useState('');
   const [reference_number, setReferenceNumber] = useState('');
   const [selectedTenant, setSelectedTenant] = useState(null);
-
+  const [referenceNumbers, setReferenceNumbers] = useState([]);
   // end
 
   const handleTenantInputChange = async (e) => {
@@ -156,6 +156,13 @@ const Payments = () => {
   // handle submit the form here
   const handleSave = async () => {
     if (tenants.length === 1 && leases.length === 1) {
+      // Validation logic
+      if (!payment_method_id || amount <= 0 || !payment_date || !paid_by) {
+        console.log('Please fill in all required fields.');
+        alert('Please fill in all required fields.');
+        return;
+      }
+  
       console.log('Selected Tenant:', tenants[0]);
       console.log('Selected Lease:', leases[0]);
       console.log('Payment Method ID:', payment_method_id);
@@ -164,8 +171,9 @@ const Payments = () => {
       console.log('Notes:', notes);
       console.log('Paid By:', paid_by);
       console.log('Reference Number:', reference_number);
-
+  
       try {
+        // Submit payment data
         const paymentData = {
           payment_method_id,
           amount,
@@ -178,39 +186,56 @@ const Payments = () => {
           lease_number: leases[0].lease_number,
           tenant_name: tenants[0].first_name,
         };
-
+  
         const cookies = parseCookies();
         const tokenFromCookie = cookies.access_token;
-
+  
         const headers = {
           Authorization: `Bearer ${tokenFromCookie}`,
           'Content-Type': 'application/json',
         };
-
+  
         const response = await axios.post(
           'https://cloudagent.co.ke/backend/api/v1/payments',
           paymentData,
           { headers }
         );
-
-        if (response.status === 200) {
-          console.log('Payment data submitted successfully:', response.data);
-          // You can perform further actions here, such as displaying a success message or updating the state.
+  
+        // Check if the reference number is already present
+        if (referenceNumbers.includes(reference_number)) {
+          console.log('Reference number is not unique');
+          alert("Check or Re-Enter the Reference Number, It Should be Unique")
+          // Handle the case where the reference number is not unique, such as displaying an error message or updating the state.
         } else {
-          console.log('Failed to submit payment data:', response.data);
-          // You can handle the error here, such as displaying an error message or updating the state.
+          console.log('Reference number is unique');
+          // Add the reference number to the referenceNumbers array
+          setReferenceNumbers([...referenceNumbers, reference_number]);
+          alert('Payment submitted successfully');
+          // Reset the form fields
+          setPayment_Method_Id('');
+          setAmount(0);
+          setPaymentDate('');
+          setNotes('');
+          setPaidBy('');
+          setReferenceNumber('');
+          setSelectedTenant(null);
+          setTenantSearchTerm('');
+          setLeaseSearchTerm('');
+          setTenants([]);
+          setLeases([]);
+  
+          // You can perform further actions here, such as displaying a success message or updating the state.
         }
       } catch (error) {
         console.error('Error occurred while submitting payment data:', error);
         // You can handle the error here, such as displaying an error message or updating the state.
       }
     } else {
-      console.log(
-        'No tenant or lease selected, or multiple tenants/leases selected'
-      );
+      console.log('No tenant or lease selected, or multiple tenants/leases selected');
+      alert('All fields need to be filled');
     }
   };
-
+  
   return (
     <>
       <div className="row">

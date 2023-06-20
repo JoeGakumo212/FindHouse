@@ -1,166 +1,207 @@
-import { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { parseCookies } from 'nookies';
-import DatePicker from 'react-datepicker';
-import { IoIosArrowUp, IoIosArrowDown } from 'react-icons/io';
+
 const Leases = () => {
-
-
-
-
-  const [lateFeeFields, setLateFeeFields] = useState({
-    late_fee_id: '',
-    late_fee_value: '',
-    late_fee_type: '',
-    late_fee_frequency: '',
-    grace_period: '',
-  });
-
   const [data, setData] = useState([]);
-
-  const [property_name, setPropertyInput] = useState('');
-  const [unit_name, setUnitInput] = useState('');
-  const [unit_mode, setLeaseTypeInput] = useState('');
-  const [utility_name, setUnitType] = useState('');
-  const [extra_charge_name, setextra_charge_name] = useState('');
-  const [rent_amount, settotalrentAmount] = useState(0);
-  const [start_date, setStartDate] = useState(null);
-  const [due_date, setSelectedDate] = useState('');
-  const [selectedDateLease, setselectedDateLease] = useState('');
-  const [first_name, setSearchInput] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
+  const [property_name, setPropertyName] = useState([]);
   const [propertyOptions, setPropertyOptions] = useState([]);
+  const [showOptions, setShowOptions] = useState(false);
+  const [unit_name, setUnitName] = useState([]);
   const [unitOptions, setUnitOptions] = useState([]);
-  const [leaseTypeOptions, setLeaseTypeOptions] = useState([]);
-  const [tenantOptions, setTenantOptions] = useState([]);
+  const [leaseType, setLeaseType] = useState('');
+  const [rent_amount, setRentAmount] = useState('');
+  const [start_date, setStartDate] = useState('');
+  const [due_date, setDueDate] = useState('');
   const [currentSection, setCurrentSection] = useState('lease');
+  const [rent_deposit, setRentDeposit] = useState('');
+  const [utility_name, setUtilityName] = useState('');
+  const [deposit_amount, setDepositAmount] = useState('');
+  // tenants state declarations
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
   const [selectedTenants, setSelectedTenants] = useState([]);
-
-  // const [late_fee_type, setLateFeeType] = useState('');
-  // const [gracePeriod, setGracePeriod] = useState(0);
-  // const [late_fee_frequency, setFrequency] = useState('');
-  const [utility_display_name, setUtilityName] = useState('');
-  const [utility_unit_cost, setCost] = useState('');
-  const [utility_base_fee, setBaseFee] = useState(0);
+  // ends
+  const [extra_charge_type, setExtraChargeType] = useState('');
+  const [extra_charge_Value, setExtraChargeValue] = useState('');
+  const [property_id, setExtraChargeType1] = useState(''); //need to be editted
+  const [extra_charge_frequency, setExtraChargeFrequency] = useState('');
+  const [late_fee_name, setLateFeeName] = useState('');
+  const [late_fee_value, setLateFeeValue] = useState('');
+  const [late_fee_type, setLateFeeType] = useState('');
+  const [grace_period, setGracePeriod] = useState('');
+  const [late_fee_frequency, setLateFeeFrequency] = useState('');
+  const [utility_display_name, setUtilityDisplayName] = useState('');
+  const [utility_unit_cost, setUtilityUnitCost] = useState('');
+  const [utility_base_fee, setBaseFee] = useState('');
   const [payment_method_name, setPaymentMethod] = useState('');
   const [payment_method_description, setPaymentDescription] = useState('');
-  // const [late_fee_value, setLateFeeCharges] = useState(0);
-  const [deposit_amount, setDepositAmount] = useState(0);
-  const [extra_charge_value, setRentAmount1] = useState(0);
-  const [extra_charge_type, setLeaseTypeInput1] = useState('');
-  const [extra_charge_frequency, setLeaseTypeInput2] = useState('');
-  const [late_fee_name, setLeaseTypeInput3] = useState('');
-  const [grace_period, setGracePeriod1] = useState(0);
-  const [rent_deposit, setRentDepositAmount] = useState(0);
-  // Event handlers
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setLateFeeFields((prev) => ({ ...prev, [name]: value }));
-  };
-  const handleChangeRentDepositAmount = (event) => {
-    setRentDepositAmount(event.target.value);
-  };
-  const handlergracePeriodChange = (event) => {
-    setGracePeriod(event.target.value);
-  };
-  const handletotalrentAmount = (event) => {
-    settotalrentAmount(event.target.value);
-  };
-  const handleRentAmount1 = (event) => {
-    setRentAmount1(event.target.value);
-  };
-  const handledepositAmount = (event) => {
-    setDepositAmount(event.target.value);
-  };
-  const handleLateFeeCharges = (event) => {
-    setLateFeeCharges(event.target.value);
+  const [selectedDateLease, setSelectedDateLease] = useState('');
+  const [nextPeriodBilling, setNextPeriodBilling] = useState(false);
+  const [waivePenalty, setWaivePenalty] = useState(false);
+  const [skipStartingPeriod, setSkipStartingPeriod] = useState(false);
+
+  // Handle next and back button
+  const handleNextClick = () => {
+    if (currentSection === 'lease') {
+      setCurrentSection('deposit');
+    } else if (currentSection === 'deposit') {
+      setCurrentSection('extra');
+    } else if (currentSection === 'extra') {
+      setCurrentSection('latefees');
+    } else if (currentSection === 'latefees') {
+      setCurrentSection('utility');
+    }
   };
 
-  const handleUnitOptionClick = (unit) => {
-    setUnitInput(unit);
-    setUnitOptions([]); // Hide unit options
-    setPropertyOptions([]); // Hide property options
-    setLeaseTypeOptions([]); // Hide lease type options
-  };
-
-  const handleLateFeeTypeChange = (event) => {
-    setLateFeeType(event.target.value);
-  };
-
-  const handleGracePeriod = (event) => {
-    setGracePeriod1(event.target.value);
-  };
-
-  const handleFrequencyChange = (event) => {
-    setFrequency(event.target.value);
+  const handleBackClick = () => {
+    if (currentSection === 'deposit') {
+      setCurrentSection('lease');
+    } else if (currentSection === 'extra') {
+      setCurrentSection('deposit');
+    } else if (currentSection === 'latefees') {
+      setCurrentSection('extra');
+    } else if (currentSection === 'utility') {
+      setCurrentSection('latefees');
+    }
   };
 
   const handlePropertyInputChange = (event) => {
-    setPropertyInput(event.target.value);
-    searchProperties(event.target.value);
+    const value = event.target.value;
+    setPropertyName(value);
+    searchProperties(value);
+    setShowOptions(true);
+  };
+
+  const handlePropertyOptionClick = (option) => {
+    setPropertyName(option);
+    setPropertyOptions([]);
+    setShowOptions(false);
+
+    const property = data.find((property) => property.property_name === option);
+    if (property) {
+      setUnitName(property.unit_name);
+      setUnitOptions([property.unit_name]);
+    } else {
+      setUnitName('');
+      setUnitOptions([]);
+    }
   };
 
   const handleUnitInputChange = (event) => {
-    setUnitInput(event.target.value);
-    searchUnits(event.target.value);
+    const value = event.target.value;
+    setUnitName(value);
+    searchUnits(value);
   };
-  const handleUnitInputClick = () => {
-    searchUnits(unit_name);
+
+  const handleUnitOptionClick = (option) => {
+    setUnitName(option);
+    setUnitOptions([]);
   };
 
   const handleLeaseTypeInputChange = (event) => {
-    setLeaseTypeInput(event.target.value);
-    searchLeaseTypes(event.target.value);
-  };
-  const handleLeaseTypeInputChanges = (event) => {
-    setextra_charge_name(event.target.value);
-    searchLeaseTypes(event.target.value);
-  };
-  const handleLeaseTypeInputChange1 = (event) => {
-    setLeaseTypeInput1(event.target.value);
-    searchLeaseTypes(event.target.value);
-  };
-  const handleLeaseTypeInputChange2 = (event) => {
-    setLeaseTypeInput2(event.target.value);
-    searchLeaseTypes(event.target.value);
-  };
-  const handleLeaseTypeInputChange3 = (event) => {
-    setLeaseTypeInput3(event.target.value);
-    searchLeaseTypes(event.target.value);
-  };
-  const handleUnitTypeChange = (event) => {
-    setUnitType(event.target.value);
-    searchUnits(event.target.value);
+    setLeaseType(event.target.value);
   };
 
-  const handleStartDateChange = (date) => {
-    setStartDate(date);
+  const handleRentAmountChange = (event) => {
+    setRentAmount(event.target.value);
+  };
+
+  const handleStartDateChange = (event) => {
+    setStartDate(event.target.value);
   };
 
   const handleDateChange = (event) => {
-    setSelectedDate(event.target.value);
+    setDueDate(event.target.value);
+  };
+  const handleChangeRentDepositAmount = (event) => {
+    const amount = event.target.value;
+    setRentDeposit(amount);
+  };
+  const handleUnitTypeChange = (event) => {
+    setUtilityName(event.target.value);
+  };
+
+  const handleChangeDepositAmount = (event) => {
+    setDepositAmount(event.target.value);
+  };
+  const handleLeaseTypeInputChange1 = (event) => {
+    setExtraChargeType(event.target.value);
+  };
+  const handleChangeExtraChargeValue = (event) => {
+    setExtraChargeValue(event.target.value);
+  };
+  // need to be eddited
+  const handleLeaseTypeInputChange11 = (event) => {
+    setExtraChargeType1(event.target.value);
+  };
+  // end
+  const handleLeaseTypeInputChange2 = (event) => {
+    setExtraChargeFrequency(event.target.value);
+  };
+  const handleLateFeeName = (event) => {
+    setLateFeeName(event.target.value);
+  };
+  const handleChangeLatefeeValue = (event) => {
+    setLateFeeValue(event.target.value);
+  };
+  const handleChangeLateFeeType = (event) => {
+    setLateFeeType(event.target.value);
+  };
+
+  const handleChangeGracePeriod = (event) => {
+    setGracePeriod(event.target.value);
+  };
+  const handleChangeLateFeeFrequency = (event) => {
+    setLateFeeFrequency(event.target.value);
+  };
+  const handleChangeUtilityName = (event) => {
+    setUtilityDisplayName(event.target.value);
+  };
+  const handleChangeUnitCost = (event) => {
+    setUtilityUnitCost(event.target.value);
+  };
+  const handleChangeBaseFee = (event) => {
+    setBaseFee(event.target.value);
+  };
+  const handlePaymentMethodChange = (event) => {
+    setPaymentMethod(event.target.value);
+  };
+
+  const handlePaymentDescriptionChange = (event) => {
+    setPaymentDescription(event.target.value);
   };
   const handleDateChangeLease = (event) => {
-    setselectedDateLease(event.target.value);
+    setSelectedDateLease(event.target.value);
   };
+
+  const handleNextPeriodBillingChange = () => {
+    setNextPeriodBilling(!nextPeriodBilling);
+  };
+
+  const handleWaivePenaltyChange = () => {
+    setWaivePenalty(!waivePenalty);
+  };
+
+  const handleSkipStartingPeriodChange = () => {
+    setSkipStartingPeriod(!skipStartingPeriod);
+  };
+  // Helper function to generate an array of day options
+  const generateDaysArray = () => {
+    const daysArray = [];
+    for (let i = 1; i <= 31; i++) {
+      daysArray.push(i);
+    }
+    return daysArray;
+  };
+  // tenants search logic
+
   const handleSearchInputChange = (event) => {
-    const inputValue = event.target.value;
-    setSearchInput(inputValue);
-    searchTenants(inputValue);
+    setSearchQuery(event.target.value);
+    searchTenants(event.target.value);
   };
 
   const handleTenantSelect = (tenant) => {
-    setSelectedTenants([...selectedTenants, tenant]);
-    setSearchInput('');
-    setSearchResults([]);
-  };
-
-  const handleRemoveTenant = (index) => {
-    const updatedTenants = [...selectedTenants];
-    updatedTenants.splice(index, 1);
-    setSelectedTenants(updatedTenants);
-  };
-  const handleCheckboxChange = (tenant) => {
     if (selectedTenants.includes(tenant)) {
       setSelectedTenants(
         selectedTenants.filter((selected) => selected !== tenant)
@@ -170,29 +211,25 @@ const Leases = () => {
     }
   };
 
-  // Generate an array of all days in a month
-  const generateDaysArray = () => {
-    const daysArray = [];
-    const currentDate = new Date();
-    const lastDay = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth() + 1,
-      0
-    ).getDate();
-
-    for (let i = 1; i <= lastDay; i++) {
-      daysArray.push(i.toString());
+  const handleCheckboxChange = (tenant) => {
+    if (selectedTenants.includes(tenant)) {
+      setSelectedTenants(
+        selectedTenants.filter((selected) => selected !== tenant)
+      );
+    } else {
+      setSelectedTenants([tenant]);
     }
 
-    return daysArray;
+    setSearchQuery(`${tenant.first_name} ${tenant.middle_name}`);
+    setSearchResults([]); // Clear the search results to hide other tenants
   };
-  // end
+  // ends here
+  // Fetch properties based on property_name
   const searchProperties = async (query) => {
     try {
       const cookies = parseCookies();
       const tokenFromCookie = cookies.access_token;
-      console.log('teke teke token', tokenFromCookie);
-      // Set the request headers
+
       const headers = {
         Authorization: `Bearer ${tokenFromCookie}`,
         'Content-Type': 'application/json',
@@ -211,23 +248,15 @@ const Leases = () => {
       const response = await axios.get(
         'https://cloudagent.co.ke/backend/api/v1/properties',
         {
-          params: {
-            property: query,
-            page: 0,
-            limit: 0,
-            sortField: 'updated_at',
-            sortDirection: 'desc',
-            whereField: '',
-            whereValue: '',
-          },
-          headers: headers, // Include the headers in the request
+          params,
+          headers,
         }
       );
 
       if (response.status === 200) {
         const apiData = response.data.data;
         const propertyOptions = apiData.map(
-          (property) => property.property_code
+          (property) => property.property_name
         );
         setPropertyOptions(propertyOptions);
         setData(apiData);
@@ -239,14 +268,13 @@ const Leases = () => {
       console.error('Error occurred while searching:', error);
     }
   };
-  // end of search property name
-  // login to fetch the endpoint for units
+
+  // Fetch units based on unit_name
   const searchUnits = async (query) => {
     try {
       const cookies = parseCookies();
       const tokenFromCookie = cookies.access_token;
 
-      // Set the request headers
       const headers = {
         Authorization: `Bearer ${tokenFromCookie}`,
         'Content-Type': 'application/json',
@@ -265,25 +293,16 @@ const Leases = () => {
       const response = await axios.get(
         'https://cloudagent.co.ke/backend/api/v1/units',
         {
-          params: {
-            unit: query,
-            page: 0,
-            limit: 0,
-            sortField: 'updated_at',
-            sortDirection: 'desc',
-            whereField: '',
-            whereValue: '',
-          },
-          headers: headers, // Include the headers in the request
+          params,
+          headers,
         }
       );
 
       if (response.status === 200) {
         const apiData = response.data.data;
-        // const unitOptions = apiData.map((item) => item.units).flat();
-        console.log('Units Data', apiData);
         const unitOptions = apiData.map((property) => property.unit_name);
         setUnitOptions(unitOptions);
+        console.log('Units Data', apiData);
         console.log('Unit Options', unitOptions);
       } else {
         console.error('Response data is not an array:', apiData.data);
@@ -292,7 +311,6 @@ const Leases = () => {
       console.error('Error occurred while searching:', error);
     }
   };
-  // end of unitsearch  //
   // search tenants starts here
   const searchTenants = async (query) => {
     try {
@@ -337,106 +355,117 @@ const Leases = () => {
     }
   };
   // ends
-
-  const handlePropertyOptionClick = (property) => {
-    setPropertyInput(property);
-    setUnitInput(''); // Reset unit input value
-    setPropertyOptions([]); // Hide property options
-    setLeaseTypeInput(''); // Reset lease type input value
-
-    const selectedProperty = data.find(
-      (item) => item.property_code === property
-    );
-    if (selectedProperty && selectedProperty.units) {
-      const unitOptions = selectedProperty.units.map((unit) => unit.unit_name);
-      setUnitOptions(unitOptions);
-    } else {
-      setUnitOptions([]);
+  // /submit form to backend
+  async function handleSubmit() {
+    // Validate required fields
+    if (
+      !property_name ||
+      !leaseType ||
+      !rent_amount ||
+      !start_date ||
+      !due_date ||
+      !rent_deposit ||
+      !selectedTenants.length ||
+      !late_fee_name ||
+      !late_fee_value ||
+      !late_fee_type ||
+      !grace_period ||
+      !late_fee_frequency ||
+      !utility_display_name ||
+      !utility_unit_cost ||
+      !utility_base_fee ||
+      !payment_method_name ||
+      !payment_method_description ||
+      !selectedDateLease
+    ) {
+      // Display error message or perform desired action for invalid form
+      alert('Please fill in all required fields.');
+      return;
     }
-  };
-
-  const searchLeaseTypes = async (query) => {
-    // TODO: Implement search function for lease types
-  };
-
-  const handleTenantInputChange = (event) => {
-    // TODO: Implement handling of tenant input change
-  };
-
-  const handleNextClick = () => {
-    if (currentSection === 'lease') {
-      setCurrentSection('deposit');
-    } else if (currentSection === 'deposit') {
-      setCurrentSection('tenant');
-    } else if (currentSection === 'tenant') {
-      setCurrentSection('latefees');
-    } else if (currentSection === 'latefees') {
-      setCurrentSection('utility');
-    }
-  };
-
-  const handleBackClick = () => {
-    if (currentSection === 'deposit') {
-      setCurrentSection('lease');
-    } else if (currentSection === 'tenant') {
-      setCurrentSection('deposit');
-    } else if (currentSection === 'latefees') {
-      setCurrentSection('tenant');
-    } else if (currentSection === 'utility') {
-      setCurrentSection('latefees');
-    }
-  };
-
-  useEffect(() => {
-    // Perform any necessary initialization or side effects here
-  }, []);
-  // handle form submit here
-  const handleSubmit = async () => {
+  
+    // All required fields are filled, proceed with logging the form data
+    console.log('Form Data:', {
+      data,
+      property_name,
+      showOptions,
+      unit_name,
+      leaseType,
+      rent_amount,
+      start_date,
+      due_date,
+      currentSection,
+      rent_deposit,
+      utility_name,
+      deposit_amount,
+      searchQuery,
+      selectedTenants,
+      extra_charge_type,
+      extra_charge_Value,
+      property_id,
+      extra_charge_frequency,
+      late_fee_name,
+      late_fee_value,
+      late_fee_type,
+      grace_period,
+      late_fee_frequency,
+      utility_display_name,
+      utility_unit_cost,
+      utility_base_fee,
+      payment_method_name,
+      payment_method_description,
+      selectedDateLease,
+      nextPeriodBilling,
+      waivePenalty,
+      skipStartingPeriod,
+    });
+  
     try {
       const cookies = parseCookies();
       const tokenFromCookie = cookies.access_token;
-
+  
       // Set the request headers
       const headers = {
         Authorization: `Bearer ${tokenFromCookie}`,
         'Content-Type': 'application/json',
       };
-
+  
+      // Prepare the data to be submitted
       const formData = {
-        // Your formData properties here
-
+        data,
         property_name,
+        showOptions,
         unit_name,
-        unit_mode,
-        utility_name,
+        leaseType,
         rent_amount,
         start_date,
         due_date,
-        selectedDateLease,
-        searchResults,
-        propertyOptions,
-        unitOptions,
-        tenantOptions,
         currentSection,
-        selectedTenants,
         rent_deposit,
-        extra_charge_name,
+        utility_name,
+        deposit_amount,
+        searchQuery,
+        selectedTenants,
+        extra_charge_type,
+        extra_charge_Value,
+        property_id,
+        extra_charge_frequency,
+        late_fee_name,
+        late_fee_value,
         late_fee_type,
+        grace_period,
         late_fee_frequency,
         utility_display_name,
         utility_unit_cost,
         utility_base_fee,
         payment_method_name,
         payment_method_description,
-        late_fee_value,
-        deposit_amount,
-        extra_charge_value,
-        extra_charge_type,
-        extra_charge_frequency,
-        late_fee_name,
-        grace_period,
+        selectedDateLease,
+        nextPeriodBilling,
+        waivePenalty,
+        skipStartingPeriod,
       };
-
+  
+      // Submit the form data to the endpoint
       const response = await axios.post(
         'https://cloudagent.co.ke/backend/api/v1/leases',
         formData,
@@ -444,44 +473,24 @@ const Leases = () => {
           headers, // Include the headers in the request
         }
       );
-      console.log('Data sent:', formData);
-      if (response.status === 200) {
-        alert('Form submitted successfully'); // Display an alert on success
-        // Handle the successful response
-      } else {
-        console.error('Failed to submit form');
-        // Handle the error response
-      }
+  
+      // Handle successful submission
+      alert('Data submitted successfully');
+      console.log('Submitted Data:', response.data);
     } catch (error) {
-      console.error('Error occurred while submitting form:', error);
+      // Handle error
+      console.error('Error submitting data:', error);
+      alert('Error submitting data. Please try again.');
     }
-      // Reset form fields
-  setPropertyInput('');
-  setUnitInput('');
-  setLeaseTypeInput('');
-  setUtilityName('');
- 
-  setStartDate(null);
-  setSelectedDate('');
-  setselectedDateLease('');
-  setSearchResults([]);
-  setPropertyOptions([]);
-  setUnitOptions([]);
-  setTenantOptions([]);
-  setCurrentSection('lease');
-  setSelectedTenants([]);
-  
-  setLateFeeType('');
- 
-  
-  setGracePeriod(0);
-  };
+  }
+  // end
 
   return (
     <>
       {currentSection === 'lease' && (
         <div className="lease-section">
           <div className="row">
+            <h3>Lease Info</h3>
             <div className="col-lg-4">
               <div className="my_profile_setting_input ui_kit_select_search form-group">
                 <label htmlFor="PropertyName">Property Name</label>
@@ -489,11 +498,11 @@ const Leases = () => {
                   type="text"
                   value={property_name}
                   onChange={handlePropertyInputChange}
-                  onClick={() => setPropertyOptions([])} // Clear property options on click
+                  onClick={() => setShowOptions(true)}
                   placeholder="Find property by Name"
                   className="selectpicker form-select"
                 />
-                {propertyOptions.length > 0 && (
+                {showOptions && propertyOptions.length > 0 && (
                   <ul className="autocomplete-options">
                     {propertyOptions.map((option, index) => (
                       <li
@@ -507,7 +516,7 @@ const Leases = () => {
                 )}
               </div>
             </div>
-
+            {/* Search unit */}
             <div className="col-lg-4">
               <div className="my_profile_setting_input ui_kit_select_search form-group">
                 <label htmlFor="unitname">Unit Name</label>
@@ -515,15 +524,14 @@ const Leases = () => {
                   type="text"
                   value={unit_name}
                   onChange={handleUnitInputChange}
-                  onClick={handleUnitInputClick}
-                  placeholder=" unit search"
+                  placeholder="Find Unit ..."
                   className="selectpicker form-select"
                 />
                 {unitOptions.length > 0 && (
                   <ul className="autocomplete-options">
                     {unitOptions.map((option, index) => (
                       <li
-                        key={index} // Assign a unique key
+                        key={index}
                         onClick={() => handleUnitOptionClick(option)}
                       >
                         {option}
@@ -533,12 +541,11 @@ const Leases = () => {
                 )}
               </div>
             </div>
-
             <div className="col-lg-4 col-xl-0">
               <div className="my_profile_setting_input form-group">
                 <label htmlFor="LEASE">Lease Type</label>
                 <select
-                  value={unit_mode}
+                  value={leaseType}
                   onChange={handleLeaseTypeInputChange}
                   placeholder="Enter lease type search"
                   className="selectpicker form-select"
@@ -551,10 +558,8 @@ const Leases = () => {
                 </select>
               </div>
             </div>
-
-            <div className="col-lg-4 ">
+            <div className="col-lg-4">
               <div className="my_profile_setting_input form-group">
-                <label htmlFor="agent_commission_value">Rent Amount</label>
                 <div className="input-group">
                   <input
                     type="number"
@@ -562,28 +567,11 @@ const Leases = () => {
                     id="totalentAmount"
                     placeholder="Rent Amount"
                     value={rent_amount}
-                    onChange={handletotalrentAmount}
+                    onChange={handleRentAmountChange}
                   />
-                  <div className="input-group-append">
-                    <button
-                      className="btn btn-outline-secondary"
-                      type="button"
-                      onClick={() => settotalrentAmount(rent_amount + 1)}
-                    >
-                      <IoIosArrowUp />
-                    </button>
-                    <button
-                      className="btn btn-outline-secondary"
-                      type="button"
-                      onClick={() => settotalrentAmount(rent_amount - 1)}
-                    >
-                      <IoIosArrowDown />
-                    </button>
-                  </div>
                 </div>
               </div>
             </div>
-
             <div className="col-lg-4 col-xl-0">
               <div className="my_profile_setting_input form-group">
                 <label htmlFor="dateOfBirth">Start Date</label>
@@ -593,11 +581,10 @@ const Leases = () => {
                   id="start_date"
                   placeholder="Start date"
                   value={start_date}
-                  onChange={(e) => setStartDate(e.target.value)}
+                  onChange={handleStartDateChange}
                 />
               </div>
             </div>
-
             <div className="col-lg-4">
               <div className="my_profile_setting_input ui_kit_select_search form-group">
                 <label htmlFor="dueonmonthday">Due on (Day of the Month)</label>
@@ -617,16 +604,16 @@ const Leases = () => {
                 </select>
               </div>
             </div>
-          </div>
-          <div className="row">
-            <div className="col-xl-12">
-              <div className="my_profile_setting_input">
-                <button
-                  className="btn btn2 float-end"
-                  onClick={handleNextClick}
-                >
-                  Next
-                </button>
+            <div className="row">
+              <div className="col-xl-12">
+                <div className="my_profile_setting_input">
+                  <button
+                    className="btn btn2 float-end"
+                    onClick={handleNextClick}
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -635,6 +622,7 @@ const Leases = () => {
 
       {currentSection === 'deposit' && (
         <div className="deposit-section">
+          <h1>Deposit</h1>
           <div className="row">
             <div className="col-lg-12">
               <div className="my_profile_setting_input ui_kit_select_search form-group">
@@ -668,37 +656,42 @@ const Leases = () => {
             </div>
             <div className="col-lg-6">
               <div className="my_profile_setting_input ui_kit_select_search form-group">
-                <label htmlFor="PropertyName">Deposit Amount</label>
-                <div className="input-group">
-                  <input
-                    type="number"
-                    className="form-control"
-                    id="deposit_amount"
-                    placeholder="Rent Amount"
-                    value={deposit_amount}
-                    onChange={handledepositAmount}
-                  />
-                  <div className="input-group-append">
-                    <button
-                      className="btn btn-outline-secondary"
-                      type="button"
-                      onClick={() => setDepositAmount(deposit_amount + 1)}
-                    >
-                      <IoIosArrowUp />
-                    </button>
-                    <button
-                      className="btn btn-outline-secondary"
-                      type="button"
-                      onClick={() => setDepositAmount(deposit_amount - 1)}
-                    >
-                      <IoIosArrowDown />
-                    </button>
-                  </div>
-                </div>
+                <label htmlFor="PropertyName">Rent Deposit Amount</label>
+                <input
+                  type="number"
+                  placeholder="Deposit Amount"
+                  className="form-control"
+                  value={deposit_amount}
+                  onChange={handleChangeDepositAmount}
+                />
               </div>
             </div>
-          </div>
-          <div className="row">
+            <h2 className="text-danger">Tenants Name</h2>
+            <div className="col-lg-12">
+              <div className="my_profile_setting_input ui_kit_select_search form-group">
+                <input
+                  type="text"
+                  placeholder="Find Tenants Name"
+                  className="selectpicker form-select"
+                  value={searchQuery}
+                  onChange={handleSearchInputChange}
+                />
+              </div>
+              {searchResults.length > 0 && (
+                <ul className="autocomplete-options">
+                  {searchResults.map((tenant, index) => (
+                    <li key={index} onClick={() => handleTenantSelect(tenant)}>
+                      <input
+                        type="checkbox"
+                        checked={selectedTenants.includes(tenant)}
+                        onChange={() => handleCheckboxChange(tenant)}
+                      />
+                      {tenant.first_name} {tenant.middle_name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
             <div className="col-xl-12">
               <div className="my_profile_setting_input">
                 <button
@@ -719,131 +712,48 @@ const Leases = () => {
         </div>
       )}
 
-      {currentSection === 'tenant' && (
-        <div className="tenant-section">
+      {currentSection === 'extra' && (
+        <div className="Extra-Charge-section">
           <div className="row">
-            <h2>Tenants Name</h2>
-            <div className="col-lg-12">
-              <div className="my_profile_setting_input ui_kit_select_search form-group">
-                <input
-                  type="text"
-                  placeholder="Search Tenant Name"
-                  className="selectpicker form-select"
-                  value={first_name}
-                  onChange={handleSearchInputChange}
-                />
-              </div>
-              {searchResults.length > 0 && (
-                <ul className="autocomplete-options">
-                  {searchResults.map((tenant, index) => (
-                    <li key={index} onClick={() => handleTenantSelect(tenant)}>
-                      <input
-                        type="checkbox"
-                        checked={selectedTenants.includes(tenant)}
-                        onChange={() => handleCheckboxChange(tenant)}
-                      />
-                      {tenant.first_name} {tenant.middle_name}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-            <div className="col-lg-12">
-              {selectedTenants.length > 0 && (
-                <div className="my_profile_setting_input">
-                  <label>Selected Tenants:</label>
-                  <ul>
-                    {selectedTenants.map((tenant, index) => (
-                      <li key={index}>
-                        {tenant.first_name} {tenant.middle_name}
-                        <div className="my_profile_setting_input">
-                          <button
-                            className="remove-tenant-btn btn btn1 "
-                            onClick={() => handleRemoveTenant(index)}
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              {selectedTenants.length > 0 && (
-                <div className="my_profile_setting_input form-group">
-                  <input
-                    type="text"
-                    placeholder="Enter selected tenants"
-                    className="selectpicker form-select"
-                    value={selectedTenants
-                      .map(
-                        (tenant) => `${tenant.first_name} ${tenant.middle_name}`
-                      )
-                      .join(', ')}
-                    readOnly
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-          <hr />
-          <div className="row">
-            <h1>Extra Charges</h1>
+            {/* <div className="col-xl-12"> */}
             <div className="col-lg-3 col-xl-0">
               <div className="my_profile_setting_input form-group">
-                <label htmlFor="Extra Charges Name">Extra Charges Name</label>
+                <label htmlFor="Exchange Charge Type">Extra Charge Name</label>
                 <select
-                  value={extra_charge_name}
-                  onChange={handleLeaseTypeInputChanges}
+                  value={extra_charge_type}
+                  onChange={handleLeaseTypeInputChange1}
                   placeholder="Enter lease type search"
                   className="selectpicker form-select"
                 >
                   <option value="" disabled selected>
-                    Extra Charges Name
+                    Extra Charge Type
                   </option>
-                  <option value="VAT">VAT</option>
-                  <option value="Service Fee">Service Fee</option>
-                  <option value="Proccessing Fee">Proccessing Fee</option>
+                  <option value="Fixed">Fixed</option>
+                  <option value="% of Total Rent">% of Total Rent</option>
+                  <option value="% of Total Amunt Over Due">
+                    % of Total Amunt Over Due
+                  </option>
                 </select>
               </div>
             </div>
-            <div className="col-lg-3 ">
-              <div className="my_profile_setting_input form-group">
-                <label htmlFor="Extra Charge Value">Extra Charge Value</label>
-                <div className="input-group">
-                  <input
-                    type="number"
-                    className="form-control"
-                    id="extra_charge_value"
-                    placeholder="Rent Amount"
-                    value={extra_charge_value}
-                    onChange={handleRentAmount1}
-                  />
-                  <div className="input-group-append">
-                    <button
-                      className="btn btn-outline-secondary"
-                      type="button"
-                      onClick={() => setRentAmount1(extra_charge_value + 1)}
-                    >
-                      <IoIosArrowUp />
-                    </button>
-                    <button
-                      className="btn btn-outline-secondary"
-                      type="button"
-                      onClick={() => setRentAmount1(extra_charge_value - 1)}
-                    >
-                      <IoIosArrowDown />
-                    </button>
-                  </div>
-                </div>
+            <div className="col-lg-3">
+              <div className="my_profile_setting_input ui_kit_select_search form-group">
+                <label htmlFor="PropertyName">extra_charge_Value</label>
+                <input
+                  type="number"
+                  placeholder="extra_charge_Value"
+                  className="form-control"
+                  value={extra_charge_Value}
+                  onChange={handleChangeExtraChargeValue}
+                />
               </div>
             </div>
             <div className="col-lg-3 col-xl-0">
               <div className="my_profile_setting_input form-group">
                 <label htmlFor="Exchange Charge Type">Extra Charge Type</label>
                 <select
-                  value={extra_charge_type}
-                  onChange={handleLeaseTypeInputChange1}
+                  value={property_id}
+                  onChange={handleLeaseTypeInputChange11}
                   placeholder="Enter lease type search"
                   className="selectpicker form-select"
                 >
@@ -876,40 +786,13 @@ const Leases = () => {
               </div>
             </div>
             <hr />
-            <hr />
-          </div>
-          <div className="row">
-            <div className="col-xl-12">
-              <div className="my_profile_setting_input">
-                <button
-                  className="btn btn1 float-start"
-                  onClick={handleBackClick}
-                >
-                  Back
-                </button>
-                <button
-                  className="btn btn2 float-end"
-                  onClick={handleNextClick}
-                >
-                  Next
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/*  */}
-      {currentSection === 'latefees' && (
-        <div className="latefees-section">
-          <h2 className="text-center text-danger">Late Fees</h2>
-          <div className="row">
-            <div className="col-lg-12">
+            <h2 className="text-center text-danger">Late Fees</h2>
+            <div className="col-lg-3">
               <div className="my_profile_setting_input ui_kit_select_search form-group">
                 <label htmlFor="lateFeeName">Late Fee Name</label>
                 <select
                   value={late_fee_name}
-                  onChange={handleLeaseTypeInputChange3}
+                  onChange={handleLateFeeName}
                   placeholder="Late Fee Name"
                   className="selectpicker form-select"
                 >
@@ -920,43 +803,24 @@ const Leases = () => {
                 </select>
               </div>
             </div>
-            <div className="col-lg-6">
+            <div className="col-lg-3">
               <div className="my_profile_setting_input ui_kit_select_search form-group">
-                <label htmlFor="lateFeeCharges">Late Fee Value</label>
-                <div className="input-group">
-                  <input
-                    type="number"
-                    className="form-control"
-                    id="late_fee_value"
-                    placeholder="Late Fee"
-                    value={lateFeeFields.late_fee_value}
-                    onClick={handleChange}
-                  />
-                  <div className="input-group-append">
-                    <button
-                      className="btn btn-outline-secondary"
-                      type="button"
-                      onClick={() => setLateFeeFields(lateFeeFields.late_fee_value + 1)}
-                    >
-                      <IoIosArrowUp />
-                    </button>
-                    <button
-                      className="btn btn-outline-secondary"
-                      type="button"
-                      onClick={() => setLateFeeFields(lateFeeFields.late_fee_value - 1)}
-                    >
-                      <IoIosArrowDown />
-                    </button>
-                  </div>
-                </div>
+                <label htmlFor="PropertyName">late_fee_value </label>
+                <input
+                  type="number"
+                  placeholder="late_fee_value "
+                  className="form-control"
+                  value={late_fee_value}
+                  onChange={handleChangeLatefeeValue}
+                />
               </div>
             </div>
-            <div className="col-lg-6">
+            <div className="col-lg-3">
               <div className="my_profile_setting_input ui_kit_select_search form-group">
                 <label htmlFor="late_fee_type">Late Fee Type</label>
                 <select
-                  value={lateFeeFields.late_fee_type}
-                  onChange={handleChange}
+                  value={late_fee_type}
+                  onChange={handleChangeLateFeeType}
                   placeholder="Enter late fee type search"
                   className="selectpicker form-select"
                 >
@@ -970,46 +834,25 @@ const Leases = () => {
                   </option>
                 </select>
               </div>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-lg-6">
+            </div>{' '}
+            <div className="col-lg-3">
               <div className="my_profile_setting_input ui_kit_select_search form-group">
-                <label htmlFor="grace_period">Grace Period</label>
-                <div className="input-group">
-                  <input
-                    type="number"
-                    className="form-control"
-                    id="grace_period"
-                    placeholder="Rent Amount"
-                    value={lateFeeFields.grace_period}
-                    onChange={handleChange}
-                  />
-                  <div className="input-group-append">
-                    <button
-                      className="btn btn-outline-secondary"
-                      type="button"
-                      onClick={() =>  setLateFeeFields(lateFeeFields.grace_period + 1)}
-                    >
-                      <IoIosArrowUp />
-                    </button>
-                    <button
-                      className="btn btn-outline-secondary"
-                      type="button"
-                      onClick={() =>  setLateFeeFields(lateFeeFields.grace_period - 1)}
-                    >
-                      <IoIosArrowDown />
-                    </button>
-                  </div>
-                </div>
+                <label htmlFor="PropertyName">Grace Period </label>
+                <input
+                  type="number"
+                  placeholder="Grace Period "
+                  className="form-control"
+                  value={grace_period}
+                  onChange={handleChangeGracePeriod}
+                />
               </div>
             </div>
-            <div className="col-lg-6">
+            <div className="col-lg-12">
               <div className="my_profile_setting_input ui_kit_select_search form-group">
                 <label htmlFor="frequency">Frequency</label>
                 <select
-                  value={lateFeeFields.late_fee_frequency}
-                  onChange={handleChange}
+                  value={late_fee_frequency}
+                  onChange={handleChangeLateFeeFrequency}
                   placeholder="Enter frequency search"
                   className="selectpicker form-select"
                 >
@@ -1024,223 +867,190 @@ const Leases = () => {
                 </select>
               </div>
             </div>
-          </div>
-          <div className="row">
-            <div className="col-xl-12">
-              <div className="my_profile_setting_input">
-                <button
-                  className="btn btn1 float-start"
-                  onClick={handleBackClick}
-                >
-                  Back
-                </button>
-                <button
-                  className="btn btn2 float-end"
-                  onClick={handleNextClick}
-                >
-                  Next
-                </button>
-              </div>
+            <div className="my_profile_setting_input">
+              <button
+                className="btn btn1 float-start"
+                onClick={handleBackClick}
+              >
+                Back
+              </button>
+              <button className="btn btn2 float-end" onClick={handleNextClick}>
+                Next
+              </button>
             </div>
+            {/* </div> */}
           </div>
         </div>
       )}
-      {currentSection === 'utility' && (
-        <div className="utility-section">
-          {/* Utility Name */}
-          <div className="row">
-            <div className="col-lg-12">
-              <div className="my_profile_setting_input ui_kit_select_search form-group">
-                <label htmlFor="utility_display_name">Utility Name</label>
-                <select
-                  value={utility_display_name}
-                  onChange={(e) => setUtilityName(e.target.value)}
-                  placeholder="Enter utility name"
-                  className="selectpicker form-select"
-                >
-                  <option value="" disabled selected>
-                    Utility Name
-                  </option>
-                  <option value="Electricity">Electricity</option>
-                  <option value="Water">Water</option>
-                  <option value="Garbage">Garbage</option>
-                </select>
-              </div>
-            </div>
-          </div>
 
-          {/* Cost */}
-          <div className="row">
-            <div className="col-lg-6">
-              <div className="my_profile_setting_input ui_kit_select_search form-group">
-                <label htmlFor="cost">Cost</label>
-                <input
-                  type="number"
-                  value={utility_unit_cost}
-                  onChange={(e) => setCost(e.target.value)}
-                  placeholder="utility_unit_cost"
-                  className="form-control"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Base Fee */}
-          <div className="row">
-            <div className="col-lg-6">
-              <div className="my_profile_setting_input ui_kit_select_search form-group">
-                <label htmlFor="utility_base_fee">Base Fee</label>
-                <div className="input-group">
-                  <input
-                    type="number"
-                    className="form-control"
-                    id="utility_base_fee"
-                    placeholder="Base Fee Amount"
-                    value={utility_base_fee}
-                    onChange={(e) => setBaseFee(e.target.value)}
-                  />
-                  <div className="input-group-append">
-                    <button
-                      className="btn btn-outline-secondary"
-                      type="button"
-                      onClick={() => setBaseFee(utility_base_fee + 1)}
-                    >
-                      <IoIosArrowUp />
-                    </button>
-                    <button
-                      className="btn btn-outline-secondary"
-                      type="button"
-                      onClick={() => setBaseFee(utility_base_fee - 1)}
-                    >
-                      <IoIosArrowDown />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Payment Method */}
-
-            <div className="col-lg-6">
-              <div className="my_profile_setting_input ui_kit_select_search form-group">
-                <label htmlFor="payment_method_name">Payment Method</label>
-                <select
-                  value={payment_method_name}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                  placeholder="Enter payment method"
-                  className="selectpicker form-select"
-                >
-                  <option value="" disabled selected>
-                    Payment Method
-                  </option>
-                  <option value="Cash">Cash</option>
-                  <option value="Mpesa">Mpesa</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Payment Description */}
-
-          <div className="col-lg-6">
-            <div className="my_profile_setting_input ui_kit_select_search form-group">
-              <label htmlFor="payment_method_description">
-                Payment Description
-              </label>
-              <input
-                type="text"
-                value={payment_method_description}
-                onChange={(e) => setPaymentDescription(e.target.value)}
-                placeholder="Payment Description"
-                className="form-control"
-              />
-            </div>
-          </div>
-
-          <hr />
-          <div className="lease-settings-section">
-            <h2 className=" text-danger">Lease Settings</h2>
+      {currentSection === 'latefees' && (
+        <div className="latefees-section">
+          {/* Render Late Fees Section */}{' '}
+          <div className="col-lg-12">
             <div className="row">
-              <div className="col-lg-12">
+              <div className="col-lg-3">
                 <div className="my_profile_setting_input ui_kit_select_search form-group">
-                  <label htmlFor="leaseDays">Lease Days</label>
+                  <label htmlFor="utility_display_name">Utility Name</label>
                   <select
-                    value={selectedDateLease}
-                    onChange={handleDateChangeLease}
+                    value={utility_display_name}
+                    onChange={(e) => setUtilityDisplayName(e.target.value)}
+                    placeholder="Enter utility name"
                     className="selectpicker form-select"
                   >
-                    <option value="" disabled>
-                      Select a day
+                    <option value="" disabled selected>
+                      Utility Name
                     </option>
-                    {generateDaysArray().map((day) => (
-                      <option key={day} value={day}>
-                        {day}
-                      </option>
-                    ))}
+                    <option value="Electricity">Electricity</option>
+                    <option value="Water">Water</option>
+                    <option value="Garbage">Garbage</option>
                   </select>
                 </div>
               </div>
-            </div>
-            <div className="row">
-              <div className="col-lg-12">
-                <div className="my_profile_setting_input form-group">
-                  <label htmlFor="billingPeriod">Billing Period</label>
-                  <div className="form-check">
-                    <input
-                      type="checkbox"
-                      className="form-check-input"
-                      id="nextPeriodBilling"
-                    />
-                    <label
-                      className="form-check-label"
-                      htmlFor="nextPeriodBilling"
+              <div className="col-lg-3">
+                <div className="my_profile_setting_input ui_kit_select_search form-group">
+                  <label htmlFor="UtilityName">utility unit cost </label>
+                  <input
+                    type="number"
+                    placeholder="Unit cost "
+                    className="form-control"
+                    value={utility_unit_cost}
+                    onChange={handleChangeUnitCost}
+                  />
+                </div>
+              </div>
+              <div className="col-lg-3">
+                <div className="my_profile_setting_input ui_kit_select_search form-group">
+                  <label htmlFor="UtilityName">Base Fee</label>
+                  <input
+                    type="number"
+                    placeholder="Base Fee "
+                    className="form-control"
+                    value={utility_base_fee}
+                    onChange={handleChangeBaseFee}
+                  />
+                </div>
+              </div>
+              <hr />
+              <h3>Payments Methods</h3>
+              <div className="col-lg-6">
+                <div className="my_profile_setting_input ui_kit_select_search form-group">
+                  <label htmlFor="payment_method_name">Payment Method</label>
+                  <select
+                    value={payment_method_name}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    placeholder="Enter payment method"
+                    className="selectpicker form-select"
+                  >
+                    <option value="" disabled selected>
+                      Payment Method
+                    </option>
+                    <option value="Cash">Cash</option>
+                    <option value="Mpesa">Mpesa</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Payment Description */}
+
+              <div className="col-lg-6">
+                <div className="my_profile_setting_input ui_kit_select_search form-group">
+                  <label htmlFor="payment_method_description">
+                    Payment Description
+                  </label>
+                  <input
+                    type="text"
+                    value={payment_method_description}
+                    onChange={(e) => setPaymentDescription(e.target.value)}
+                    placeholder="Payment Description"
+                    className="form-control"
+                  />
+                </div>
+              </div>
+
+              <hr />
+              <h2 className=" text-danger">Lease Settings</h2>
+              <div className="row">
+                <div className="col-lg-12">
+                  <div className="my_profile_setting_input ui_kit_select_search form-group">
+                    <label htmlFor="leaseDays">Lease Days</label>
+                    <select
+                      value={selectedDateLease}
+                      onChange={handleDateChangeLease}
+                      className="selectpicker form-select"
                     >
-                      Next Period Billing (When billing, invoice period is set
-                      as next month.)
-                    </label>
+                      <option value="" disabled>
+                        Select a day
+                      </option>
+                      {generateDaysArray().map((day) => (
+                        <option key={day} value={day}>
+                          {day}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="row">
-              <div className="col-lg-12">
-                <div className="my_profile_setting_input form-group">
-                  <div className="form-check">
-                    <input
-                      type="checkbox"
-                      className="form-check-input"
-                      id="waivePenalty"
-                    />
-                    <label className="form-check-label" htmlFor="waivePenalty">
-                      Waive Penalty (For this lease, do not charge penalties.)
-                    </label>
+              <div className="row">
+                <div className="col-lg-12">
+                  <div className="my_profile_setting_input form-group">
+                    <label htmlFor="billingPeriod">Billing Period</label>
+                    <div className="form-check">
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id="nextPeriodBilling"
+                      />
+                      <label
+                        className="form-check-label"
+                        htmlFor="nextPeriodBilling"
+                      >
+                        Next Period Billing (When billing, invoice period is set
+                        as next month.)
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="row">
-              <div className="col-lg-12">
-                <div className="my_profile_setting_input form-group">
-                  <div className="form-check">
-                    <input
-                      type="checkbox"
-                      className="form-check-input"
-                      id="skipStartingPeriod"
-                    />
-                    <label
-                      className="form-check-label"
-                      htmlFor="skipStartingPeriod"
-                    >
-                      Skip Starting Period (For this lease, do not bill the
-                      first period.)
-                    </label>
+              <div className="row">
+                <div className="col-lg-12">
+                  <div className="my_profile_setting_input form-group">
+                    <div className="form-check">
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id="waivePenalty"
+                      />
+                      <label
+                        className="form-check-label"
+                        htmlFor="waivePenalty"
+                      >
+                        Waive Penalty (For this lease, do not charge penalties.)
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-xl-12">
+              <div className="row">
+                <div className="col-lg-12">
+                  <div className="my_profile_setting_input form-group">
+                    <div className="form-check">
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id="skipStartingPeriod"
+                      />
+                      <label
+                        className="form-check-label"
+                        htmlFor="skipStartingPeriod"
+                      >
+                        Skip Starting Period (For this lease, do not bill the
+                        first period.)
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="my_profile_setting_input">
                 <button
                   className="btn btn1 float-start"
