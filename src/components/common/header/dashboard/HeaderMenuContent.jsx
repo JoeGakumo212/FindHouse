@@ -476,7 +476,7 @@ const HeaderMenuContent = ({ float = "" }) => {
               src="/assets/images/team/e1.png"
               alt="e1.png"
             />
-            {session ? `${session.user.name},`: ''}<span className="dn-1199 ms-1">Ali Tufan</span>
+            {session ? `${session.user.name},`: ''}<span className="dn-1199 ms-1">Jose Gakumo</span>
           </a>
           <div className="dropdown-menu">
             <MyAccount />

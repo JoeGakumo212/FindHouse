@@ -18,7 +18,7 @@ const FeatureProperties = () => {
         console.log('am here', tokenFromCookie);
         // Perform request to the API using the obtained token
         const apiResponse = await fetch(
-          'https://cloudagent.co.ke/backend/api/v1/properties?filter=&page=0&limit=0&sortField=updated_at&sortDirection=desc&whereField=&whereValue=',
+          'https://cloudagent.co.ke/backend/api/v1/properties?filter=&page=0&limit=90000000000000000000000000000000000&sortField=updated_at&sortDirection=desc&whereField=&whereValue=',
           {
             headers: {
               Authorization: `Bearer ${tokenFromCookie}`,
@@ -41,11 +41,13 @@ const FeatureProperties = () => {
   }, []);
 
   const settings = {
-    dots: true,
+    dots: false,
     infinite: true,
     speed: 500,
     slidesToShow: data.length < 1 ? data.length : 1,
     slidesToScroll: data.length < 1 ? 1 : 1,
+    autoplay: true,
+    autoplaySpeed: 5000,
   };
 
   return (
@@ -54,6 +56,9 @@ const FeatureProperties = () => {
         {data.map((item) => (
           <div className="item" key={item.id}>
             <div className="feat_property home3">
+
+            <Link href={`/listing-details-v1/${item.id}`}>
+                    <a className="fp_price">
               <div className="thumb">
                 <img
                   className="img-whp"
@@ -62,8 +67,6 @@ const FeatureProperties = () => {
                 />
                 <div className="thmb_cntnt">
                  
-                  <Link href={`/listing-details-v1/${item.id}`}>
-                    <a className="fp_price">
                       <div>
                         <ul>
                           {item.vacant_units &&
@@ -74,7 +77,7 @@ const FeatureProperties = () => {
                                 )
                               ),
                             ].map((price) => (
-                              <li className="list-inline-item mt-3" key={price}>
+                              <li className="list-inline-item mt-3 text-light" key={price}>
                                 {price} <small>/mo</small>
                                
                               </li>
@@ -88,13 +91,15 @@ const FeatureProperties = () => {
                     </ul>
                       </div>
                       
-                    </a>
-                  </Link>
+                    
                 
-                </div>                
+                </div>   
+                             
               </div>
-
+              </a>
+                  </Link>
             </div>
+            
           </div>
         ))}
       </Slider>

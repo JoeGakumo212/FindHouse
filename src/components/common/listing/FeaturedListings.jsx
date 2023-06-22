@@ -16,7 +16,7 @@ const FeaturedListings = () => {
         console.log('am here', tokenFromCookie);
         // Perform request to the API using the obtained token
         const apiResponse = await fetch(
-          'https://cloudagent.co.ke/backend/api/v1/properties?filter=&page=0&limit=0&sortField=updated_at&sortDirection=desc&whereField=&whereValue=',
+          'https://cloudagent.co.ke/backend/api/v1/properties?filter=&page=0&limit=900000000000000000000000000000000000000&sortField=updated_at&sortDirection=desc&whereField=&whereValue=',
           {
             headers: {
               Authorization: `Bearer ${tokenFromCookie}`,

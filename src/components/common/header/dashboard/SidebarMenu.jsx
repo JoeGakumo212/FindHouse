@@ -224,6 +224,20 @@ const SidebarMenu = () => {
             </li>
             <li
               className={`treeview ${
+                isSinglePageActive("/Vacants", route.pathname)
+                  ? "active"
+                  : ""
+              }`}
+            >
+              <Link href="/Vacants">
+                <a>
+                  <i className="flaticon-magnifying-glass"></i>
+                  <span> Vacants</span>
+                </a>
+              </Link>
+            </li>
+            <li
+              className={`treeview ${
                 isSinglePageActive("/my-saved-search", route.pathname)
                   ? "active"
                   : ""

@@ -5,6 +5,7 @@ import { parseCookies } from 'nookies';
 const Leases = () => {
   const [data, setData] = useState([]);
   const [property_name, setPropertyName] = useState([]);
+    const [property_location, setPropertyLocation] = useState('');
   const [propertyOptions, setPropertyOptions] = useState([]);
   const [showOptions, setShowOptions] = useState(false);
   const [unit_name, setUnitName] = useState([]);
@@ -382,7 +383,7 @@ const Leases = () => {
       alert('Please fill in all required fields.');
       return;
     }
-  
+
     // All required fields are filled, proceed with logging the form data
     console.log('Form Data:', {
       data,
@@ -418,17 +419,17 @@ const Leases = () => {
       waivePenalty,
       skipStartingPeriod,
     });
-  
+
     try {
       const cookies = parseCookies();
       const tokenFromCookie = cookies.access_token;
-  
+
       // Set the request headers
       const headers = {
         Authorization: `Bearer ${tokenFromCookie}`,
         'Content-Type': 'application/json',
       };
-  
+
       // Prepare the data to be submitted
       const formData = {
         data,
@@ -464,7 +465,7 @@ const Leases = () => {
         waivePenalty,
         skipStartingPeriod,
       };
-  
+
       // Submit the form data to the endpoint
       const response = await axios.post(
         'https://cloudagent.co.ke/backend/api/v1/leases',
@@ -473,7 +474,7 @@ const Leases = () => {
           headers, // Include the headers in the request
         }
       );
-  
+
       // Handle successful submission
       alert('Data submitted successfully');
       console.log('Submitted Data:', response.data);
@@ -496,7 +497,7 @@ const Leases = () => {
                 <label htmlFor="PropertyName">Property Name</label>
                 <input
                   type="text"
-                  value={property_name}
+                  value={`${property_name} ${property_location}`}
                   onChange={handlePropertyInputChange}
                   onClick={() => setShowOptions(true)}
                   placeholder="Find property by Name"
@@ -560,16 +561,15 @@ const Leases = () => {
             </div>
             <div className="col-lg-4">
               <div className="my_profile_setting_input form-group">
-                <div className="input-group">
-                  <input
-                    type="number"
-                    className="form-control"
-                    id="totalentAmount"
-                    placeholder="Rent Amount"
-                    value={rent_amount}
-                    onChange={handleRentAmountChange}
-                  />
-                </div>
+                <label htmlFor="RentAmount">Rent Amount</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  id="totalentAmount"
+                  placeholder="Rent Amount"
+                  value={rent_amount}
+                  onChange={handleRentAmountChange}
+                />
               </div>
             </div>
             <div className="col-lg-4 col-xl-0">

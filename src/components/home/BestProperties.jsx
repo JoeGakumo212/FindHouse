@@ -18,7 +18,7 @@ const BestProperties = () => {
         
         // Perform request to the API using the obtained token
         const apiResponse = await fetch(
-          'https://cloudagent.co.ke/backend/api/v1/properties?filter=&page=0&limit=0&sortField=updated_at&sortDirection=desc&whereField=&whereValue=',
+          'https://cloudagent.co.ke/backend/api/v1/properties?filter=&page=0&limit=900000000000000000000000000000000&sortField=updated_at&sortDirection=desc&whereField=&whereValue=',
           {
             headers: {
               Authorization: `Bearer ${tokenFromCookie}`,
@@ -46,6 +46,8 @@ const BestProperties = () => {
     speed: 500,
     slidesToShow: data.length < 3 ? data.length : 3,
     slidesToScroll: data.length < 3 ? 1 : 3,
+    autoplay: true,
+    autoplaySpeed: 5000,
   };
 
   return (

@@ -1,11 +1,8 @@
 import Link from 'next/link';
 import Slider from 'react-slick';
-import properties from '../../data/properties';
-// import axios from "axios";
 import { useState, useEffect } from 'react';
-import Cookies from 'js-cookie';
 import { parse } from 'cookie';
-import { sign } from 'jsonwebtoken';
+
 const FeaturedProperties = () => {
   const [data, setData] = useState([]);
   const [accesstoken, setToken] = useState('');
@@ -39,7 +36,7 @@ const FeaturedProperties = () => {
           const tokenFromCookie = cookie.access_token;
 
           const apiResponse = await fetch(
-            'https://cloudagent.co.ke/backend/api/v1/properties?filter=&page=0&limit=0&sortField=updated_at&sortDirection=desc&whereField=&whereValue=',
+            'https://cloudagent.co.ke/backend/api/v1/properties?filter=&page=0&limit=900000000000000000000000000000&sortField=updated_at&sortDirection=desc&whereField=&whereValue=',
             {
               headers: {
                 Authorization: `Bearer ${tokenFromCookie}`,
@@ -49,7 +46,6 @@ const FeaturedProperties = () => {
 
           if (apiResponse.ok) {
             const apiData = await apiResponse.json();
-            
             setData(apiData.data);
           } else {
             // Handle unauthorized or other error cases for the API request
@@ -72,6 +68,7 @@ const FeaturedProperties = () => {
     slidesToShow: data.length < 3 ? data.length : 3,
     slidesToScroll: data.length < 3 ? 1 : 3,
   };
+
   return (
     <>
       <Slider {...settings} arrows={true}>
@@ -119,31 +116,31 @@ const FeaturedProperties = () => {
                   </Link>
                 </div>
               </div>
-            
-            <div className="details">
-              <div className="tc_content">
-                <Link href={`/listing-details-v1/${item.id}`}>
-                  <a className="fp_price">
-                    <div>
-                      <h4 className="text-thm">
-                        {item.property_type?.display_name}
-                      </h4>
-                    </div>
-                  </a>
-                </Link>
-                <h4>
+
+              <div className="details">
+                <div className="tc_content">
                   <Link href={`/listing-details-v1/${item.id}`}>
-                    <div>{item.property_code}</div>
+                    <a className="fp_price">
+                      <div>
+                        <h4 className="text-thm">
+                          {item.property_type?.display_name}
+                        </h4>
+                      </div>
+                    </a>
                   </Link>
-                </h4>
-                <p>
-                  {item.display_name}
-                  {item.property_name}
-                  {item.location}
-                </p>
+                  <h4>
+                    <Link href={`/listing-details-v1/${item.id}`}>
+                      <div>{item.property_code}</div>
+                    </Link>
+                  </h4>
+                  <p>
+                    {item.display_name}
+                    {item.property_name}
+                    {item.location}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
           </div>
         ))}
       </Slider>
