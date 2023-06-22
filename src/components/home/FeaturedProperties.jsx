@@ -67,6 +67,23 @@ const FeaturedProperties = () => {
     speed: 500,
     slidesToShow: data.length < 3 ? data.length : 3,
     slidesToScroll: data.length < 3 ? 1 : 3,
+    responsive: [
+      {
+        breakpoint: 992, // Medium devices (tablets, 768px and up)
+        settings: {
+          slidesToShow: data.length < 2 ? data.length : 2,
+          slidesToScroll: data.length < 2 ? 1 : 2,
+        },
+      },
+      {
+        breakpoint: 576, // Small devices (landscape phones, 576px and up)
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          dots: false,
+        },
+      },
+    ],
   };
 
   return (

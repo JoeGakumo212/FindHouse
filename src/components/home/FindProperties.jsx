@@ -48,6 +48,7 @@ const FindProperties = () => {
     slidesToScroll: data.length < 2 ? 1 : 2,
     autoplay: true,
     autoplaySpeed: 5000,
+    
   };
   return (
     <>
