@@ -5,6 +5,8 @@ import axios from 'axios';
 import { Button, Modal, Form } from 'react-bootstrap';
 import { IoIosArrowUp, IoIosArrowDown } from 'react-icons/io';
 import DetailedInfo from './DetailedInfo';
+import { toast, ToastContainer } from 'react-nextjs-toast';
+
 const CreateList = () => {
   const [landlord_id, setlandlord_id] = useState('');
   const [property_code, setproperty_code] = useState('');
@@ -24,6 +26,8 @@ const CreateList = () => {
   const [extra_charge_value, setextra_charge_value] = useState(0);
   const [extra_charge_type, setextra_charge_type] = useState('');
   const [extra_charge_frequency, setextra_charge_frequency] = useState('');
+
+ 
 
   const handleIncreaseutility_base_fee = () => {
     setutility_base_fee((prevValue) => prevValue + 1);
@@ -148,20 +152,17 @@ const CreateList = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+    // Retrieve the unitFields from state or variable
+    const storedUnitFields = unitFields;
     const propertyDetails = {
       landlord_id,
       property_name,
       property_code,
       property_type_id,
       location,
-      // square_foot,
-      // unit_type_id,
-      // unit_mode,
-      // bed_rooms,
-      // bath_rooms,
-      // total_rooms,
-      // rent_amount,
+      unit_name,
+      unitFields: storedUnitFields,
+
       agent_commission_value,
       agent_commission_type,
       payment_method_id,
@@ -198,18 +199,16 @@ const CreateList = () => {
           createPropertyResponse.data
         );
 
-        // Get the property ID from the response
         const propertyId = createPropertyResponse.data.id;
 
-        // Send data to the units endpoint
-        const unitDetails = {
-          property_id: propertyId,
-          // Add any additional unit details here
-        };
+      const unitDetails = {
+        property_id: propertyId,
+        unitFields, // Include the captured unit fields here
+      };
 
-        const createUnitResponse = await axios.post(
-          'https://cloudagent.co.ke/backend/api/v1/units',
-          unitDetails,
+      const createUnitResponse = await axios.post(
+        'https://cloudagent.co.ke/backend/api/v1/units',
+        unitDetails,
           {
             headers: {
               Authorization: `Bearer ${tokenFromCookie}`,
@@ -219,17 +218,17 @@ const CreateList = () => {
 
         if (createUnitResponse.status === 200) {
           console.log('Unit created successfully:', createUnitResponse.data);
-          // Show success alert message
-          alert('Property Added successfully!');
-          // Clear input fields after successful submission
+          
+          toast.notify('Property and unit added successfully!');
+         
           clearInputFields();
-          // Handle success if needed
+          ded
         } else {
           console.error(
             'Failed to create unit:',
             createUnitResponse.statusText
           );
-          // Handle error if needed
+        
         }
       } else if (createPropertyResponse.status === 422) {
         console.error('Data already exists:', createPropertyResponse.data);
@@ -249,34 +248,6 @@ const CreateList = () => {
     }
   };
 
-  const handleReset = () => {
-    setlandlord_id('');
-    setproperty_code('');
-    setproperty_type_id('');
-    setlocation('');
-    setproperty_name('');
-    setUnitFields('');
-    setunit_name('');
-    setFloorUnit(0);
-    setunit_type_id('');
-    setPropertyType('');
-    setrentAmount(0);
-    setBedRooms(0);
-    setBathRooms(0);
-    setTotalRooms(0);
-    setSquareFoot(0);
-    setagent_commission_value(0);
-    setagent_commission_type('');
-    setpayment_method_id('');
-    setpayment_method_description('');
-    setutility_id('');
-    setutility_unit_cost('');
-    setutility_base_fee('');
-    setextra_charge_id('');
-    setextra_charge_value('');
-    setextra_charge_type('');
-    setextra_charge_frequency('');
-  };
 
   return (
     <>
@@ -295,6 +266,8 @@ const CreateList = () => {
               />
             </div>
           </div>
+         
+          {/* end */}
           <div className="col-lg-6 col-xl-6">
             <div className="my_profile_setting_input ui_kit_select_search form-group">
               <label>Property Type</label>
@@ -308,12 +281,12 @@ const CreateList = () => {
                 <option value="" disabled selected>
                   Property Type
                 </option>
-                <option data-tokens="Duplex">Duplex</option>
-                <option data-tokens="House">House</option>
-                <option data-tokens="Other">Other</option>
-                <option data-tokens="Commercial">Commercial</option>
-                <option data-tokens="Mixed_Use">Mixed Use</option>
-                <option data-tokens="Apartment">Apartment</option>
+                <option data-tokens="Duplex" value="Duplex">Duplex</option>
+                <option data-tokens="House" value="House">House</option>
+                <option data-tokens="Other" value="other">Other</option>
+                <option data-tokens="Commercial" value="commercial">Commercial</option>
+                <option data-tokens="Mixed_Use" value="mixed_use">Mixed Use</option>
+                <option data-tokens="Apartment" value="apartment">Apartment</option>
               </select>
             </div>
           </div>
@@ -366,7 +339,7 @@ const CreateList = () => {
             <h3 className="mb30 text-danger">Unit Name</h3>
           </div>
           <DetailedInfo />
-        </div>
+          </div>
 
         {/* payments deails */}
         <div className="my_dashboard_review mb-3">
@@ -639,7 +612,7 @@ const CreateList = () => {
         {/* end */}
         <div className="col-xl-12">
           <div className="my_profile_setting_input">
-            <button className="btn btn1 float-start" onClick={handleReset}>
+            <button className="btn btn1 float-start" >
               Reset
             </button>
             <button className="btn btn2 float-end" onClick={handleSubmit}>

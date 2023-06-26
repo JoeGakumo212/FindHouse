@@ -79,7 +79,7 @@ const SidebarMenu = () => {
               <Link href="/create-listing">
                 <a>
                   <i className="flaticon-plus"></i>
-                  <span> Create Listing</span>
+                  <span> Create Property</span>
                 </a>
               </Link>
             )}

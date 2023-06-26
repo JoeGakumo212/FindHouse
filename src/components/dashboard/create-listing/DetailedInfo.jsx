@@ -1,8 +1,8 @@
-import CheckBoxFilter from '../../common/CheckBoxFilter';
-import { useState, useEffect } from 'react';
 import { parseCookies } from 'nookies';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import { useState,} from 'react';
+
 import { Button, Modal, Form } from 'react-bootstrap';
 import { IoIosArrowUp, IoIosArrowDown } from 'react-icons/io';
 const DetailedInfo = () => {
@@ -16,6 +16,9 @@ const DetailedInfo = () => {
   const [bath_rooms, setBathRooms] = useState(0);
   const [total_rooms, setTotalRooms] = useState(0);
   const [square_foot, setSquareFoot] = useState(0);
+  const [shouldPreventClose, setShouldPreventClose] = useState(false);
+
+
 
   useState('');
   const handleOpenModal = () => {
@@ -133,81 +136,48 @@ const DetailedInfo = () => {
     // Close the modal
     setShowModal(false);
   };
-  // clear input fields
-  const clearInputFields = () => {
-    setlandlord_id('');
-    setproperty_code('');
-    setproperty_type_id('');
-    setlocation('');
-    setproperty_name('');
-    setUnitFields('');
-    setunit_name('');
-    setFloorUnit(0);
-    setunit_type_id('');
-    setPropertyType('');
-    setrentAmount(0);
-    setBedRooms(0);
-    setBathRooms(0);
-    setTotalRooms(0);
-    setSquareFoot(0);
-    setagent_commission_value(0);
-    setagent_commission_type('');
-    setpayment_method_id('');
-    setpayment_method_description('');
-    setutility_id('');
-    setutility_unit_cost('');
-    setutility_base_fee('');
-    setextra_charge_id('');
-    setextra_charge_value('');
-    setextra_charge_type('');
-    setextra_charge_frequency('');
-  };
+  
   // end
-  const handleSaveProperty1 = async () => {
-    // Create an object with the data to be sent
-    const propertyData = {
-      unit_name,
-      unit_floor,
-      unit_type_id,
-      unit_mode,
-      rent_amount,
-      bed_rooms,
-      bath_rooms,
-      total_rooms,
-      square_foot,
-    };
-    console.log('propertyDetails:', propertyData);
-
+  const handleContinue = async () => {
+    // Handle saving the data along with other input fields on the main page
     try {
       const cookies = parseCookies();
       const tokenFromCookie = cookies.access_token;
-
-      // Create the unit
+  
+      const unitDetails = {
+        unit_name: unit_name,
+        unit_floor: unit_floor,
+        unit_type_id: unit_type_id,
+        unit_mode: unit_mode,
+        rent_amount: rent_amount,
+        bed_rooms: bed_rooms,
+        bath_rooms: bath_rooms,
+        total_rooms: total_rooms,
+        square_foot: square_foot,
+      };
+  
+      const headers = {
+        Authorization: `Bearer ${tokenFromCookie}`,
+      };
+  
       const createUnitResponse = await axios.post(
         'https://cloudagent.co.ke/backend/api/v1/units',
-        propertyData,
-        {
-          headers: {
-            Authorization: `Bearer ${tokenFromCookie}`,
-          },
-        }
+        unitDetails,
+        { headers }
       );
-
-      if (createUnitResponse.status === 200) {
-        // Close the modal
-        closeModal();
-
-        clearInputFields();
-      }
+  
+      console.log('Unit creation response:', createUnitResponse.data);
     } catch (error) {
-      // Handle the error
-      console.error('Error saving unit:', error);
+      console.error('Error creating unit:', error);
     }
-  };
-
-  const closeModal = () => {
-    // Add code to close the modal
     setShowModal(false);
+  };
+  
+  
+  const closeModal = () => {
+    if (!shouldPreventClose) {
+      setShowModal(false);
+    }
   };
 
   return (
@@ -485,7 +455,8 @@ const DetailedInfo = () => {
               </>
             )}
           </Modal.Body>
-          <Modal.Footer>
+        
+          <Modal.Footer show={showModal} onHide={closeModal}>
             <Button variant="secondary" onClick={handleCloseModal}>
               Cancel
             </Button>
@@ -493,15 +464,16 @@ const DetailedInfo = () => {
               <Button
                 variant="primary"
                 onClick={() => {
-                  handleSaveProperty1();
+                 handleContinue();
                   closeModal();
                 }}
               >
-                Save
+                Continue
               </Button>
             )}
           </Modal.Footer>
         </Modal>
+        
       </div>
 
       {/* end */}
