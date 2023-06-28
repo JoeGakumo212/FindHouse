@@ -5,7 +5,7 @@ import {useSession} from 'next-auth/react'
 const HeaderMenuContent = ({ float = "" }) => {
   const route = useRouter();
   const {session, loading}=useSession()
-  console.log(session,loading)
+
   const home = [
     {
       id: 1,

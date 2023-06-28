@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { parseCookies } from 'nookies';
 import DatePicker from 'react-datepicker';
+import { toast, } from 'react-nextjs-toast';
 import 'react-datepicker/dist/react-datepicker.css';
 
 const ProfileInfo = () => {
@@ -165,9 +166,12 @@ const ProfileInfo = () => {
       if (response.status === 200) {
         console.log('Data successfully posted:', response.data);
         alert('Landlord Created Successfully!!!!');
+        toast.notify(`Landlord Created Successfully!!!!`);
         return;
         // Perform any additional actions upon successful response
-      } else {
+      } 
+     
+      else {
         console.error('API request failed with status:', response.status);
         console.error('Error response:', response.data); // Log the specific error response
       }

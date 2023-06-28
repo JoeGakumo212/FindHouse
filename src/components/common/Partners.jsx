@@ -11,6 +11,7 @@ const Partners = () => {
               alt="1.png"
             />
           </div>
+          
         </div>
       ))}
     </>

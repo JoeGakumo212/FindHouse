@@ -15,7 +15,7 @@ const FindProperties = () => {
         const cookies = parseCookies();
         const tokenFromCookie = cookies.access_token;
 
-        console.log('am here', tokenFromCookie);
+        
         // Perform request to the API using the obtained token
         const apiResponse = await fetch(
           'https://cloudagent.co.ke/backend/api/v1/properties?filter=&page=0&limit=90000000000000000000000000000&sortField=updated_at&sortDirection=desc&whereField=&whereValue=',

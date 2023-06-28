@@ -5,8 +5,20 @@ import FavouritProducts from "./FavouritProducts";
 import Filtering from "./Filtering";
 import Pagination from "./Pagination";
 import SearchBox from "./SearchBox";
+import { useState } from "react";
 
 const index = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (query) => {
+    setSearchQuery(query); // Update the search query state
+  };
+  const [selectedFilter, setSelectedFilter] = useState('');
+
+  const handleFilter = (filterOption) => {
+    setSelectedFilter(filterOption);
+  };
+
   return (
     <>
       {/* <!-- Main Header Nav --> */}
@@ -63,13 +75,13 @@ const index = () => {
                     <ul className="mb0">
                       <li className="list-inline-item">
                         <div className="candidate_revew_search_box course fn-520">
-                          <SearchBox />
+                          <SearchBox onSearch={handleSearch} />
                         </div>
                       </li>
                       {/* End li */}
 
                       <li className="list-inline-item">
-                        <Filtering />
+                        <Filtering onFilter={handleFilter}/>
                       </li>
                       {/* End li */}
                     </ul>
@@ -80,7 +92,7 @@ const index = () => {
                 <div className="col-lg-12">
                   <div className="my_dashboard_review mb40">
                     <div className="favorite_item_list">
-                      <FavouritProducts />
+                      <FavouritProducts searchQuery={searchQuery}  selectedFilter={selectedFilter}/>
 
                       <div className="mbp_pagination">
                         <Pagination />

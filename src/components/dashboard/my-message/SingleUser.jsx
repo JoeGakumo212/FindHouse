@@ -49,7 +49,7 @@ const SingleUser = () => {
       id: 6,
       img: "/assets/images/team/s6.jpg",
       name: "Vincent Porter",
-      meta: `I'm going to office.`,
+      meta: `I'm going to office. `,
       unreadMessage: "",
       unreadMessageClass: "",
       status: "online",

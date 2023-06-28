@@ -153,15 +153,15 @@ const CreateList = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     // Retrieve the unitFields from state or variable
-    const storedUnitFields = unitFields;
+    // const storedUnitFields = unitFields;
     const propertyDetails = {
       landlord_id,
       property_name,
       property_code,
       property_type_id,
       location,
-      unit_name,
-      unitFields: storedUnitFields,
+      // unit_name,
+      // unitFields: storedUnitFields,
 
       agent_commission_value,
       agent_commission_type,
