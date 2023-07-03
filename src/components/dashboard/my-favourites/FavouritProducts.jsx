@@ -3,8 +3,11 @@ import { useState, useEffect } from 'react';
 import { parseCookies } from 'nookies';
 import { toast } from 'react-nextjs-toast';
 
-const FavouritProducts = ({ searchQuery,selectedFilter }) => {
+const FavouritProducts = ({ searchQuery,selectedFilter, }) => {
   const [data, setData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [deletedItemId, setDeletedItemId] = useState(null);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,7 +40,11 @@ const FavouritProducts = ({ searchQuery,selectedFilter }) => {
     fetchData();
   }, [selectedFilter]);
 
-  const handleDelete = async (id) => {
+//  perform deletion here
+const handleDelete = async (id) => {
+  const confirmed = window.confirm('Are you sure you want to delete this item?');
+
+  if (confirmed) {
     try {
       // Get the access token from the cookies
       const cookies = parseCookies();
@@ -57,6 +64,10 @@ const FavouritProducts = ({ searchQuery,selectedFilter }) => {
       if (apiResponse.ok) {
         // Property deleted successfully
         toast.notify('Favorite Deleted successfully');
+        // Remove the deleted property from the data list
+          // Set the deletedItemId state to the ID of the deleted item
+          setDeletedItemId(id);
+        // setData((prevData) => prevData.filter((item) => item.id !== id));
       } else {
         // Handle unauthorized or other error cases for the API request
         console.error('Failed to delete property');
@@ -64,39 +75,61 @@ const FavouritProducts = ({ searchQuery,selectedFilter }) => {
     } catch (error) {
       console.error('Failed to delete property:', error);
     }
-  };
-
-  // Filter the data based on the search query
-  const filteredData = data.filter((item) =>
-    item.property_name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  if (selectedFilter === "featured") {
-    filteredData = filteredData.filter((item) => item.featured);
-  } else if (selectedFilter === "recent") {
-    filteredData = filteredData.sort((a, b) => {
-      return new Date(b.updated_at) - new Date(a.updated_at);
-    });
-  } else if (selectedFilter === "old") {
-    filteredData = filteredData.sort((a, b) => {
-      return new Date(a.updated_at) - new Date(b.updated_at);
-    });
   }
+};
+
+  
+ // Filter the data based on the search query and selected filter
+let filteredData = [...data];
+if (searchQuery) {
+  filteredData = filteredData.filter((item) =>
+    item.property_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    // item.price.toString().includes(searchQuery.toLowerCase()) ||
+    item.location.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+}
+if (selectedFilter === "featured") {
+  console.log("Before filtering:", filteredData);
+  filteredData = filteredData.filter((item) => item.featured);
+  console.log("After filtering:", filteredData);
+
+} else if (selectedFilter === "recent") {
+  filteredData.sort((a, b) => {
+    return new Date(b.updated_at) - new Date(a.updated_at);
+  });
+} else if (selectedFilter === "old") {
+  filteredData.sort((a, b) => {
+    return new Date(a.updated_at) - new Date(b.updated_at);
+  });
+}
+// Remove the deleted item from the filteredData array
+if (deletedItemId) {
+  filteredData = filteredData.filter((item) => item.id !== deletedItemId);
+  setDeletedItemId(null); // Reset the deletedItemId state
+}
+const handlePageChange = (page) => {
+  setCurrentPage(page);
+};
   let content = filteredData?.slice(0, 4)?.map((item) => (
     <div className="feat_property list favorite_page" key={item.id}>
       <div className="thumb">
-        <img
-          className="img-whp  cover"
-          src="/assets/images/property/2.jpg"
-          alt="fp1.jpg"
-        />
-        <div className="thmb_cntnt">
-          <ul className="tag mb0">
-            <li className="list-inline-item">
-              <a href="#">For Rent</a>
-            </li>
-          </ul>
-        </div>
-      </div>
+          <Link href={`/listing-details-v1/${item.id}`}>
+            <a className="fp_price">
+            <img
+              className="img-whp  cover"
+              src="/assets/images/property/2.jpg"
+              alt="fp1.jpg"
+            />
+            <div className="thmb_cntnt">
+              <ul className="tag mb0">
+                <li className="list-inline-item">
+                  <a href="#">For Rent</a>
+                </li>
+              </ul>
+            </div>
+            </a>
+          </Link>
+          </div>
       {/* End .thumb */}
 
       <div className="details">
@@ -109,6 +142,9 @@ const FavouritProducts = ({ searchQuery,selectedFilter }) => {
           </h4>
           <p>
             <span className="flaticon-placeholder"></span> {item.location}
+          </p>
+          <p>
+            <span className="flaticon-placeholder"></span> {item.property_code}
           </p>
           <Link href={`/listing-details-v1/${item.id}`}>
             <a className="fp_price">

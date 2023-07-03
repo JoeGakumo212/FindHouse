@@ -24,13 +24,15 @@ const Utility = () => {
   const [entryType, setEntryType] = useState('manual');
   const [selectedFile, setSelectedFile] = useState(null);
   const [file, setFile] = useState(null);
-
+  const [selectedUtilityId, setSelectedUtilityId] = useState('');
   const fileInputRef = useRef(null);
 
   const handlePropertyInputChange = (event) => {
     setPropertyName(event.target.value);
     searchProperties(event.target.value);
   };
+
+ 
 
   const handlePropertyOptionClick = (option, index) => {
     setPropertyName(option);
@@ -45,9 +47,36 @@ const Utility = () => {
     }
   };
 
+   // Define the utilities array with utility information
+   const utilities = [
+    {
+      utility_name: 'electricity',
+      utility_display_name: 'Electricity',
+      id: '0db05c4d-d654-4eae-bc10-e512c710eb04',
+    },
+    {
+      utility_name: 'water',
+      utility_display_name: 'Water',
+      id: '601ec7f5-c51b-4468-8eae-0188ef56b6cb',
+    },
+    {
+      utility_name: 'garbage',
+      utility_display_name: 'Garbage',
+      id: 'f6d384ec-a780-46c5-b12d-cbb4a6527cd7',
+    },
+  ];
   const handleLeaseTypeInputChange = (event) => {
-    setLeaseType(event.target.value);
+    const selectedValue = event.target.value;
+    setLeaseType(selectedValue);
+
+    // Find the utility object based on the selected value
+    const selectedUtility = utilities.find((utility) => utility.utility_name === selectedValue);
+
+    if (selectedUtility) {
+      setSelectedUtilityId(selectedUtility.id);
+    }
   };
+ 
 
   const handleUnitInputChange = (index, event) => {
     const { name, value } = event.target;
@@ -198,8 +227,8 @@ const Utility = () => {
 
       const params = {
         property: query,
-        page: 0,
-        limit: 0,
+        page: 1,
+        limit: 1000,
         sortField: 'updated_at',
         sortDirection: 'desc',
         whereField: '',
@@ -246,8 +275,8 @@ const Utility = () => {
 
       const params = {
         unit: query,
-        page: 0,
-        limit: 0,
+        page: 1,
+        limit: 100,
         sortField: 'updated_at',
         sortDirection: 'desc',
         whereField: '',
@@ -291,56 +320,7 @@ const Utility = () => {
     }
   };
 
-  // save the utility
-  // const handleSaveUtility = async () => {
-  //   try {
-  //     // Prepare the data to be submitted
-  //     // const data = {
-  //     //   property_name: property_name,
-  //     //   lease_type: leaseType,
-  //     //   unit_readings: unitReadings,
-  //     // };
-  //     const data = {
-  //       property_id: selectedPropertyId,
-  //       utility_id: '601ec7f5-c51b-4468-8eae-0188ef56b6cb',
-  //       unitReadings: unitReadings.map((unit) => ({
-  //         unit_id: unit.unit_name,
-  //         reading_date: unit.reading_date,
-  //         current_reading: unit.current_reading,
-  //       })),
-  //     };
-
-  //     // Log the data before submitting
-  //     console.log('Utility data to be submitted:', data);
-
-  //     const cookies = parseCookies();
-  //     const tokenFromCookie = cookies.access_token;
-
-  //     const headers = {
-  //       Authorization: `Bearer ${tokenFromCookie}`,
-  //       'Content-Type': 'application/json',
-  //     };
-
-  //     // Send a POST request to the API endpoint with cookies and headers
-  //     const response = await axios.post(
-  //       'https://cloudagent.co.ke/backend/api/v1/readings',
-  //       data,
-  //       {
-  //         headers: headers,
-  //       }
-  //     );
-
-  //     if (response.status === 200) {
-  //       console.log('Utility data saved successfully');
-  //       alert('Utility data saved successfully');
-  //       // Reset the form or perform any additional actions upon successful submission
-  //     } else {
-  //       console.error('Failed to save utility data:', response.data);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error occurred while saving utility data:', error);
-  //   }
-  // };
+ 
   const handleSaveUtility = async () => {
     try {
       // Validate input fields
@@ -363,7 +343,8 @@ const Utility = () => {
       // Prepare the data to be submitted
       const data = {
         property_id: selectedPropertyId,
-        utility_id: '601ec7f5-c51b-4468-8eae-0188ef56b6cb',
+        // utility_id: '601ec7f5-c51b-4468-8eae-0188ef56b6cb',
+        utility_id: selectedUtilityId,
         unitReadings: unitReadings.map((unit) => ({
           unit_id: unit.unit_name,
           reading_date: unit.reading_date,
@@ -401,7 +382,7 @@ const Utility = () => {
         setUnitReadings([]);
         setManualRadio(false); // Assuming it's a boolean state variable
            // Refresh the page
-      window.location.reload();
+           window.location.href = '/dashboard';
       } else {
         console.error('Failed to save utility data:', response.data);
       }
@@ -440,7 +421,7 @@ const Utility = () => {
             )}
           </div>
         </div>
-        <div className="col-lg-6 col-xl-0">
+        {/* <div className="col-lg-6 col-xl-0">
           <div className="my_profile_setting_input form-group">
             <label htmlFor="LEASE">Lease Type</label>
             <select
@@ -457,7 +438,27 @@ const Utility = () => {
               <option value="Garbage">Garbage</option>
             </select>
           </div>
+        </div> */}
+         <div className="col-lg-6 col-xl-0">
+        <div className="my_profile_setting_input form-group">
+          <label htmlFor="LEASE">Lease Type</label>
+          <select
+            value={leaseType}
+            onChange={handleLeaseTypeInputChange}
+            placeholder="Enter lease type search"
+            className="selectpicker form-select"
+          >
+            <option value="" disabled>
+              Select lease type
+            </option>
+            {utilities.map((utility) => (
+              <option key={utility.id} value={utility.utility_name}>
+                {utility.utility_display_name}
+              </option>
+            ))}
+          </select>
         </div>
+      </div>
       </div>
 
       <div className="row">
@@ -538,7 +539,7 @@ const Utility = () => {
               <div className="col-lg-4">
                 <div className="my_profile_setting_input">
                   <input
-                    type="text"
+                    type="number"
                     name="current_reading"
                     value={unit.current_reading}
                     onChange={(event) => handleUnitInputChange(index, event)}

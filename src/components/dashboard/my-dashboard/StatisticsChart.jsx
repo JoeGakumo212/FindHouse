@@ -58,7 +58,7 @@ export const data = {
       data: labels.map(() => faker.datatype.number({ min: 100, max: 400 })),
       borderColor: "rgb(255, 99, 132)",
       backgroundColor: "rgba(255, 99, 132, 0.5)",
-      data: [196, 132, 215, 362, 210, 252],
+      data: [196, 132, 215, 362, 210, 252,],
       fill: false,
     },
   ],

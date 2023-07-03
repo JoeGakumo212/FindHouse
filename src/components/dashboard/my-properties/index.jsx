@@ -5,8 +5,27 @@ import TableData from "./TableData";
 import Filtering from "./Filtering";
 import Pagination from "./Pagination";
 import SearchBox from "./SearchBox";
-
+import { useState, useEffect } from 'react';
 const index = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [dataUpdated, setDataUpdated] = useState(false);
+ const [data, setData] = useState([]);
+ const [currentPage, setCurrentPage] = useState(1);
+
+  // Trigger the dataUpdated state whenever the data changes
+  useEffect(() => {
+    setDataUpdated((prev) => !prev);
+  }, [data]);
+
+// handle search
+  const handleSearch = (query) => {
+    setSearchQuery(query); // Update the search query state
+  };
+  const [selectedFilter, setSelectedFilter] = useState('');
+
+  const handleFilter = (filterOption) => {
+    setSelectedFilter(filterOption);
+  };
   return (
     <>
       {/* <!-- Main Header Nav --> */}
@@ -63,13 +82,13 @@ const index = () => {
                     <ul className="mb0">
                       <li className="list-inline-item">
                         <div className="candidate_revew_search_box course fn-520">
-                          <SearchBox />
+                          <SearchBox onSearch={handleSearch}/>
                         </div>
                       </li>
                       {/* End li */}
 
                       <li className="list-inline-item">
-                        <Filtering />
+                        <Filtering onFilter={handleFilter}/>
                       </li>
                       {/* End li */}
                     </ul>
@@ -81,7 +100,7 @@ const index = () => {
                   <div className="my_dashboard_review mb40">
                     <div className="property_table">
                       <div className="table-responsive mt0">
-                        <TableData />
+                        <TableData key={dataUpdated}  searchQuery={searchQuery}  selectedFilter={selectedFilter}  currentPage={currentPage}/>
                       </div>
                       {/* End .table-responsive */}
 

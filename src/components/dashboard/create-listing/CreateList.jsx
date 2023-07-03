@@ -218,7 +218,7 @@ const CreateList = () => {
 
         if (createUnitResponse.status === 200) {
           console.log('Unit created successfully:', createUnitResponse.data);
-          
+          alert('Property and unit added successfully!');
           toast.notify('Property and unit added successfully!');
          
           clearInputFields();
@@ -249,6 +249,7 @@ const CreateList = () => {
   };
 
 
+
   return (
     <>
       <form>
@@ -260,7 +261,7 @@ const CreateList = () => {
                 type="text"
                 className="form-control"
                 id="landlord_id"
-                placeholder="Find Landlord"
+                placeholder="Name of Landlord"
                 value={landlord_id}
                 onChange={({ target }) => setlandlord_id(target?.value)}
               />

@@ -35,7 +35,7 @@ const SearchBox = ({ onSearch }) => {
         <input
           className="form-control mr-sm-2"
           type="search"
-          placeholder="Search"
+          placeholder="Search Property or Location"
           aria-label="Search"
           value={searchQuery}
           onChange={handleSearch}

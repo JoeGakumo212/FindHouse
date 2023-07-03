@@ -1,4 +1,12 @@
-const Pagination = () => {
+import React from 'react';
+
+const Pagination = ({ onPageChange }) => {
+  // Call the onPageChange function with the new page when a page link is clicked
+  const handlePageClick = (event, page) => {
+    event.preventDefault();
+    onPageChange(page);
+  };
+
   return (
     <ul className="page_navigation">
       <li className="page-item disabled">
@@ -8,7 +16,7 @@ const Pagination = () => {
         </a>
       </li>
       <li className="page-item">
-        <a className="page-link" href="#">
+        <a className="page-link" href="#" onClick={(event) => handlePageClick(event, 1)}>
           1
         </a>
       </li>
@@ -18,7 +26,7 @@ const Pagination = () => {
         </a>
       </li>
       <li className="page-item">
-        <a className="page-link" href="#">
+        <a className="page-link" href="#" onClick={(event) => handlePageClick(event, 3)}>
           3
         </a>
       </li>
@@ -28,7 +36,7 @@ const Pagination = () => {
         </a>
       </li>
       <li className="page-item">
-        <a className="page-link" href="#">
+        <a className="page-link" href="#" onClick={(event) => handlePageClick(event, 29)}>
           29
         </a>
       </li>

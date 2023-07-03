@@ -268,7 +268,7 @@ const handleCancel = () => {
           headers: headers
         }
       );
-  
+        alert("Vacation Notice saved Successfully")
       console.log('Save data:', response.data);
       console.log("DATA",data)
     } catch (error) {

@@ -167,6 +167,8 @@ const DetailedInfo = () => {
       );
   
       console.log('Unit creation response:', createUnitResponse.data);
+      alert("Unit created Successfully")
+
     } catch (error) {
       console.error('Error creating unit:', error);
     }

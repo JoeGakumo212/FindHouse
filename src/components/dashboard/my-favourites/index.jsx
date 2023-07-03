@@ -5,11 +5,21 @@ import FavouritProducts from "./FavouritProducts";
 import Filtering from "./Filtering";
 import Pagination from "./Pagination";
 import SearchBox from "./SearchBox";
-import { useState } from "react";
+
+import { useState, useEffect } from 'react';
 
 const index = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [dataUpdated, setDataUpdated] = useState(false);
+ const [data, setData] = useState([]);
+ const [currentPage, setCurrentPage] = useState(1);
 
+  // Trigger the dataUpdated state whenever the data changes
+  useEffect(() => {
+    setDataUpdated((prev) => !prev);
+  }, [data]);
+
+// handle search
   const handleSearch = (query) => {
     setSearchQuery(query); // Update the search query state
   };
@@ -18,7 +28,11 @@ const index = () => {
   const handleFilter = (filterOption) => {
     setSelectedFilter(filterOption);
   };
+// handle pagination
 
+const handlePageChange = (page) => {
+  setCurrentPage(page);
+};
   return (
     <>
       {/* <!-- Main Header Nav --> */}
@@ -64,7 +78,7 @@ const index = () => {
 
                 <div className="col-lg-4 col-xl-4 mb10">
                   <div className="breadcrumb_content style2 mb30-991">
-                    <h2 className="breadcrumb_title">My Favorites</h2>
+                    <h2 className="breadcrumb_title">My Favorites Properties</h2>
                     <p>We are glad to see you again!</p>
                   </div>
                 </div>
@@ -92,10 +106,10 @@ const index = () => {
                 <div className="col-lg-12">
                   <div className="my_dashboard_review mb40">
                     <div className="favorite_item_list">
-                      <FavouritProducts searchQuery={searchQuery}  selectedFilter={selectedFilter}/>
+                      <FavouritProducts  key={dataUpdated}  searchQuery={searchQuery}  selectedFilter={selectedFilter}  currentPage={currentPage}/>
 
                       <div className="mbp_pagination">
-                        <Pagination />
+                        <Pagination onPageChange={handlePageChange} />
                       </div>
                     </div>
                   </div>
