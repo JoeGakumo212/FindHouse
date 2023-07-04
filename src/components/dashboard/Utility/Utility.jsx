@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { parseCookies } from 'nookies';
 import { toast } from 'react-toastify';
@@ -26,13 +26,12 @@ const Utility = () => {
   const [file, setFile] = useState(null);
   const [selectedUtilityId, setSelectedUtilityId] = useState('');
   const fileInputRef = useRef(null);
+  const [utilities, setUtilities] = useState([]);
 
   const handlePropertyInputChange = (event) => {
     setPropertyName(event.target.value);
     searchProperties(event.target.value);
   };
-
- 
 
   const handlePropertyOptionClick = (option, index) => {
     setPropertyName(option);
@@ -47,36 +46,49 @@ const Utility = () => {
     }
   };
 
-   // Define the utilities array with utility information
-   const utilities = [
-    {
-      utility_name: 'electricity',
-      utility_display_name: 'Electricity',
-      id: '0db05c4d-d654-4eae-bc10-e512c710eb04',
-    },
-    {
-      utility_name: 'water',
-      utility_display_name: 'Water',
-      id: '601ec7f5-c51b-4468-8eae-0188ef56b6cb',
-    },
-    {
-      utility_name: 'garbage',
-      utility_display_name: 'Garbage',
-      id: 'f6d384ec-a780-46c5-b12d-cbb4a6527cd7',
-    },
-  ];
+  // Define the utilities array with utility information
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const cookies = parseCookies();
+      const tokenFromCookie = cookies.access_token;
+
+      const headers = {
+        Authorization: `Bearer ${tokenFromCookie}`,
+        'Content-Type': 'application/json',
+      };
+
+      const response = await axios.get(
+        'https://cloudagent.co.ke/backend/api/v1/utilities',
+        { headers }
+      );
+      console.log('API Response:', response.data);
+
+      setUtilities(response.data.data); // Update to access the 'data' property correctly
+    } catch (error) {
+      console.error('API Error:', error);
+    }
+  };
+
   const handleLeaseTypeInputChange = (event) => {
     const selectedValue = event.target.value;
     setLeaseType(selectedValue);
 
     // Find the utility object based on the selected value
-    const selectedUtility = utilities.find((utility) => utility.utility_name === selectedValue);
+    const selectedUtility = utilities.find(
+      (utility) => utility.utility_name === selectedValue
+    );
 
     if (selectedUtility) {
       setSelectedUtilityId(selectedUtility.id);
+      console.log('Selected Utility:', selectedUtility.utility_name);
+      console.log('Selected utility Id:', selectedUtility.id);
     }
   };
- 
 
   const handleUnitInputChange = (index, event) => {
     const { name, value } = event.target;
@@ -121,7 +133,7 @@ const Utility = () => {
         Authorization: `Bearer ${tokenFromCookie}`,
         'Content-Type': 'application/json',
       };
-     
+
       const response = await axios.get(
         'https://cloudagent.co.ke/backend/api/v1/readings/csv_template',
         {
@@ -147,7 +159,7 @@ const Utility = () => {
         Authorization: `Bearer ${tokenFromCookie}`,
         'Content-Type': 'application/json',
       };
-     
+
       const response = await axios.get(
         'https://cloudagent.co.ke/backend/api/v1/readings/excel_template',
         {
@@ -228,7 +240,7 @@ const Utility = () => {
       const params = {
         property: query,
         page: 1,
-        limit: 1000,
+        limit: 9000,
         sortField: 'updated_at',
         sortDirection: 'desc',
         whereField: '',
@@ -251,9 +263,6 @@ const Utility = () => {
         const propertyID = apiData.map((property) => property.id);
         setUnitOptions(propertyID);
         setPropertyOptions(propertyOptions);
-        console.log('Property Id', propertyID);
-
-        console.log('Property Details Name', apiData);
       } else {
         console.error('Response data is not an array:', apiData.data);
       }
@@ -276,7 +285,7 @@ const Utility = () => {
       const params = {
         unit: query,
         page: 1,
-        limit: 100,
+        limit: 9000,
         sortField: 'updated_at',
         sortDirection: 'desc',
         whereField: '',
@@ -301,17 +310,8 @@ const Utility = () => {
 
         setUnitReadings(updatedReadings);
 
-        console.log('Units Data', apiData);
-        console.log('Unit Options', unitOptions);
-
-        // Show only one unit_name at a time
-        console.log('Selected Unit:', apiData[index]);
-
         // Map unitIDs individually
-        apiData.forEach((unit) => {
-          console.log('Unit ID:', unit.unit_name);
-          console.log('Yes you are omasiah');
-        });
+        apiData.forEach((unit) => {});
       } else {
         console.error('Response data is not an array:', apiData.data);
       }
@@ -320,7 +320,6 @@ const Utility = () => {
     }
   };
 
- 
   const handleSaveUtility = async () => {
     try {
       // Validate input fields
@@ -328,22 +327,24 @@ const Utility = () => {
         alert('Please select a property');
         return;
       }
-  
+
       if (unitReadings.length === 0) {
         alert('Please add unit readings');
         return;
       }
-  
-      const hasEmptyReading = unitReadings.some((unit) => !unit.current_reading || !unit.reading_date);
+
+      const hasEmptyReading = unitReadings.some(
+        (unit) => !unit.current_reading || !unit.reading_date
+      );
       if (hasEmptyReading) {
         alert('Please provide readings and dates for all units');
         return;
       }
-  
+
       // Prepare the data to be submitted
       const data = {
         property_id: selectedPropertyId,
-        // utility_id: '601ec7f5-c51b-4468-8eae-0188ef56b6cb',
+
         utility_id: selectedUtilityId,
         unitReadings: unitReadings.map((unit) => ({
           unit_id: unit.unit_name,
@@ -351,18 +352,15 @@ const Utility = () => {
           current_reading: unit.current_reading,
         })),
       };
-  
-      // Log the data before submitting
-      console.log('Utility data to be submitted:', data);
-  
+
       const cookies = parseCookies();
       const tokenFromCookie = cookies.access_token;
-  
+
       const headers = {
         Authorization: `Bearer ${tokenFromCookie}`,
         'Content-Type': 'application/json',
       };
-  
+
       // Send a POST request to the API endpoint with cookies and headers
       const response = await axios.post(
         'https://cloudagent.co.ke/backend/api/v1/readings',
@@ -371,27 +369,24 @@ const Utility = () => {
           headers: headers,
         }
       );
-  
+
       if (response.status === 200) {
         console.log('Utility data saved successfully');
         alert('Utility data saved successfully');
-  
+
         // Reset the input fields and radio button selection
         setPropertyName('');
         setLeaseType(''); // Assuming it's a string or initial value
         setUnitReadings([]);
-        setManualRadio(false); // Assuming it's a boolean state variable
-           // Refresh the page
-           window.location.href = '/dashboard';
       } else {
         console.error('Failed to save utility data:', response.data);
+        alert('Failed to save utility data');
       }
     } catch (error) {
       console.error('Error occurred while saving utility data:', error);
+      alert('Error occurred while saving utility data');
     }
   };
-  
-  
 
   return (
     <>
@@ -421,44 +416,23 @@ const Utility = () => {
             )}
           </div>
         </div>
-        {/* <div className="col-lg-6 col-xl-0">
+
+        <div className="col-lg-6 col-xl-0">
           <div className="my_profile_setting_input form-group">
-            <label htmlFor="LEASE">Lease Type</label>
+            <label htmlFor="LEASE">Utility Type</label>
             <select
               value={leaseType}
               onChange={handleLeaseTypeInputChange}
-              placeholder="Enter lease type search"
               className="selectpicker form-select"
             >
-              <option value="" disabled selected>
-                Electricity
-              </option>
-              <option value="Electricity">Electricity</option>
-              <option value="Water">Water</option>
-              <option value="Garbage">Garbage</option>
+              {utilities.map((utility) => (
+                <option key={utility.id} value={utility.utility_name}>
+                  {utility.utility_display_name}
+                </option>
+              ))}
             </select>
           </div>
-        </div> */}
-         <div className="col-lg-6 col-xl-0">
-        <div className="my_profile_setting_input form-group">
-          <label htmlFor="LEASE">Lease Type</label>
-          <select
-            value={leaseType}
-            onChange={handleLeaseTypeInputChange}
-            placeholder="Enter lease type search"
-            className="selectpicker form-select"
-          >
-            <option value="" disabled>
-              Select lease type
-            </option>
-            {utilities.map((utility) => (
-              <option key={utility.id} value={utility.utility_name}>
-                {utility.utility_display_name}
-              </option>
-            ))}
-          </select>
         </div>
-      </div>
       </div>
 
       <div className="row">
@@ -609,7 +583,6 @@ const Utility = () => {
               </div>
             </div>
           </div>
-          
         </>
       )}
     </>

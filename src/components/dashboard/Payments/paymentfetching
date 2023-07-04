@@ -1,0 +1,68 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { parseCookies } from 'nookies';
+
+const Utility = () => {
+  const [payment_method_id, setPayment_Method_Id] = useState('');
+  const [paymentMethods, setPaymentMethods] = useState([]);
+
+  useEffect(() => {
+    const cookies = parseCookies();
+    const tokenFromCookie = cookies.access_token;
+
+    const headers = {
+      Authorization: `Bearer ${tokenFromCookie}`,
+      'Content-Type': 'application/json',
+    };
+
+    // Fetch payment methods from the endpoint
+    axios
+      .get('https://cloudagent.co.ke/backend/api/v1/payment_methods?list=payment_method_name,payment_method_display_name', {
+        headers: headers,
+      })
+      .then((response) => {
+        setPaymentMethods(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
+  const handlePaymentMethodChange = (e) => {
+    const selectedPaymentMethodId = e.target.value;
+    const selectedPaymentMethod = paymentMethods.find((method) => method.id === selectedPaymentMethodId);
+
+    if (selectedPaymentMethod) {
+      console.log('Selected Payment Method:', selectedPaymentMethod.payment_method_display_name);
+      console.log('Payment Method ID:', selectedPaymentMethod.id);
+    }
+
+    setPayment_Method_Id(selectedPaymentMethodId);
+  };
+// handle submit and post payment_method_id
+  return (
+    <div className="col-lg-6">
+      <div className="my_profile_setting_input form-group">
+        <label htmlFor="paymentMethod">Payment Method</label>
+        <select
+          value={payment_method_id}
+          onChange={handlePaymentMethodChange}
+          id="paymentMethod"
+          className="selectpicker form-select"
+          placeholder="Payment Method"
+        >
+          <option value="" disabled defaultValue>
+            Payment Method
+          </option>
+          {paymentMethods.map((method) => (
+            <option key={method.id} value={method.id}>
+              {method.payment_method_display_name}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
+};
+
+export default Utility;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
 import { parseCookies } from 'nookies';
 import axios from 'axios';
 
@@ -19,8 +19,44 @@ const Payments = () => {
   const [reference_number, setReferenceNumber] = useState('');
   const [selectedTenant, setSelectedTenant] = useState(null);
   const [referenceNumbers, setReferenceNumbers] = useState([]);
+  
+  const [paymentMethods, setPaymentMethods] = useState([]);
   // end
+// fetching paymentIdMethod
+useEffect(() => {
+  const cookies = parseCookies();
+  const tokenFromCookie = cookies.access_token;
 
+  const headers = {
+    Authorization: `Bearer ${tokenFromCookie}`,
+    'Content-Type': 'application/json',
+  };
+
+  // Fetch payment methods from the endpoint
+  axios
+    .get('https://cloudagent.co.ke/backend/api/v1/payment_methods?list=payment_method_name,payment_method_display_name', {
+      headers: headers,
+    })
+    .then((response) => {
+      setPaymentMethods(response.data);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}, []);
+
+const handlePaymentMethodChange = (e) => {
+  const selectedPaymentMethodId = e.target.value;
+  const selectedPaymentMethod = paymentMethods.find((method) => method.id === selectedPaymentMethodId);
+
+  if (selectedPaymentMethod) {
+    console.log('Selected Payment Method:', selectedPaymentMethod.payment_method_display_name);
+    console.log('Payment Method ID:', selectedPaymentMethod.id);
+  }
+
+  setPayment_Method_Id(selectedPaymentMethodId);
+};
+// end
   const handleTenantInputChange = async (e) => {
     const inputValue = e.target.value;
     setTenantSearchTerm(inputValue);
@@ -48,8 +84,8 @@ const Payments = () => {
           { middle_name: inputValue },
           { last_name: inputValue },
         ],
-        page: 0,
-        limit: 0,
+        page: 1,
+        limit: 90000,
         sortField: 'updated_at',
         sortDirection: 'desc',
         whereField: '',
@@ -135,12 +171,7 @@ const Payments = () => {
     setIsLeaseLoading(false);
   };
 
-  // const handleTenantSelection = (tenant) => {
-  //   setTenantSearchTerm(
-  //     `${tenant.first_name} ${tenant.middle_name} ${tenant.last_name}`
-  //   );
-  //   setTenants([tenant]);
-  // };
+  
   const handleTenantSelection = (tenant) => {
     setSelectedTenant(tenant);
     setTenantSearchTerm(
@@ -183,6 +214,7 @@ const Payments = () => {
           reference_number,
           tenant_id: tenants[0].id,
           lease_id: leases[0].id,
+          property_id: leases[0].property.property_id,        
           lease_number: leases[0].lease_number,
           tenant_name: tenants[0].first_name,
         };
@@ -305,10 +337,10 @@ const Payments = () => {
                     <strong className="text-success">Lease Number:</strong>{' '}
                     {lease.lease_number}
                     <p className="text-success">
-                      {lease.property.property_name} Unit: {lease.unit_names}{' '}
+                      propertyName:{lease.property.property_name} <br></br>Unit: {lease.unit_names}{' '}<br></br>
                       Type: {lease.lease_type.lease_type_display_name}
                     </p>
-                    <p>Property: </p>
+                  
                   </p>
                 </div>
               ))}
@@ -319,27 +351,28 @@ const Payments = () => {
           )}
         </div>
 
-        {/* New payment fields */}
-
+       
         <div className="col-lg-6">
-          <div className="my_profile_setting_input form-group">
-            <label htmlFor="paymentMethod">Payment Method</label>
-            <select
-              value={payment_method_id}
-              onChange={(e) => setPayment_Method_Id(e.target.value)}
-              id="paymentMethod"
-              className="selectpicker form-select"
-              placeholder="Payment Method"
-            >
-              <option value="" disabled defaultValue>
-                Payment Method
-              </option>
-              <option value="Cash">Cash</option>
-              <option value="Mpesa">Mpesa</option>
-              <option value="Bank">Bank</option>
-            </select>
-          </div>
-        </div>
+      <div className="my_profile_setting_input form-group">
+        <label htmlFor="paymentMethod">Payment Method</label>
+        <select
+          value={payment_method_id}
+          onChange={handlePaymentMethodChange}
+          id="paymentMethod"
+          className="selectpicker form-select"
+          placeholder="Payment Method"
+        >
+          <option value="" disabled defaultValue>
+            Payment Method
+          </option>
+          {paymentMethods.map((method) => (
+            <option key={method.id} value={method.id}>
+              {method.payment_method_display_name}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
         <div className="col-lg-6">
           <div className="my_profile_setting_input form-group">
             <label htmlFor="amount">Amount</label>

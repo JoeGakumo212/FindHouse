@@ -16,7 +16,7 @@ const CreateList = () => {
 
   const [agent_commission_value, setagent_commission_value] = useState(0);
   const [agent_commission_type, setagent_commission_type] = useState('');
-  const [payment_method_id, setpayment_method_id] = useState('');
+  // const [payment_method_id, setpayment_method_id] = useState('');
   const [payment_method_description, setpayment_method_description] =
     useState('');
   const [utility_id, setutility_id] = useState('');
@@ -26,7 +26,84 @@ const CreateList = () => {
   const [extra_charge_value, setextra_charge_value] = useState(0);
   const [extra_charge_type, setextra_charge_type] = useState('');
   const [extra_charge_frequency, setextra_charge_frequency] = useState('');
+  const [utilities, setUtilities] = useState([]);
+  const [leaseType, setLeaseType] = useState('');
+  const [selectedUtilityId, setSelectedUtilityId] = useState('');
+  const [payment_method_id, setPayment_Method_Id] = useState('');
+  const [paymentMethods, setPaymentMethods] = useState([]);
 
+// payment method fetch
+useEffect(() => {
+  const cookies = parseCookies();
+  const tokenFromCookie = cookies.access_token;
+
+  const headers = {
+    Authorization: `Bearer ${tokenFromCookie}`,
+    'Content-Type': 'application/json',
+  };
+
+  // Fetch payment methods from the endpoint
+  axios
+    .get('https://cloudagent.co.ke/backend/api/v1/payment_methods?list=payment_method_name,payment_method_display_name', {
+      headers: headers,
+    })
+    .then((response) => {
+      setPaymentMethods(response.data);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}, []);
+
+const handlePaymentMethodChange = (e) => {
+  const selectedPaymentMethodId = e.target.value;
+  const selectedPaymentMethod = paymentMethods.find((method) => method.id === selectedPaymentMethodId);
+
+  if (selectedPaymentMethod) {
+    console.log('Selected Payment Method:', selectedPaymentMethod.payment_method_display_name);
+    console.log('Payment Method ID:', selectedPaymentMethod.id);
+  }
+
+  setPayment_Method_Id(selectedPaymentMethodId);
+};
+// end
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const cookies = parseCookies();
+      const tokenFromCookie = cookies.access_token;
+
+      const headers = {
+        Authorization: `Bearer ${tokenFromCookie}`,
+        'Content-Type': 'application/json',
+      };
+
+      const response = await axios.get('https://cloudagent.co.ke/backend/api/v1/utilities', { headers });
+      console.log('API Response:', response.data);
+
+      setUtilities(response.data.data); // Update to access the 'data' property correctly
+    } catch (error) {
+      console.error('API Error:', error);
+    }
+  };
+
+  const handleLeaseTypeInputChange = (event) => {
+    const selectedValue = event.target.value;
+    setLeaseType(selectedValue);
+
+    // Find the utility object based on the selected value
+    const selectedUtility = utilities.find((utility) => utility.utility_name === selectedValue);
+
+    if (selectedUtility) {
+      setSelectedUtilityId(selectedUtility.id);
+      console.log("elected Utility:",selectedUtility.utility_name);
+      console.log("Selected utility ID:",selectedUtility.id);
+    }
+  };
+  
  
 
   const handleIncreaseutility_base_fee = () => {
@@ -77,35 +154,7 @@ const CreateList = () => {
   };
   // end
 
-  // reset the input fields
-  const clearInputFields = () => {
-    setlandlord_id('');
-    setproperty_code('');
-    setproperty_type_id('');
-    setlocation('');
-    setproperty_name('');
-    setUnitFields('');
-    setunit_name('');
-    setFloorUnit(0);
-    setunit_type_id('');
-    setPropertyType('');
-    setrentAmount(0);
-    setBedRooms(0);
-    setBathRooms(0);
-    setTotalRooms(0);
-    setSquareFoot(0);
-    setagent_commission_value(0);
-    setagent_commission_type('');
-    setpayment_method_id('');
-    setpayment_method_description('');
-    setutility_id('');
-    setutility_unit_cost('');
-    setutility_base_fee('');
-    setextra_charge_id('');
-    setextra_charge_value('');
-    setextra_charge_type('');
-    setextra_charge_frequency('');
-  };
+  
 
   const router = useRouter();
   const [data, setData] = useState({});
@@ -168,7 +217,7 @@ const CreateList = () => {
       payment_method_id,
       payment_method_description,
       utility_unit_cost,
-      utility_id,
+      utility_id: selectedUtilityId,
       utility_base_fee,
       extra_charge_id,
       extra_charge_value,
@@ -198,12 +247,13 @@ const CreateList = () => {
           'Property created successfully:',
           createPropertyResponse.data
         );
-
+        alert("Property created successfully")
+          
         const propertyId = createPropertyResponse.data.id;
 
       const unitDetails = {
         property_id: propertyId,
-        unitFields, // Include the captured unit fields here
+        
       };
 
       const createUnitResponse = await axios.post(
@@ -222,7 +272,7 @@ const CreateList = () => {
           toast.notify('Property and unit added successfully!');
          
           clearInputFields();
-          ded
+          
         } else {
           console.error(
             'Failed to create unit:',
@@ -248,7 +298,35 @@ const CreateList = () => {
     }
   };
 
-
+// reset the input fields
+const clearInputFields = () => {
+  setlandlord_id('');
+  setproperty_code('');
+  setproperty_type_id('');
+  setlocation('');
+  setproperty_name('');
+  setUnitFields('');
+  setunit_name('');
+  setFloorUnit(0);
+  setunit_type_id('');
+  setPropertyType('');
+  setrentAmount(0);
+  setBedRooms(0);
+  setBathRooms(0);
+  setTotalRooms(0);
+  setSquareFoot(0);
+  setagent_commission_value(0);
+  setagent_commission_type('');
+  setpayment_method_id('');
+  setpayment_method_description('');
+  setutility_id('');
+  setutility_unit_cost('');
+  setutility_base_fee('');
+  setextra_charge_id('');
+  setextra_charge_value('');
+  setextra_charge_type('');
+  setextra_charge_frequency('');
+};
 
   return (
     <>
@@ -400,24 +478,27 @@ const CreateList = () => {
                 </select>
               </div>
             </div>
-            <div className="col-lg-6 col-xl-6">
-              <div className="my_profile_setting_input ui_kit_select_search form-group">
-                <label>Payment Method Name</label>
-                <select
-                  className="selectpicker form-select"
-                  data-live-search="true"
-                  data-width="100%"
-                  value={payment_method_id}
-                  onChange={(e) => setpayment_method_id(e.target.value)}
-                >
-                  <option value="" disabled selected>
-                    Payment Method Name
-                  </option>
-                  <option data-tokens="cash">Cash</option>
-                  <option data-tokens="Mpesa">Mpesa</option>
-                </select>
-              </div>
-            </div>
+            <div className="col-lg-6">
+      <div className="my_profile_setting_input form-group">
+        <label htmlFor="paymentMethod">Payment Method</label>
+        <select
+          value={payment_method_id}
+          onChange={handlePaymentMethodChange}
+          id="paymentMethod"
+          className="selectpicker form-select"
+          placeholder="Payment Method"
+        >
+          <option value="" disabled defaultValue>
+            Payment Method
+          </option>
+          {paymentMethods.map((method) => (
+            <option key={method.id} value={method.id}>
+              {method.payment_method_display_name}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
             <div className="col-lg-6 col-xl-6">
               <div className="my_profile_setting_input form-group">
                 <label htmlFor="propertyTitle">
@@ -544,25 +625,24 @@ const CreateList = () => {
               <h3 className="mb30 text-danger">Utilities Details</h3>
             </div>
 
-            <div className="col-lg-4">
-              <div className="my_profile_setting_input ui_kit_select_search form-group">
-                <label> Utility Name</label>
-                <select
-                  className="selectpicker form-select"
-                  data-live-search="true"
-                  data-width="100%"
-                  value={utility_id}
-                  onChange={(e) => setutility_id(e.target.value)}
-                >
-                  <option value="" disabled selected>
-                    Utility Name
-                  </option>
-                  <option data-tokens="Electricity">Electricity</option>
-                  <option data-tokens="Water">Water</option>
-                  <option data-tokens="Garbage">Garbage</option>
-                </select>
-              </div>
-            </div>
+             <div className="col-lg-6 col-xl-0">
+          <div className="my_profile_setting_input form-group">
+            <label htmlFor="LEASE">Utility Type</label>
+            <select
+              value={leaseType}
+              onChange={handleLeaseTypeInputChange}
+              className="selectpicker form-select"
+            >
+              {utilities.map((utility) => (
+                <option key={utility.id} value={utility.utility_name}>
+                  {utility.utility_display_name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+          
+      
             <div className="col-lg-4 ">
               <div className="my_profile_setting_input form-group">
                 <label htmlFor="property_name">Unit Cost</label>

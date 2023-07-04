@@ -1,7 +1,7 @@
 import { parseCookies } from 'nookies';
 import { useRouter } from 'next/router';
 import axios from 'axios';
-import { useState,} from 'react';
+import { useState,useEffect} from 'react';
 
 import { Button, Modal, Form } from 'react-bootstrap';
 import { IoIosArrowUp, IoIosArrowDown } from 'react-icons/io';
@@ -17,6 +17,45 @@ const DetailedInfo = () => {
   const [total_rooms, setTotalRooms] = useState(0);
   const [square_foot, setSquareFoot] = useState(0);
   const [shouldPreventClose, setShouldPreventClose] = useState(false);
+
+
+  const [unitTypes, setUnitTypes] = useState([]);
+  const [utility_id, setUtilityId] = useState('');
+  const cookies = parseCookies();
+  const tokenFromCookie = cookies.access_token;
+
+  const headers = {
+    Authorization: `Bearer ${tokenFromCookie}`,
+    'Content-Type': 'application/json',
+  };
+
+  useEffect(() => {
+    const fetchUnitTypes = async () => {
+      try {
+        const response = await axios.get(
+          'https://cloudagent.co.ke/backend/api/v1/unit_types?list=unit_type_name,unit_type_display_name',
+          { headers }
+        );
+        setUnitTypes(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchUnitTypes();
+  }, []);
+
+  const handleUtilityChange = (event) => {
+    const selectedUtilityName = event.target.value;
+    const selectedUtility = unitTypes.find(
+      (utility) => utility.unit_type_name === selectedUtilityName
+    );
+
+    if (selectedUtility) {
+      setUtilityId(selectedUtility.id);
+      console.log(selectedUtility.id); // Log the selected utility ID
+    }
+  };
 
 
 
@@ -147,7 +186,7 @@ const DetailedInfo = () => {
       const unitDetails = {
         unit_name: unit_name,
         unit_floor: unit_floor,
-        unit_type_id: unit_type_id,
+        unit_type_id:  utility_id,
         unit_mode: unit_mode,
         rent_amount: rent_amount,
         bed_rooms: bed_rooms,
@@ -168,6 +207,9 @@ const DetailedInfo = () => {
   
       console.log('Unit creation response:', createUnitResponse.data);
       alert("Unit created Successfully")
+
+    clearInputFields(); // Clear input fields after successful unit creation
+  
 
     } catch (error) {
       console.error('Error creating unit:', error);
@@ -298,34 +340,27 @@ const DetailedInfo = () => {
                     </div>
                   </div>
                 </div>
-                <div className="col-lg-12 ">
-                  <div className="my_profile_setting_input ui_kit_select_search form-group">
-                    {/* <label>Unit Type</label> */}
-                    <select
-                      className="selectpicker form-select"
-                      data-live-search="true"
-                      data-width="100%"
-                      placeholder="Unit Type"
-                      value={unit_type_id}
-                      onChange={(e) => setunit_type_id(e.target.value)}
-                    >
-                      <option value="" disabled selected>
-                        Unit Type
-                      </option>
-                      <option data-tokens="One_Bed_Room">One Bed Room</option>
-                      <option data-tokens="Two_Bed_Roo">Two Bed Room</option>
-                      <option data-tokens="Single_Room">Single Room</option>
-                      <option data-tokens="cloudagent">cloudagent</option>
-                      <option data-tokens="Test_cloudagent">
-                        Test cloudagent
-                      </option>
-                      <option data-tokens="Test_Cloudagent1">
-                        Test Cloudagent1
-                      </option>
-                      <option data-tokens="Bed_sitter">Bed sitter</option>
-                    </select>
-                  </div>
-                </div>
+                <div className="col-lg-12">
+      <div className="my_profile_setting_input ui_kit_select_search form-group">
+        <label>Utility Name</label>
+        <select
+          className="selectpicker form-select"
+          data-live-search="true"
+          data-width="100%"
+          value={utility_id}
+          onChange={handleUtilityChange}
+        >
+          <option value="" disabled>
+            Utility Name 
+          </option>
+          {unitTypes.map((utility) => (
+            <option key={utility.id} value={utility.unit_type_name}>
+              {utility.unit_type_display_name}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
                 <div className="row">
                   <div className="col-lg-6 col-xs-6">
                     <div className="my_profile_setting_input form-group">
