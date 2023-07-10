@@ -1,0 +1,198 @@
+{
+    "lease_type_id": "b6a3c1ad-e581-42dc-a2fb-17e9279c0261",
+    "property": {
+        "id": "88520ef0-3bb5-4a90-a098-ef8eba99cb71",
+        "property_code": "Jo345",
+        "agent_id": null,
+        "unit_total": 1,
+        "property_type_id": "e366a2df-9f3c-41ae-80d2-d5f74dcd10d4",
+        "property_type": {
+            "id": "e366a2df-9f3c-41ae-80d2-d5f74dcd
+            "display_name": "Apartment"
+        },
+        "units": [
+            {
+                "id": "3340e054-5f09-4a57-b6d5-68a59d20549b",
+                "leases_total": 0,
+                "agent_id": null,
+                "property_id": "88520ef0-3bb5-4a90-a098-ef8eba99cb71",
+                "property": {
+                    "id": "88520ef0-3bb5-4a90-a098-ef8eba99cb71",
+                    "property_code": "Jo345",
+                    "property_name": "Joe",
+                    "location": "NAkuru"
+                },
+                "unit_name": "JOE",
+                "rent_amount": 20000,
+                "unit_floor": 3,
+                "description": null,
+                "rent_period": null,
+                "unit_status": null,
+                "billing_frequency": null,
+                "unit_mode": "residential",
+                "unit_type_id": "6037f533-559d-4179-baca-7b6719c846df",
+                "unit_type": {
+                    "id": "6037f533-559d-4179-baca-7b6719c846df",
+                    "unit_type_display_name": "Two Bed Room"
+                },
+                "lease_numbers": "",
+                "bath_rooms": "2",
+                "bed_rooms": "4",
+                "total_rooms": null,
+                "square_foot": null,
+                "created_at": "2023-05-29T09:10:36.000000Z",
+                "updated_at": "2023-05-29T09:10:36.000000Z",
+                "leases": []
+            }
+        ],
+        "vacant_units": [
+            {
+                "id": "3340e054-5f09-4a57-b6d5-68a59d20549b",
+                "leases_total": 0,
+                "agent_id": null,
+                "property_id": "88520ef0-3bb5-4a90-a098-ef8eba99cb71",
+                "property": {
+                    "id": "88520ef0-3bb5-4a90-a098-ef8eba99cb71",
+                    "property_code": "Jo345",
+                    "property_name": "Joe",
+                    "location": "NAkuru"
+                },
+                "unit_name": "JOE",
+                "rent_amount": 20000,
+                "unit_floor": 3,
+                "description": null,
+                "rent_period": null,
+                "unit_status": null,
+                "billing_frequency": null,
+                "unit_mode": "residential",
+                "unit_type_id": "6037f533-559d-4179-baca-7b6719c846df",
+                "unit_type": {
+                    "id": "6037f533-559d-4179-baca-7b6719c846df",
+                    "unit_type_display_name": "Two Bed Room"
+                },
+                "lease_numbers": "",
+                "bath_rooms": "2",
+                "bed_rooms": "4",
+                "total_rooms": null,
+                "square_foot": null,
+                "created_at": "2023-05-29T09:10:36.000000Z",
+                "updated_at": "2023-05-29T09:10:36.000000Z",
+                "leases": []
+            }
+        ],
+        "total_units": 1,
+        "total_vacant_units": 1,
+        "extra_charges": [],
+        "late_fees": [],
+        "utility_costs": [],
+        "payment_methods": [],
+        "landlord_id": "877dbf1e-7748-42a2-900c-75f3f32b5288",
+        "property_name": "Joe",
+        "location": "NAkuru",
+        "latitude": null,
+        "longitude": null,
+        "address_1": null,
+        "address_2": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "zip": null,
+        "agent_commission_value": null,
+        "agent_commission_type": null,
+        "created_by": null,
+        "updated_by": null,
+        "created_at": "2023-05-29T09:10:36.000000Z",
+        "updated_at": "2023-05-29T09:10:36.000000Z"
+    },
+    "units": [
+        {
+            "id": "3340e054-5f09-4a57-b6d5-68a59d20549b",
+            "leases_total": 0,
+            "agent_id": null,
+            "property_id": "88520ef0-3bb5-4a90-a098-ef8eba99cb71",
+            "property": {
+                "id": "88520ef0-3bb5-4a90-a098-ef8eba99cb71",
+                "property_code": "Jo345",
+                "property_name": "Joe",
+                "location": "NAkuru"
+            },
+            "unit_name": "JOE",
+            "rent_amount": 20000,
+            "unit_floor": 3,
+            "description": null,
+            "rent_period": null,
+            "unit_status": null,
+            "billing_frequency": null,
+            "unit_mode": "residential",
+            "unit_type_id": "6037f533-559d-4179-baca-7b6719c846df",
+            "unit_type": {
+                "id": "6037f533-559d-4179-baca-7b6719c846df",
+                "unit_type_display_name": "Two Bed Room"
+            },
+            "lease_numbers": "",
+            "bath_rooms": "2",
+            "bed_rooms": "4",
+            "total_rooms": null,
+            "square_foot": null,
+            "created_at": "2023-05-29T09:10:36.000000Z",
+            "updated_at": "2023-05-29T09:10:36.000000Z",
+            "leases": []
+        }
+    ],
+    "start_date": "2023-06-13",
+    "due_date": "",
+    "rent_amount": 5000,
+    "due_on": 5,
+    "rent_deposit": "4000",
+    "utilityDeposits": [
+        {
+            "utility_id": "0db05c4d-d654-4eae-bc10-e512c710eb04",
+            "deposit_amount": 2000
+        }
+    ],
+    "tenants": [
+        {
+            "first_name": "joseph",
+            "middle_name": "gakumo",
+            "last_name": "munyui",
+            "id": "963b9b25-70ed-4dd1-8c66-407a0263b877",
+            "leases": []
+        }
+    ],
+    "extraCharges": [
+        {
+            "extra_charge_id": "6492cc17-4b24-470d-9638-207801ccb949",
+            "extra_charge_value": 1,
+            "extra_charge_type": "total_rent_percentage",
+            "extra_charge_frequency": "period_to_period"
+        }
+    ],
+    "lateFeeFields": [
+        {
+            "late_fee_id": "76324155-24c6-456f-9850-d28a86891cfe",
+            "late_fee_value": 1,
+            "late_fee_type": "total_rent_percentage",
+            "grace_period": 1,
+            "late_fee_frequency": "one_time"
+        }
+    ],
+    "utilityCharges": [
+        {
+            "utility_id": "0db05c4d-d654-4eae-bc10-e512c710eb04",
+            "utility_unit_cost": "12",
+            "utility_base_fee": 2
+        }
+    ],
+    "paymentMethodFields": [
+        {
+            "payment_method_id": "70e141b8-39f5-480a-bb24-c5db82da4a99",
+            "payment_method_description": "paid via mpesa"
+        }
+    ],
+    "generate_invoice_on": 25,
+    "next_period_billing": true,
+    "skip_starting_period": true,
+    "waive_penalty": true,
+    "property_id": "88520ef0-3bb5-4a90-a098-ef8eba99cb71",
+    "landlord_id": "877dbf1e-7748-42a2-900c-75f3f32b5288"
+}

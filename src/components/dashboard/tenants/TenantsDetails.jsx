@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { parseCookies } from 'nookies';
 const TenantsDetails = () => {
@@ -22,6 +22,9 @@ const TenantsDetails = () => {
   const [showNextOfKin, setShowNextOfKin] = useState(false);
   const [stagedTenantData, setStagedTenantData] = useState({});
   const [showTenants, setShowTenants] = useState(true);
+  const [tenantTypes, setTenantTypes] = useState([]);
+  const [selectedType, setSelectedType] = useState('');
+  const [selectedTenantType, setSelectedTenantType] = useState(null);
   // nextofKin section
   const [next_of_kin_name, setNext_of_kin_name] = useState('');
   const [next_of_kin_phone, setNext_of_kin_phone] = useState('');
@@ -53,7 +56,48 @@ const TenantsDetails = () => {
   const [currentSection, setCurrentSection] = useState(1);
   const totalSections = 4; // Total number of profile sections
   const [showSaveButton, setShowSaveButton] = useState(false);
+  // handle selection of tenant type
+  useEffect(() => {
+    fetchData();
+  }, []);
 
+  const fetchData = async () => {
+    try {
+      const cookies = parseCookies();
+      const tokenFromCookie = cookies.access_token;
+
+      const headers = {
+        Authorization: `Bearer ${tokenFromCookie}`,
+        'Content-Type': 'application/json',
+      };
+
+      const response = await axios.get(
+        'https://cloudagent.co.ke/backend/api/v1/tenant_types?list=tenant_type_name%20,tenant_type_display_name',
+        { headers }
+      );
+      console.log('API Response:', response.data);
+
+      setTenantTypes(response.data);
+    } catch (error) {
+      console.error('API Error:', error);
+    }
+  };
+
+  const handleTypeChange = (event) => {
+    const selectedValue = event.target.value;
+    setSelectedType(selectedValue);
+
+    // Find the tenant type object based on the selected value
+    const selectedTenantType = tenantTypes.find(
+      (type) => type.tenant_type_display_name === selectedValue
+    );
+
+    setSelectedTenantType(selectedTenantType);
+    console.log('Selected NAme:', selectedTenantType.tenant_type_display_name);
+    console.log('Selected NAme ID:', selectedTenantType.id);
+  };
+
+  // end
   // State variable for form errors
   const [errors, setErrors] = useState({});
 
@@ -83,9 +127,7 @@ const TenantsDetails = () => {
 
     // Validate the form fields for each section
     if (currentSection === 1) {
-      if (tenant_type.trim() === '') {
-        formErrors.tenant_type = 'Tenant Type is required';
-      }
+      
       if (first_name.trim() === '') {
         formErrors.first_name = 'First Name is required';
       }
@@ -199,12 +241,15 @@ const TenantsDetails = () => {
         formErrors.employment_position = 'Employment Position is required';
       }
       if (employer_contact_phone.trim() === '') {
-        formErrors.employer_contact_phone = 'Employer Contact Phone is required';
+        formErrors.employer_contact_phone =
+          'Employer Contact Phone is required';
       } else if (employer_contact_phone.trim().length < 10) {
-        formErrors.employer_contact_phone = 'Employer Contact Phone should be at least 10 digits';
+        formErrors.employer_contact_phone =
+          'Employer Contact Phone should be at least 10 digits';
       }
       if (employer_contact_email.trim() === '') {
-        formErrors.employer_contact_email = 'Employer Contact Email is required';
+        formErrors.employer_contact_email =
+          'Employer Contact Email is required';
       } else if (!isValidEmail(employer_contact_email.trim())) {
         formErrors.employer_contact_email = 'Employer Contact Email is invalid';
       }
@@ -237,7 +282,7 @@ const TenantsDetails = () => {
   const checkFormCompleteness = () => {
     // Check if all fields are filled in the form
     if (currentSection === 1) {
-      if (tenant_type.trim() === '' || first_name.trim() === '') {
+      if (selectedTenantType.trim() === '' || first_name.trim() === '') {
         return false;
       }
       // Check other fields in section 1
@@ -303,7 +348,7 @@ const TenantsDetails = () => {
       }
 
       const data = {
-        tenant_type,
+        tenant: selectedTenantType.id,
         first_name,
         middle_name,
         last_name,
@@ -416,19 +461,22 @@ const TenantsDetails = () => {
           <div className="row">
             <div className="col-lg-4">
               <div className="my_profile_setting_input ui_kit_select_search form-group">
-                <label>Property Type</label>
+                <label htmlFor="tenantType">Tenant Type*</label>
                 <select
+                  id="tenantType"
+                  value={selectedType}
+                  onChange={handleTypeChange}
                   className="selectpicker form-select"
-                  data-live-search="true"
-                  data-width="100%"
-                  value={tenant_type}
-                  onChange={(e) => setTenant_Type(e.target.value)}
                 >
-                  <option value="" disabled selected>
-                    Tenant Type
-                  </option>
-                  <option data-tokens="Individual">Individual</option>
-                  <option data-tokens="Business">Business</option>
+                  <option value="">Select</option>
+                  {tenantTypes.map((type) => (
+                    <option
+                      key={type.tenant_type_name}
+                      value={type.tenant_type_display_name}
+                    >
+                      {type.tenant_type_display_name}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>

@@ -35,6 +35,7 @@ const Leases = () => {
   const [payment_method_name, setPaymentMethod] = useState('');
   const [payment_method_description, setPaymentDescription] = useState('');
   const [selectedDateLease, setSelectedDateLease] = useState('');
+  const [selectedProperty, setSelectedProperty] = useState(null);
 
   const handleNextClick = () => {
     if (currentSection === 'lease') {
@@ -200,7 +201,7 @@ const Leases = () => {
       console.error('Error occurred while searching:', error);
     }
   };
-  // search the property and store its property_id
+
   const handlePropertyOptionClick = (option) => {
     setPropertyName(option);
     setPropertyOptions([]);
@@ -215,51 +216,66 @@ const Leases = () => {
       setUnitOptions([]);
     }
   };
+// finding property and it id
 
-  const searchProperties = async (query) => {
-    try {
-      const cookies = parseCookies();
-      const tokenFromCookie = cookies.access_token;
+const searchProperties = async (query) => {
+  try {
+    const cookies = parseCookies();
+    const tokenFromCookie = cookies.access_token;
 
-      const headers = {
-        Authorization: `Bearer ${tokenFromCookie}`,
-        'Content-Type': 'application/json',
-      };
+    const headers = {
+      Authorization: `Bearer ${tokenFromCookie}`,
+      'Content-Type': 'application/json',
+    };
 
-      const params = {
-        property: query,
-        page: 1,
-        limit: 1000,
-        sortField: 'updated_at',
-        sortDirection: 'desc',
-        whereField: '',
-        whereValue: '',
-      };
+    const params = {
+      property: query,
+      page: 1,
+      limit: 1000,
+      sortField: 'updated_at',
+      sortDirection: 'desc',
+      whereField: '',
+      whereValue: '',
+    };
 
-      const response = await axios.get(
-        'https://cloudagent.co.ke/backend/api/v1/properties',
-        {
-          params,
-          headers,
-        }
-      );
-
-      if (response.status === 200) {
-        const apiData = response.data.data;
-        const propertyOptions = apiData.map(
-          (property) => property.property_name
-        );
-        setPropertyOptions(propertyOptions);
-        setData(apiData);
-        console.log('Property Details Name', apiData);
-      } else {
-        console.error('Response data is not an array:', apiData.data);
+    const response = await axios.get(
+      'https://cloudagent.co.ke/backend/api/v1/properties',
+      {
+        params,
+        headers,
       }
-    } catch (error) {
-      console.error('Error occurred while searching:', error);
-    }
-  };
+    );
 
+    if (response.status === 200) {
+      const apiData = response.data.data;
+      const propertyOptions = apiData.map((property) => ({
+        property_name: property.property_name,
+        property_id: property.id,
+      }));
+      setPropertyOptions(propertyOptions);
+      setData(apiData);
+      console.log('Property Details Name', apiData);
+    } else {
+      console.error('Response data is not an array:', apiData.data);
+    }
+  } catch (error) {
+    console.error('Error occurred while searching:', error);
+  }
+};
+
+const handlePropertyInputChanged = (event) => {
+  const { value } = event.target;
+  setPropertyName(value);
+  searchProperties(value);
+};
+const handlePropertyOptionClicked = (option) => {
+  console.log('Selected Property Name:', option.property_name);
+  console.log('Selected Property ID:', option.property_id);
+
+  setPropertyName(option.property_name); 
+  setShowOptions(false); 
+};
+ 
   // tenants search logic
 
   const handleSearchInputChange = (event) => {
@@ -336,6 +352,9 @@ const Leases = () => {
   // ends
   // handle submit function
   async function handleSubmit() {
+    const selectedProperty = propertyOptions.find(
+      (option) => option.property_name === property_name
+    );
     try {
       const cookies = parseCookies();
       const tokenFromCookie = cookies.access_token;
@@ -348,8 +367,8 @@ const Leases = () => {
       const formData = {
         data: {
           tenants: selectedTenants,
-
-          property_id: property_id,
+          property_id: selectedProperty.property_id,
+         
 
           units: [
             {
@@ -407,30 +426,30 @@ const Leases = () => {
           <div className="row">
             <h3>Lease Info</h3>
             <div className="col-lg-4">
-              <div className="my_profile_setting_input ui_kit_select_search form-group">
-                <label htmlFor="PropertyName">Property Name</label>
-                <input
-                  type="text"
-                  value={property_name}
-                  onChange={handlePropertyInputChange}
-                  onClick={() => setShowOptions(true)}
-                  placeholder="Find property by Name"
-                  className="selectpicker form-select"
-                />
-                {showOptions && propertyOptions.length > 0 && (
-                  <ul className="autocomplete-options">
-                    {propertyOptions.map((option, index) => (
-                      <li
-                        key={index}
-                        onClick={() => handlePropertyOptionClick(option)}
-                      >
-                        {option}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
+        <div className="my_profile_setting_input ui_kit_select_search form-group">
+          <label htmlFor="PropertyName">Property Name</label>
+          <input
+            type="text"
+            value={property_name}
+            onChange={handlePropertyInputChanged}
+            onClick={() => setShowOptions(true)}
+            placeholder="Find property by Name"
+            className="selectpicker form-select"
+          />
+          {showOptions && propertyOptions.length > 0 && (
+            <ul className="autocomplete-options">
+              {propertyOptions.map((option, index) => (
+                <li
+                  key={index}
+                  onClick={() => handlePropertyOptionClicked(option)}
+                >
+                  {option.property_name} - {option.id}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
             <div className="col-lg-4">
               <div className="my_profile_setting_input ui_kit_select_search form-group">
                 <label htmlFor="unitname">Unit Name</label>
