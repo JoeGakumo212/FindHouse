@@ -1,13 +1,13 @@
 import dynamic from "next/dynamic";
 import Seo from "../../components/common/seo";
 
-import MyPayments from "../../components/dashboard/Payments";
+import PaymentsTableData from './PaymentsTableData'
 
 const index = () => {
   return (
     <>
       <Seo pageTitle="My Tenants" />
-      <MyPayments />
+      <PaymentsTableData />
     </>
   );
 };

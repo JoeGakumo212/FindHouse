@@ -48,7 +48,7 @@ const Utility = () => {
     }
   };
   
-
+// handle submit utility_id: selectedUtilityId,
   return (
     <>
      <div className="col-lg-6 col-xl-0">

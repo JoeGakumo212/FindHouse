@@ -75,7 +75,7 @@ const index = () => {
                 <div className="col-lg-12">
                   <div id="myreview" className="my_dashboard_review">
                     <div className="review_content">
-                      <h4>My Reviews</h4>
+                      <h4>My Reviews hello</h4>
                       <AuthorReview />
                     </div>
                   </div>

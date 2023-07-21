@@ -1,30 +1,12 @@
 import Header from "../../common/header/dashboard/Header";
 import SidebarMenu from "../../common/header/dashboard/SidebarMenu";
 import MobileMenu from "../../common/header/MobileMenu";
-import TableData from "./TableData";
-import Filtering from "./Filtering";
-import Pagination from "./Pagination";
-import SearchBox from "./SearchBox";
-import { useState, useEffect } from 'react';
-const index = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [dataUpdated, setDataUpdated] = useState(false);
- const [data, setData] = useState([]);
- const [currentPage, setCurrentPage] = useState(1);
-
-  // Trigger the dataUpdated state whenever the data changes
-  useEffect(() => {
-    setDataUpdated((prev) => !prev);
-  }, [data]);
-
-// handle search
-  const handleSearch = (query) => {
-    setSearchQuery(query); // Update the search query state
-  };
-  const [selectedFilter, setSelectedFilter] = useState('');
-
-  const handleFilter = (filterOption) => {
-    setSelectedFilter(filterOption);
+import TenantsForm from'./TenantsForm';
+import { useRouter } from 'next/router';
+const index = ({ propertyId }) => {
+  const router = useRouter(); // Initialize useRouter
+           const handleBack = () => {
+    router.push('/tenants');
   };
   return (
     <>
@@ -69,50 +51,43 @@ const index = () => {
                 </div>
                 {/* End Dashboard Navigation */}
 
-                <div className="col-lg-4 col-xl-4 mb10">
-                  <div className="breadcrumb_content style2 mb30-991">
-                    <h2 className="breadcrumb_title">My Favorites</h2>
+                <div className="col-lg-6 mb10">
+                  <div className="breadcrumb_content style2">
+                    <h2 className="breadcrumb_title">Add New Tenant</h2>
                     <p>We are glad to see you again!</p>
+                   
                   </div>
                 </div>
-                {/* End .col */}
-
-                <div className="col-lg-8 col-xl-8">
-                  <div className="candidate_revew_select style2 text-end mb30-991">
-                    <ul className="mb0">
-                      <li className="list-inline-item">
-                        <div className="candidate_revew_search_box course fn-520">
-                          <SearchBox onSearch={handleSearch}/>
-                        </div>
-                      </li>
-                      {/* End li */}
-
-                      <li className="list-inline-item">
-                        <Filtering onFilter={handleFilter}/>
-                      </li>
-                      {/* End li */}
-                    </ul>
+                <div className="col-lg-6 mb10">
+                  <div className="breadcrumb_content style2">
+                  <div className="my_profile_setting_input">
+            <button
+              className="btn float-start btn-danger"
+              onClick={handleBack}
+            >
+            Back to Tenants
+            </button>
+          </div>
+                   
                   </div>
                 </div>
+        
                 {/* End .col */}
 
                 <div className="col-lg-12">
-                  <div className="my_dashboard_review mb40">
-                    <div className="property_table">
-                      <div className="table-responsive mt0">
-                        <TableData key={dataUpdated}  searchQuery={searchQuery}  selectedFilter={selectedFilter}  currentPage={currentPage}/>
+                  <div className="my_dashboard_review">
+                    <div className="row">
+                      <div className="col-lg-12">
+                        <h3 className="mb30 text-danger">Capture Tenants Details</h3>
+                       
                       </div>
-                      {/* End .table-responsive */}
 
-                      <div className="mbp_pagination">
-                        <Pagination />
-                      </div>
-                      {/* End .mbp_pagination */}
+                      <TenantsForm />
                     </div>
-                    {/* End .property_table */}
-                  </div>
+                  </div>                 
+                
                 </div>
-                {/* End .col */}
+               
               </div>
               {/* End .row */}
 

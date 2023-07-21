@@ -1,9 +1,9 @@
 import Header from '../../common/header/dashboard/Header';
 import SidebarMenu from '../../common/header/dashboard/SidebarMenu';
 import MobileMenu from '../../common/header/MobileMenu';
-import TenantsDetails from './TenantsDetails';
 
-
+import TenantsTable from './TenantsTable';
+import TenantsDetails from './TenantsDetails'
 const index = () => {
   return (
     <>
@@ -62,12 +62,14 @@ const index = () => {
                   <div className="my_dashboard_review mb40">
                     <div className="favorite_item_list">
 
-                      <TenantsDetails />
+                      <TenantsTable />
                       
                     </div>
                    
                   </div>
                 </div>
+               
+              
 
                 {/* End .col */}
 

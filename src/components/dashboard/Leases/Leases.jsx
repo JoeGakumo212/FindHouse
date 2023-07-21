@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { parseCookies } from 'nookies';
 
@@ -32,10 +32,108 @@ const Leases = () => {
   const [utility_display_name, setUtilityDisplayName] = useState('');
   const [utility_unit_cost, setUtilityUnitCost] = useState('');
   const [utility_base_fee, setUtilityBaseFee] = useState('');
-  const [payment_method_name, setPaymentMethod] = useState('');
   const [payment_method_description, setPaymentDescription] = useState('');
   const [selectedDateLease, setSelectedDateLease] = useState('');
-  const [selectedProperty, setSelectedProperty] = useState(null);
+
+  const [payment_method_id, setPayment_Method_Id] = useState('');
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [utilities, setUtilities] = useState([]);
+  const [leaseType, setLeaseType] = useState('');
+  const [selectedUtilityId, setSelectedUtilityId] = useState('');
+  const [supportData, setSupportData] = useState(null);
+  const [selectedLeaseType, setSelectedLeaseType] = useState('');
+  const [selectedLateFee, setSelectedLateFee] = useState('');
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
+  const [selectedUtility, setSelectedUtility] = useState('');
+  const [selectedExtraCharge, setSelectedExtraCharge] = useState('');
+
+  // getting the support data
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const cookies = parseCookies();
+      const tokenFromCookie = cookies.access_token;
+
+      const headers = {
+        Authorization: `Bearer ${tokenFromCookie}`,
+        'Content-Type': 'application/json',
+      };
+
+      const response = await axios.get(
+        'https://cloudagent.co.ke/backend/api/v1/lease_support_data',
+        { headers }
+      );
+      const data = response.data;
+      setSupportData(data);
+    } catch (error) {
+      console.error('Error fetching support data:', error);
+    }
+  };
+  // Define currentSectionData based on the currentSection value
+
+  let currentSectionData = [];
+  if (currentSection === 'lease') {
+    currentSectionData = supportData?.lease_types || [];
+  } else if (currentSection === 'extra') {
+    currentSectionData = supportData?.extra_charges || [];
+  } else if (currentSection === 'deposit') {
+    currentSectionData = supportData?.deposit_types || [];
+  } else if (currentSection === 'latefees') {
+    currentSectionData = supportData?.late_fees || [];
+  } else if (currentSection === 'utility') {
+    currentSectionData = supportData?.utilities || [];
+  }
+
+  //  end
+  const handleLeaseTypeChange = (event) => {
+    const selectedName = event.target.value;
+    const selectedId = supportData.lease_types.find(
+      (leaseType) => leaseType.lease_type_name === selectedName
+    )?.id;
+   
+    setSelectedLeaseType(selectedName);
+  };
+  const handleLateFeeChange = (event) => {
+    const selectedName = event.target.value;
+    const selectedLateFee = supportData.late_fees[0];
+
+    if (selectedLateFee) {
+      const selectedId = selectedLateFee.id;
+     
+      setSelectedLateFee(selectedName);
+    }
+  };
+
+  const handlePaymentMethodChange = (event) => {
+    const selectedName = event.target.value;
+    const selectedId = supportData.payment_methods.find(
+      (paymentMethod) => paymentMethod.payment_method_name === selectedName
+    )?.id;
+  
+    setSelectedPaymentMethod(selectedName);
+  };
+
+  const handleUtilityChange = (event) => {
+    const selectedName = event.target.value;
+    const selectedId = supportData.utilities.find(
+      (utility) => utility.utility_name === selectedName
+    )?.id;
+   
+    setSelectedUtility(selectedName);
+  };
+
+  const handleExtraChargeChange = (event) => {
+    const selectedName = event.target.value;
+    const selectedId = supportData.extra_charges.find(
+      (extraCharge) => extraCharge.extra_charge_name === selectedName
+    )?.id;
+   
+    setSelectedExtraCharge(selectedName);
+  };
+  // end
 
   const handleNextClick = () => {
     if (currentSection === 'lease') {
@@ -216,66 +314,70 @@ const Leases = () => {
       setUnitOptions([]);
     }
   };
-// finding property and it id
+  // finding property and it id
 
-const searchProperties = async (query) => {
-  try {
-    const cookies = parseCookies();
-    const tokenFromCookie = cookies.access_token;
+  const searchProperties = async (query) => {
+    try {
+      const cookies = parseCookies();
+      const tokenFromCookie = cookies.access_token;
 
-    const headers = {
-      Authorization: `Bearer ${tokenFromCookie}`,
-      'Content-Type': 'application/json',
-    };
+      const headers = {
+        Authorization: `Bearer ${tokenFromCookie}`,
+        'Content-Type': 'application/json',
+      };
 
-    const params = {
-      property: query,
-      page: 1,
-      limit: 1000,
-      sortField: 'updated_at',
-      sortDirection: 'desc',
-      whereField: '',
-      whereValue: '',
-    };
+      const params = {
+        property: query,
+        page: 1,
+        limit: 1000,
+        sortField: 'updated_at',
+        sortDirection: 'desc',
+        whereField: '',
+        whereValue: '',
+      };
 
-    const response = await axios.get(
-      'https://cloudagent.co.ke/backend/api/v1/properties',
-      {
-        params,
-        headers,
+      const response = await axios.get(
+        'https://cloudagent.co.ke/backend/api/v1/properties',
+        {
+          params,
+          headers,
+        }
+      );
+
+      if (response.status === 200) {
+        const apiData = response.data.data;
+        const propertyOptions = apiData.map((property) => ({
+          property_name: property.property_name,
+          property_id: property.id,
+        }));
+        setPropertyOptions(propertyOptions);
+        setData(apiData);
+        console.log('Property Details Name', apiData);
+      } else {
+        console.error('Response data is not an array:', apiData.data);
       }
-    );
-
-    if (response.status === 200) {
-      const apiData = response.data.data;
-      const propertyOptions = apiData.map((property) => ({
-        property_name: property.property_name,
-        property_id: property.id,
-      }));
-      setPropertyOptions(propertyOptions);
-      setData(apiData);
-      console.log('Property Details Name', apiData);
-    } else {
-      console.error('Response data is not an array:', apiData.data);
+    } catch (error) {
+      console.error('Error occurred while searching:', error);
     }
-  } catch (error) {
-    console.error('Error occurred while searching:', error);
-  }
-};
+  };
 
-const handlePropertyInputChanged = (event) => {
-  const { value } = event.target;
-  setPropertyName(value);
-  searchProperties(value);
-};
-const handlePropertyOptionClicked = (option) => {
-  console.log('Selected Property Name:', option.property_name);
-  console.log('Selected Property ID:', option.property_id);
+  const handlePropertyInputChanged = (event) => {
+    const { value } = event.target;
+    setPropertyName(value);
+    searchProperties(value);
+  };
+  const handlePropertyOptionClicked = (option) => {
+    console.log('Selected Property Name:', option.property_name);
+    console.log('Selected Property ID:', option.property_id);
 
-  setPropertyName(option.property_name); 
-  setShowOptions(false); 
-};
- 
+    setPropertyName(option.property_name);
+    setShowOptions(false);
+  };
+  const selectedProperty = propertyOptions.find(
+    (option) => option.property_name === property_name
+  );
+  const propertyId = selectedProperty ? selectedProperty.id : null;
+console.log("Property Id",propertyId)  
   // tenants search logic
 
   const handleSearchInputChange = (event) => {
@@ -324,7 +426,7 @@ const handlePropertyOptionClicked = (option) => {
           { middle_name: { $regex: query, $options: 'i' } },
         ],
         page: 1,
-        limit:100,
+        limit: 100,
         sortField: 'updated_at',
         sortDirection: 'desc',
         whereField: '',
@@ -363,13 +465,29 @@ const handlePropertyOptionClicked = (option) => {
         Authorization: `Bearer ${tokenFromCookie}`,
         'Content-Type': 'application/json',
       };
+      // Extract the IDs of the selected items
+      const selectedLeaseTypeId = supportData.lease_types.find(
+        (leaseType) => leaseType.lease_type_name === selectedLeaseType
+      )?.id;
+      const selectedLateFeeId = supportData.late_fees.find(
+        (lateFee) => lateFee.late_fee_name === selectedLateFee
+      )?.id;
+      const selectedPaymentMethodId = supportData.payment_methods.find(
+        (paymentMethod) =>
+          paymentMethod.payment_method_name === selectedPaymentMethod
+      )?.id;
+      const selectedUtilityId = supportData.utilities.find(
+        (utility) => utility.utility_name === selectedUtility
+      )?.id;
+      const selectedExtraChargeId = supportData.extra_charges.find(
+        (extraCharge) => extraCharge.extra_charge_name === selectedExtraCharge
+      )?.id;
 
       const formData = {
         data: {
           tenants: selectedTenants,
-          property_id: selectedProperty.property_id,
-         
-
+        
+          propertyId: selectedProperty.property_id,
           units: [
             {
               unit_name: unit_name,
@@ -379,14 +497,8 @@ const handlePropertyOptionClicked = (option) => {
           ],
           start_date,
           due_date,
-
           rent_deposit,
-          utility_name,
-
-          utilityDeposits: deposit_amount,
-          selectedTenants,
-
-          extra_charge_type,
+          utilityDeposits: deposit_amount,            
           extra_charge_Value,
           extra_charge_frequency,
           late_fee_name,
@@ -397,9 +509,13 @@ const handlePropertyOptionClicked = (option) => {
           utility_display_name,
           utility_unit_cost,
           utility_base_fee,
-          payment_method_name,
           payment_method_description,
           selectedDateLease,
+          leaseTypeId: selectedLeaseTypeId,
+          lateFeeId: selectedLateFeeId,
+          paymentMethodId: selectedPaymentMethodId,
+          utilityId: selectedUtilityId,
+          extraChargeId: selectedExtraChargeId,
         },
       };
 
@@ -426,30 +542,30 @@ const handlePropertyOptionClicked = (option) => {
           <div className="row">
             <h3>Lease Info</h3>
             <div className="col-lg-4">
-        <div className="my_profile_setting_input ui_kit_select_search form-group">
-          <label htmlFor="PropertyName">Property Name</label>
-          <input
-            type="text"
-            value={property_name}
-            onChange={handlePropertyInputChanged}
-            onClick={() => setShowOptions(true)}
-            placeholder="Find property by Name"
-            className="selectpicker form-select"
-          />
-          {showOptions && propertyOptions.length > 0 && (
-            <ul className="autocomplete-options">
-              {propertyOptions.map((option, index) => (
-                <li
-                  key={index}
-                  onClick={() => handlePropertyOptionClicked(option)}
-                >
-                  {option.property_name} - {option.id}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
+              <div className="my_profile_setting_input ui_kit_select_search form-group">
+                <label htmlFor="PropertyName">Property Name</label>
+                <input
+                  type="text"
+                  value={property_name}
+                  onChange={handlePropertyInputChanged}
+                  onClick={() => setShowOptions(true)}
+                  placeholder="Find property by Name"
+                  className="selectpicker form-select"
+                />
+                {showOptions && propertyOptions.length > 0 && (
+                  <ul className="autocomplete-options">
+                    {propertyOptions.map((option, index) => (
+                      <li
+                        key={index}
+                        onClick={() => handlePropertyOptionClicked(option)}
+                      >
+                        {option.property_name} - {option.id}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
             <div className="col-lg-4">
               <div className="my_profile_setting_input ui_kit_select_search form-group">
                 <label htmlFor="unitname">Unit Name</label>
@@ -475,20 +591,22 @@ const handlePropertyOptionClicked = (option) => {
               </div>
             </div>
 
-            <div className="col-lg-4">
+            <div className="col-lg-4 col-xl-0">
               <div className="my_profile_setting_input form-group">
-                <label htmlFor="unitmode">Unit Mode</label>
+                <label htmlFor="LEASE">Lease Types</label>
                 <select
-                  value={unit_mode}
-                  onChange={handleUnitModeInputChange}
-                  placeholder="Select Unit Mode"
+                  value={selectedLeaseType}
+                  onChange={handleLeaseTypeChange}
                   className="selectpicker form-select"
                 >
-                  <option value="" disabled>
-                    Select Unit Mode
-                  </option>
-                  <option value="Residential">Residential</option>
-                  <option value="Commercial">Commercial</option>
+                  {currentSectionData.map((leaseType) => (
+                    <option
+                      key={leaseType.id}
+                      value={leaseType.lease_type_name}
+                    >
+                      {leaseType.lease_type_display_name}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -569,21 +687,19 @@ const handlePropertyOptionClicked = (option) => {
                 />
               </div>
             </div>
-            <div className="col-lg-6">
-              <div className="my_profile_setting_input ui_kit_select_search form-group">
-                <label htmlFor="PropertyName">Unit Name</label>
+            <div className="col-lg-6 col-xl-0">
+              <div className="my_profile_setting_input form-group">
+                <label htmlFor="UTILITY">Utilities</label>
                 <select
-                  value={utility_name}
-                  onChange={handleUnitTypeChange}
-                  placeholder="Enter lease type search"
+                  value={selectedUtility}
+                  onChange={handleUtilityChange}
                   className="selectpicker form-select"
                 >
-                  <option value="" disabled selected>
-                    Unit Name
-                  </option>
-                  <option value="Electricity">Electricity</option>
-                  <option value="Water">Water</option>
-                  <option value="Garbage">Garbage</option>
+                  {supportData.utilities.map((utility) => (
+                    <option key={utility.id} value={utility.utility_name}>
+                      {utility.utility_display_name}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -648,21 +764,22 @@ const handlePropertyOptionClicked = (option) => {
       {currentSection === 'extra' && (
         <div className="Extra-Charge-section">
           <div className="row">
-            <div className="col-lg-3 col-xl-0">
+            <div className="col-lg-6 col-xl-0">
               <div className="my_profile_setting_input form-group">
-                <label htmlFor="Exchange Charge Type">Extra Charge Name</label>
+                <label htmlFor="EXTRA_CHARGE">Extra Charges</label>
                 <select
-                  value={extra_charge_type}
-                  onChange={handleLeaseExtraChargeTypeInputChange}
-                  placeholder="Enter lease type search"
+                  value={selectedExtraCharge}
+                  onChange={handleExtraChargeChange}
                   className="selectpicker form-select"
                 >
-                  <option value="" disabled selected>
-                    Extra Charge Name
-                  </option>
-                  <option value="VAT">VAT</option>
-                  <option value="service fee">Services Fee</option>
-                  <option value="Processing Fee">Processing</option>
+                  {currentSectionData.map((extraCharge) => (
+                    <option
+                      key={extraCharge.id}
+                      value={extraCharge.extra_charge_name}
+                    >
+                      {extraCharge.extra_charge_display_name}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -717,19 +834,19 @@ const handlePropertyOptionClicked = (option) => {
             </div>
             <hr />
             <h2 className="text-center text-danger">Late Fees</h2>
-            <div className="col-lg-3">
-              <div className="my_profile_setting_input ui_kit_select_search form-group">
-                <label htmlFor="lateFeeName">Late Fee Name</label>
+            <div className="col-lg-3 col-xl-0">
+              <div className="my_profile_setting_input form-group">
+                <label htmlFor="LATE_FEE">Late Fees</label>
                 <select
-                  value={late_fee_name}
-                  onChange={handleLateFeeName}
-                  placeholder="Late Fee Name"
+                  value={selectedLateFee}
+                  onChange={handleLateFeeChange}
                   className="selectpicker form-select"
                 >
-                  <option value="" disabled selected>
-                    Late Fee Name
-                  </option>
-                  <option value="Penalty">Penalty</option>
+                  {supportData.late_fees.map((lateFee) => (
+                    <option key={lateFee.id} value={lateFee.late_fee_name}>
+                      {lateFee.late_fee_display_name}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -816,21 +933,19 @@ const handlePropertyOptionClicked = (option) => {
         <div className="latefees-section">
           <div className="col-lg-12">
             <div className="row">
-              <div className="col-lg-3">
-                <div className="my_profile_setting_input ui_kit_select_search form-group">
-                  <label htmlFor="utility_display_name">Utility Name</label>
+              <div className="col-lg-3 col-xl-0">
+                <div className="my_profile_setting_input form-group">
+                  <label htmlFor="UTILITY">Utilities</label>
                   <select
-                    value={utility_display_name}
-                    onChange={(e) => setUtilityDisplayName(e.target.value)}
-                    placeholder="Enter utility name"
+                    value={selectedUtility}
+                    onChange={handleUtilityChange}
                     className="selectpicker form-select"
                   >
-                    <option value="" disabled selected>
-                      Utility Name
-                    </option>
-                    <option value="Electricity">Electricity</option>
-                    <option value="Water">Water</option>
-                    <option value="Garbage">Garbage</option>
+                    {supportData.utilities.map((utility) => (
+                      <option key={utility.id} value={utility.utility_name}>
+                        {utility.utility_display_name}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -860,26 +975,27 @@ const handlePropertyOptionClicked = (option) => {
               </div>
               <hr />
               <h3>Payments Methods</h3>
-              <div className="col-lg-6">
-                <div className="my_profile_setting_input ui_kit_select_search form-group">
-                  <label htmlFor="payment_method_name">Payment Method</label>
+
+              {/* Payment Description */}
+              <div className="col-lg-6 col-xl-0">
+                <div className="my_profile_setting_input form-group">
+                  <label htmlFor="PAYMENT_METHOD">Payment Methods</label>
                   <select
-                    value={payment_method_name}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                    placeholder="Enter payment method"
+                    value={selectedPaymentMethod}
+                    onChange={handlePaymentMethodChange}
                     className="selectpicker form-select"
                   >
-                    <option value="" disabled selected>
-                      Payment Method
-                    </option>
-                    <option value="Cash">Cash</option>
-                    <option value="Mpesa">Mpesa</option>
+                    {supportData.payment_methods.map((paymentMethod) => (
+                      <option
+                        key={paymentMethod.id}
+                        value={paymentMethod.payment_method_name}
+                      >
+                        {paymentMethod.payment_method_display_name}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
-
-              {/* Payment Description */}
-
               <div className="col-lg-6">
                 <div className="my_profile_setting_input ui_kit_select_search form-group">
                   <label htmlFor="payment_method_description">

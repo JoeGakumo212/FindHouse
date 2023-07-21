@@ -5,7 +5,7 @@ import { useState,useEffect} from 'react';
 
 import { Button, Modal, Form } from 'react-bootstrap';
 import { IoIosArrowUp, IoIosArrowDown } from 'react-icons/io';
-const DetailedInfo = () => {
+const DetailedInfo =  ({ createdUnit })=> {
   const [showModal, setShowModal] = useState(false);
   const [unit_name, setunit_name] = useState('');
   const [unit_floor, setFloorUnit] = useState(0);
@@ -488,6 +488,7 @@ const DetailedInfo = () => {
                       </div>
                     </div>
                   </div>
+                  {createdUnit && <p>Created Unit: {createdUnit.name}</p>}
                 </div>
               </>
             )}
@@ -519,3 +520,4 @@ const DetailedInfo = () => {
 };
 
 export default DetailedInfo;
+

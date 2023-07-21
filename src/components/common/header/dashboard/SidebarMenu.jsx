@@ -1,37 +1,49 @@
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { useSession } from "next-auth/react";
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
 import {
   isParentPageActive,
   isSinglePageActive,
-} from "../../../../utils/daynamicNavigation";
+} from '../../../../utils/daynamicNavigation';
 
 const SidebarMenu = () => {
   const route = useRouter();
-  const {data:session, loading}=useSession()
+  const { data: session, loading } = useSession();
   const myProperties = [
-    { id: 1, name: "General Elements", route: "/my-properties" },
-    { id: 2, name: "Advanced Elements", route: "/my-properties" },
-    { id: 3, name: "Editors", route: "/my-properties" },
-  ];
+    {
+      id: 1,
+      name: 'All Properties',
+      route: '/my-properties/PropertyTableData',
+    },
+    { route: `/my-properties/${route.query.id}/Info`, name: 'Info' },
+    { route: `/my-properties/${route.query.id}/Unit`, name: 'Unit' },
+    { route: `/my-properties/${route.query.id}/Lease`, name: 'Lease' },
+    { route: `/my-properties/${route.query.id}/Invoice`, name: 'Invoice' },
+    { route: `/my-properties/${route.query.id}/EditUnit`, name: 'EditUnit' },
+    {
+      route: `/my-properties/${route.query.id}/Vacate-notice`,
+      name: 'Vacate-notice',
+    },
+  ].filter((item) => item.name && item.id);
+
   const reviews = [
-    { id: 1, name: "My Reviews", route: "/my-review" },
-    { id: 2, name: "Visitor Reviews", route: "/my-review" },
+    { id: 1, name: 'My Reviews', route: '/my-review' },
+    { id: 2, name: 'Visitor Reviews', route: '/my-review' },
   ];
   const manageAccount = [
     {
       id: 1,
-      name: "My Package",
-      route: "/my-package",
-      icon: "flaticon-box",
+      name: 'My Package',
+      route: '/my-package',
+      icon: 'flaticon-box',
     },
     {
       id: 2,
-      name: "My Profile",
-      route: "/my-profile",
-      icon: "flaticon-user",
+      name: 'My Profile',
+      route: '/my-profile',
+      icon: 'flaticon-user',
     },
-    { id: 3, name: "Logout", route: "/login", icon: "flaticon-logout" },
+    { id: 3, name: 'Logout', route: '/login', icon: 'flaticon-logout' },
   ];
 
   return (
@@ -55,9 +67,9 @@ const SidebarMenu = () => {
           <ul>
             <li
               className={`treeview ${
-                isSinglePageActive("/my-dashboard", route.pathname)
-                  ? "active"
-                  : ""
+                isSinglePageActive('/my-dashboard', route.pathname)
+                  ? 'active'
+                  : ''
               }`}
             >
               <Link href="/my-dashboard">
@@ -67,7 +79,7 @@ const SidebarMenu = () => {
                 </a>
               </Link>
             </li>
-            <li
+            {/* <li
               className={`treeview ${
                 isSinglePageActive("/create-listing", route.pathname)
                   ? "active"
@@ -83,12 +95,12 @@ const SidebarMenu = () => {
                 </a>
               </Link>
             )}
-            </li>
+            </li> */}
             <li
               className={`treeview ${
-                isSinglePageActive("/my-message", route.pathname)
-                  ? "active"
-                  : ""
+                isSinglePageActive('/my-message', route.pathname)
+                  ? 'active'
+                  : ''
               }`}
             >
               <Link href="/my-message">
@@ -107,7 +119,7 @@ const SidebarMenu = () => {
           <ul>
             <li
               className={`treeview ${
-                isParentPageActive(myProperties, route.pathname) ? "active" : ""
+                isParentPageActive(myProperties, route.pathname) ? 'active' : ''
               }`}
             >
               <a data-bs-toggle="collapse" href="#my-property">
@@ -115,9 +127,29 @@ const SidebarMenu = () => {
                 <i className="fa fa-angle-down pull-right"></i>
               </a>
               <ul className="treeview-menu collapse" id="my-property">
-                {myProperties.map((item) => (
+                {/* {myProperties.map((item) => (
                   <li key={item.id}>
                     <Link href={item.route}>
+                      <a>
+                        <i className="fa fa-circle"></i> {item.name}
+                      </a>
+                    </Link>
+                  </li>
+                ))} */}
+                {myProperties.map((item) => (
+                  <li
+                    key={item.id}
+                    className={`treeview ${
+                      isParentPageActive(myProperties, route.pathname)
+                        ? 'active'
+                        : ''
+                    }`}
+                  >
+                    <Link
+                      href={item.route}
+                      as={`/my-properties/${item.id}`}
+                      passHref
+                    >
                       <a>
                         <i className="fa fa-circle"></i> {item.name}
                       </a>
@@ -130,7 +162,7 @@ const SidebarMenu = () => {
 
             <li
               className={`treeview ${
-                isParentPageActive(reviews, route.pathname) ? "active" : ""
+                isParentPageActive(reviews, route.pathname) ? 'active' : ''
               }`}
             >
               <a data-bs-toggle="collapse" href="#review">
@@ -154,9 +186,9 @@ const SidebarMenu = () => {
 
             <li
               className={`treeview ${
-                isSinglePageActive("/my-favourites", route.pathname)
-                  ? "active"
-                  : ""
+                isSinglePageActive('/my-favourites', route.pathname)
+                  ? 'active'
+                  : ''
               }`}
             >
               <Link href="/my-favourites">
@@ -168,9 +200,9 @@ const SidebarMenu = () => {
             </li>
             <li
               className={`treeview ${
-                isSinglePageActive("/tenants", route.pathname)
-                  ? "active"
-                  : ""
+                isSinglePageActive('/tenants/TenantsTableData', route.pathname)
+                  ? 'active'
+                  : ''
               }`}
             >
               <Link href="/tenants">
@@ -182,23 +214,34 @@ const SidebarMenu = () => {
             </li>
             <li
               className={`treeview ${
-                isSinglePageActive("/Leases", route.pathname)
-                  ? "active"
-                  : ""
+                isSinglePageActive('/invoices/Invoice', route.pathname)
+                  ? 'active'
+                  : ''
               }`}
             >
-              <Link href="/Leases">
+              <Link href="/invoices">
                 <a>
                   <i className="flaticon-magnifying-glass"></i>
-                  <span> Leases</span>
+                  <span> Invoice</span>
                 </a>
               </Link>
             </li>
             <li
               className={`treeview ${
-                isSinglePageActive("/Payments", route.pathname)
-                  ? "active"
-                  : ""
+                isSinglePageActive('/Leases', route.pathname) ? 'active' : ''
+              }`}
+            >
+              <Link href="/LeasesData">
+                <a>
+                  <i className="flaticon-magnifying-glass"></i>
+                  <span> LeasesData</span>
+                </a>
+              </Link>
+            </li>
+            
+            <li
+              className={`treeview ${
+                isSinglePageActive('/Payments', route.pathname) ? 'active' : ''
               }`}
             >
               <Link href="/Payments">
@@ -210,9 +253,7 @@ const SidebarMenu = () => {
             </li>
             <li
               className={`treeview ${
-                isSinglePageActive("/Utility", route.pathname)
-                  ? "active"
-                  : ""
+                isSinglePageActive('/Utility', route.pathname) ? 'active' : ''
               }`}
             >
               <Link href="/Utility">
@@ -224,9 +265,7 @@ const SidebarMenu = () => {
             </li>
             <li
               className={`treeview ${
-                isSinglePageActive("/Vacants", route.pathname)
-                  ? "active"
-                  : ""
+                isSinglePageActive('/Vacants', route.pathname) ? 'active' : ''
               }`}
             >
               <Link href="/Vacants">
@@ -238,9 +277,9 @@ const SidebarMenu = () => {
             </li>
             <li
               className={`treeview ${
-                isSinglePageActive("/my-saved-search", route.pathname)
-                  ? "active"
-                  : ""
+                isSinglePageActive('/my-saved-search', route.pathname)
+                  ? 'active'
+                  : ''
               }`}
             >
               <Link href="/my-saved-search">
@@ -260,7 +299,7 @@ const SidebarMenu = () => {
             {manageAccount.map((item) => (
               <li
                 className={
-                  isSinglePageActive(item.route, route.pathname) ? "active" : ""
+                  isSinglePageActive(item.route, route.pathname) ? 'active' : ''
                 }
                 key={item.id}
               >

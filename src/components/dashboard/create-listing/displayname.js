@@ -4,64 +4,115 @@ import { parseCookies } from 'nookies';
 
 const Leases = () => {
   const [propertyTypes, setPropertyTypes] = useState([]);
-  const [selectedType, setSelectedType] = useState('');
+  const [lateFees, setLateFees] = useState([]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [utilities, setUtilities] = useState([]);
+  const [extraCharges, setExtraCharges] = useState([]);
 
+  // Fetch the support data
   useEffect(() => {
-    fetchData();
+    fetchSupportData();
   }, []);
 
-  const fetchData = async () => {
+  const fetchSupportData = async () => {
+    const cookies = parseCookies();
+    const tokenFromCookie = cookies.access_token;
+
+    const headers = {
+      Authorization: `Bearer ${tokenFromCookie}`,
+      'Content-Type': 'application/json',
+    };
+
     try {
-      const cookies = parseCookies();
-      const tokenFromCookie = cookies.access_token;
-
-      const headers = {
-        Authorization: `Bearer ${tokenFromCookie}`,
-        'Content-Type': 'application/json',
-      };
-
       const response = await axios.get('https://cloudagent.co.ke/backend/api/v1/property_support_data', { headers });
-      console.log('API Response:', response.data);
-
-      setPropertyTypes(response.data.property_types);
+      const data = response.data;
+      setPropertyTypes(data.property_types);
+      setLateFees(data.late_fees);
+      setPaymentMethods(data.payment_methods);
+      setUtilities(data.utilities);
+      setExtraCharges(data.extra_charges);
     } catch (error) {
-      console.error('API Error:', error);
+      console.error('Error fetching support data:', error);
     }
   };
 
-  const handleTypeChange = (event) => {
-    const selectedValue = event.target.value;
-    setSelectedType(selectedValue);
-
-    // Find the property type object based on the selected value
-    const selectedType = propertyTypes.find((type) => type.display_name === selectedValue);
-
-    if (selectedType) {
-      console.log('Selected Property Type:', selectedType.display_name);
-      console.log('Selected Property Type ID:', selectedType.id);
-    }
-  };
-  // sending the selected display name
-  const payload = {
-    propertyType: selectedType.display_name,
-    propertyTypeId: selectedType.id,
-  };
   return (
-    <div className="col-lg-6">
-      <h2>Property Types</h2>
-      <div className="my_profile_setting_input form-group">
-        <label htmlFor="propertyType">Select Property Type:</label>
-        <select id="propertyType" value={selectedType} onChange={handleTypeChange} className="selectpicker form-select">
-          <option value="">Select</option>
-          {propertyTypes.map((type) => (
-            <option key={type.id} value={type.display_name}>
-              {type.display_name}
-            </option>
-          ))}
-        </select>
-      </div>
+    <div>
+      <form> {/* Wrap the form elements inside a form element */}
+        <div className="col-lg-6">
+          <div className="my_profile_setting_input form-group">
+            <label htmlFor="PropertyType">Property Type</label>
+            <select className="form-select">
+              {propertyTypes.map((propertyType) => (
+                <option key={propertyType.id} value={propertyType.id}>
+                  {propertyType.display_name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="col-lg-6">
+          <div className="my_profile_setting_input form-group">
+            <label htmlFor="LateFee">Late Fee</label>
+            <select className="form-select">
+              {lateFees.map((lateFee) => (
+                <option key={lateFee.id} value={lateFee.id}>
+                  {lateFee.late_fee_display_name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="col-lg-6">
+          <div className="my_profile_setting_input form-group">
+            <label htmlFor="PaymentMethod">Payment Method</label>
+            <select className="form-select">
+              {paymentMethods.map((paymentMethod) => (
+                <option key={paymentMethod.id} value={paymentMethod.id}>
+                  {paymentMethod.payment_method_display_name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="col-lg-6">
+          <div className="my_profile_setting_input form-group">
+            <label htmlFor="Utility">Utility</label>
+            <select className="form-select">
+              {utilities.map((utility) => (
+                <option key={utility.id} value={utility.id}>
+                  {utility.utility_display_name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="col-lg-6">
+          <div className="my_profile_setting_input form-group">
+            <label htmlFor="ExtraCharge">Extra Charge</label>
+            <select className="form-select">
+              {extraCharges.map((extraCharge) => (
+                <option key={extraCharge.id} value={extraCharge.id}>
+                  {extraCharge.extra_charge_display_name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </form>
     </div>
   );
 };
 
 export default Leases;
+<div className="my_dashboard_review mt30">
+<div className="col-lg-12">
+  <h3 className="mb30 text-danger">Unit Name</h3>
+</div>
+<DetailedInfo />
+</div>     
+

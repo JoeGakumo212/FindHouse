@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { parseCookies } from 'nookies';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 const TenantsDetails = () => {
+  const router = useRouter();
   const [tenant_type, setTenant_Type] = useState('');
   const [first_name, setFirst_name] = useState('');
   const [middle_name, setMiddle_name] = useState('');
@@ -56,6 +59,9 @@ const TenantsDetails = () => {
   const [currentSection, setCurrentSection] = useState(1);
   const totalSections = 4; // Total number of profile sections
   const [showSaveButton, setShowSaveButton] = useState(false);
+  
+
+  
   // handle selection of tenant type
   useEffect(() => {
     fetchData();
@@ -448,14 +454,18 @@ const TenantsDetails = () => {
         alert('Data submitted successfully!');
         // Reset form fields
         // ...
+        router.push('tenants');
       } catch (error) {
         // Handle any errors
         console.error('Error:', error);
       }
     }
   };
+   
+
   return (
     <>
+     
       {currentSection === 1 && (
         <div className="profile-section mb-3">
           <div className="row">

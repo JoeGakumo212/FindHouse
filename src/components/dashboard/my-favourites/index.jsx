@@ -109,7 +109,7 @@ const handlePageChange = (page) => {
                       <FavouritProducts  key={dataUpdated}  searchQuery={searchQuery}  selectedFilter={selectedFilter}  currentPage={currentPage}/>
 
                       <div className="mbp_pagination">
-                        <Pagination onPageChange={handlePageChange} />
+                        {/* <Pagination onPageChange={handlePageChange} /> */}
                       </div>
                     </div>
                   </div>

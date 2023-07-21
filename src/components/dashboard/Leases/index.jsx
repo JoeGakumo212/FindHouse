@@ -2,9 +2,13 @@ import Header from '../../common/header/dashboard/Header';
 import SidebarMenu from '../../common/header/dashboard/SidebarMenu';
 import MobileMenu from '../../common/header/MobileMenu';
 import Leases from './Leases';
-
+import { useRouter } from 'next/router';
 
 const index = () => {
+  const router = useRouter(); // Initialize useRouter
+  const handleBack = () => {
+    router.push('LeasesData');
+  };
   return (
     <>
       {/* <!-- Main Header Nav --> */}
@@ -50,27 +54,34 @@ const index = () => {
 
                 <div className="col-lg-4 col-xl-4 mb10">
                   <div className="breadcrumb_content style2 mb30-991">
-                    <h2 className="breadcrumb_title">
-                      Leases Details
-                    </h2>
+                    <h2 className="breadcrumb_title">Leases Details</h2>
                     <p>We are glad to see you again!</p>
                   </div>
                 </div>
+                <div className="col-lg-4 mb10">
+                  <div className="breadcrumb_content style2">
+                    <div className="my_profile_setting_input">
+                      <button
+                        className="btn float-end btn-danger"
+                        onClick={handleBack}
+                      >
+                        Back to Leases Management
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
                 {/* End .col */}
 
                 <div className="col-lg-12">
                   <div className="my_dashboard_review mb40">
                     <div className="favorite_item_list">
-
-                      <Leases/>
-                      
+                      <Leases />
                     </div>
-                   
                   </div>
                 </div>
 
                 {/* End .col */}
-
               </div>
               {/* End .row */}
 

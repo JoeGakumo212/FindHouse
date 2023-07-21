@@ -5,7 +5,7 @@ import MyLeases from "../../components/dashboard/Leases";
 const index = () => {
   return (
     <>
-      <Seo pageTitle="My Tenants" />
+      <Seo pageTitle="My Leases" />
       <MyLeases />
     </>
   );
