@@ -39,6 +39,7 @@ const Info = () => {
         }
       } catch (error) {
         console.log('Error fetching property details:', error);
+        console.log('Response data:', error.response.data);
         setProperty(null);
       }
     };

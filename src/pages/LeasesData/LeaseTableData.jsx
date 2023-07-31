@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import Header from '../../components/common/header/dashboard/Header';
 import SidebarMenu from '../../components/common/header/dashboard/SidebarMenu';
 import MobileMenu from '../../components/common/header/MobileMenu';
+import Info from '../Vacate/Info'
 const LeaseTableData = ({ tenantId }) => {
   const [leases, setLeases] = useState([]);
   const [filter, setFilter] = useState('');
@@ -13,7 +14,7 @@ const LeaseTableData = ({ tenantId }) => {
   const [totalPages, setTotalPages] = useState(1);
   const pageSize = 5;
   const router = useRouter();
-
+  const [leaseData, setLeaseData] = useState(null);
   const fetchData = async () => {
     try {
       const cookies = parseCookies();
@@ -266,6 +267,7 @@ const LeaseTableData = ({ tenantId }) => {
                             </tbody>
                           </table>
                         </div>
+                       
                         {renderPagination()}
                       </div>
                     </div>

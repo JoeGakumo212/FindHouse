@@ -4,10 +4,12 @@ import { parseCookies } from 'nookies';
 import { toast } from 'react-toastify';
 import { saveAs } from 'file-saver';
 import FileSaver from 'file-saver';
-
+import { useRouter } from 'next/router';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRef } from 'react';
-
+import Header from '../../components/common/header/dashboard/Header';
+import SidebarMenu from '../../components/common/header/dashboard/SidebarMenu';
+import MobileMenu from '../../components/common/header/MobileMenu';
 const Utility = () => {
   const [property_name, setPropertyName] = useState('');
   const [showOptions, setShowOptions] = useState(false);
@@ -27,7 +29,10 @@ const Utility = () => {
   const [selectedUtilityId, setSelectedUtilityId] = useState('');
   const fileInputRef = useRef(null);
   const [utilities, setUtilities] = useState([]);
-
+  const router = useRouter();
+  const handleBacked = () => {
+    router.push('/Utility');
+  };
   const handlePropertyInputChange = (event) => {
     setPropertyName(event.target.value);
     searchProperties(event.target.value);
@@ -390,6 +395,57 @@ const Utility = () => {
 
   return (
     <>
+      {/* <!-- Main Header Nav --> */}
+      <Header />
+
+      {/* <!--  Mobile Menu --> */}
+      <MobileMenu />
+
+      <div className="dashboard_sidebar_menu">
+        <div
+          className="offcanvas offcanvas-dashboard offcanvas-start"
+          tabIndex="-1"
+          id="DashboardOffcanvasMenu"
+          data-bs-scroll="true"
+        >
+          <SidebarMenu />
+        </div>
+      </div>
+      {/* End sidebar_menu */}
+
+      {/* <!-- Our Dashbord --> */}
+      <section className="our-dashbord dashbord bgc-f7 pb50">
+        <div className="container-fluid ovh">
+          <div className="col-lg-12">
+          <div className="row">
+                <div className="col-lg-6 mb10">
+                  <div className="breadcrumb_content style2">
+                    <div className="my_profile_setting_input">
+                      <h3>Add Utility</h3>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-lg-4 mb10">
+                  <div className="breadcrumb_content style2">
+                    <div className="my_profile_setting_input">
+                      <button
+                        className="btn float-end btn-danger"
+                        onClick={handleBacked}
+                      >
+                        Back to Utility Management
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <div className="my_dashboard_review mb40">
+              <div className="favorite_item_list">
+                <div className="container">
+                  <h2>Utility Management</h2>
+
+                  <div className="border-dark">
+                    <div className="row">
+                     
       <div className="row">
         <div className="col-lg-6">
           <div className="my_profile_setting_input ui_kit_select_search form-group">
@@ -585,6 +641,10 @@ const Utility = () => {
           </div>
         </>
       )}
+      </div>
+      </div>
+      </div></div>
+      </div></div></div></section>
     </>
   );
 };

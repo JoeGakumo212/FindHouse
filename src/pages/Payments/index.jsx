@@ -6,7 +6,7 @@ import PaymentsTableData from './PaymentsTableData'
 const index = () => {
   return (
     <>
-      <Seo pageTitle="My Tenants" />
+      <Seo pageTitle="My Payments" />
       <PaymentsTableData />
     </>
   );

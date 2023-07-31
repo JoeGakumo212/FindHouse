@@ -7,15 +7,14 @@ import Header from '../../components/common/header/dashboard/Header';
 import SidebarMenu from '../../components/common/header/dashboard/SidebarMenu';
 import MobileMenu from '../../components/common/header/MobileMenu';
 
-const PropertyTableData = () => {
-  const [properties, setProperties] = useState([]);
+const Landlords = () => {
+  const [landlords, setLandlords] = useState([]);
+  const [selectedLandlord, setSelectedLandlord] = useState(null);
   const [filter, setFilter] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const pageSize = 5;
   const router = useRouter(); // Initialize useRouter
-  const [activeTab, setActiveTab] = useState('Info');
 
   const fetchData = async () => {
     try {
@@ -27,8 +26,9 @@ const PropertyTableData = () => {
         'Content-Type': 'application/json',
       };
 
+      // Update the API endpoint to fetch landlord data
       const response = await axios.get(
-        'https://cloudagent.co.ke/backend/api/v1/properties?filter=&page=&limit=999999999999999999999999999999999&sortField=updated_at&sortDirection=desc&whereField=&whereValue=',
+        'https://cloudagent.co.ke/backend/api/v1/landlords?filter=&page=1&limit=999999999999999999999999999999999999999999999&sortField=updated_at&sortDirection=desc&whereField=&whereValue=',
         {
           headers: {
             Authorization: `Bearer ${tokenFromCookie}`,
@@ -37,7 +37,8 @@ const PropertyTableData = () => {
         }
       );
 
-      setProperties(response.data.data);
+      setLandlords(response.data.data);
+
       setTotalPages(Math.ceil(response.data.meta.total / pageSize));
     } catch (error) {
       console.log('Error fetching data:', error);
@@ -53,14 +54,14 @@ const PropertyTableData = () => {
     setCurrentPage(1); // Reset the current page when the filter changes
   };
 
-  const filteredProperties = properties.filter((property) => {
+  const filteredLandlords = landlords.filter((landlord) => {
     const searchTerm = filter.toLowerCase();
-    const { property_code, property_name, location } = property;
+    const { first_name, last_name, phone } = landlord;
 
     return (
-      property_code.toLowerCase().includes(searchTerm) ||
-      property_name.toLowerCase().includes(searchTerm) ||
-      location.toLowerCase().includes(searchTerm)
+      first_name?.toLowerCase().includes(searchTerm) ||
+      last_name?.toLowerCase().includes(searchTerm) ||
+      phone?.toLowerCase().includes(searchTerm)
     );
   });
 
@@ -68,11 +69,12 @@ const PropertyTableData = () => {
     setCurrentPage(page);
   };
 
-  const handleAddProperty = () => {
-    router.push('/my-properties/CreateListing'); // Navigate to the /createList route
+  const handleAddLandlords = () => {
+    router.push('/my-landlords/AddLandLord'); // Navigate to the /createList route
   };
-
+ 
   const renderPagination = () => {
+    console.log('filteredLandlords:', filteredLandlords);
     const pages = [];
     for (let i = 1; i <= totalPages; i++) {
       pages.push(
@@ -117,14 +119,15 @@ const PropertyTableData = () => {
     );
   };
 
-  const handleEditUnit = (propertyId) => {
-    // Navigate to the dynamic route with the propertyId
-    router.push(`/my-properties/${propertyId}`);
+  const handleEditLandlord = (landlordId) => {
+    // Navigate to the dynamic route with the landlordId
+    router.push(`/my-landlords/${landlordId}/EditForm`);
   };
-
-  const handlePropertyClick = (propertyId, event) => {
-    event.preventDefault(); // Prevent default anchor tag navigation behavior
-    router.push(`/my-properties/${propertyId}`);
+  const handleViewLandlord = (landlordId) => {
+    // Find the selected landlord based on the landlordId
+    const selected = landlords.find((landlord) => landlord.id === landlordId);
+    setSelectedLandlord(selected);
+    router.push(`/my-landlords/${landlordId}`);
   };
 
   return (
@@ -155,16 +158,16 @@ const PropertyTableData = () => {
             <div className="my_dashboard_review mb40">
               <div className="favorite_item_list">
                 <div className="container">
-                  <h2>Property Management</h2>
+                  <h2>Landlord Management</h2>
 
                   <div className="row">
                     <div className="col-lg-4">
                       <div className="my_profile_setting_input">
                         <button
                           className="btn btn1 float-start"
-                          onClick={handleAddProperty}
+                          onClick={handleAddLandlords}
                         >
-                          Add Property
+                          Add Landlord
                         </button>
                       </div>
                     </div>
@@ -174,7 +177,7 @@ const PropertyTableData = () => {
                           type="text"
                           value={filter}
                           onChange={handleFilterChange}
-                          placeholder="Filter Property by Name, Location or Property Code"
+                          placeholder="Filter Landlord by First Name, Last Name or Phone Number"
                           className="form-control border-dark"
                         />
                       </div>
@@ -184,65 +187,56 @@ const PropertyTableData = () => {
                     <table className="table table-striped">
                       <thead>
                         <tr className="bg-dark text-danger">
-                          <th className="text-light">Property Code</th>
-                          <th className="text-light">Property Name</th>
-                          <th className="text-light">Location</th>
-                          <th className="text-light">Unit</th>
+                          <th className="text-light">First Name</th>
+                          <th className="text-light">Last Name</th>
+                          <th className="text-light">Phone</th>
+                          <th className="text-light">Email Address</th>
+                          {/* Add more columns as needed */}
                           <th className="text-light">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredProperties
+                        {filteredLandlords
                           .slice(
                             (currentPage - 1) * pageSize,
                             currentPage * pageSize
                           )
-                          .map((property, index) => (
+                          .map((landlord, index) => (
                             <tr
-                              key={property.id}
+                              key={landlord.id}
                               className={
                                 index % 2 === 0 ? 'table-light' : 'table-light'
                               }
                             >
                               <td>
-                                <button
-                                  className="btn btn-link"
-                                  onClick={(event) =>
-                                    handlePropertyClick(property.id, event)
-                                  }
-                                >
-                                  {property.property_code}
-                                </button>
+                                {/* Assuming there is a unique identifier for landlords */}
+                                <Link href={`/my-landlords/${landlord.id}`}>
+                                  <a>{landlord.first_name}</a>
+                                </Link>
                               </td>
-                              <td>
-                                <button
-                                  className="btn btn-link"
-                                  onClick={(event) =>
-                                    handlePropertyClick(property.id, event)
-                                  }
-                                >
-                                  {property.property_name}
-                                </button>
-                              </td>
-                              <td>{property.location}</td>
-                              <td>{property.unit_total}</td>
+                              <td>{landlord.last_name || '-'}</td>
+                              <td>{landlord.phone}</td>
+                              <td>{landlord.email}</td>
                               <td>
                                 <ul className="view_edit_delete_list mb0">
+                                  {/* Assuming there is an Edit Landlord page */}
                                   <li
                                     className="list-inline-item"
                                     data-toggle="tooltip"
                                     data-placement="top"
-                                    title="View Property"
-                                    onClick={() => handleEditUnit(property.id)}
+                                    title="view Landlord"
+                                    onClick={() =>
+                                      handleViewLandlord(landlord.id)
+                                    }
                                   >
-                                    <span className="flaticon-edit"></span>
+                                    <span className="flaticon-user"></span>
                                   </li>
                                   <li
                                     className="list-inline-item"
                                     data-toggle="tooltip"
                                     data-placement="top"
-                                    title="Edit Unit"
-                                    onClick={() => handleEditUnit(property.id)}
+                                    title="Edit Landlord"
+                                    onClick={() => handleEditLandlord(landlord.id)}
                                   >
                                     <span className="flaticon-edit"></span>
                                   </li>
@@ -264,4 +258,4 @@ const PropertyTableData = () => {
   );
 };
 
-export default PropertyTableData;
+export default Landlords;

@@ -12,9 +12,10 @@ import TenantInfo from './[id]/TenantInfo';
 import TenantLease from './[id]/TenantLease';
 import TenantPayments from './[id]/TenantPayments';
 
-const MyComponent = () => {
+const MyComponent = ({ tenantData }) => {
   const router = useRouter();
   const { id } = router.query;
+  // Destructure the tenant data
 
   const [activeTab, setActiveTab] = useState('info'); // Default active tab is 'info'
 
@@ -32,6 +33,10 @@ const MyComponent = () => {
     }
   }, [router.query.tab]);
 
+  const handleEditTenant = (tenantId) => {
+    console.log('Clicked here for tenant ID:', tenantId);
+    router.push(`/tenants/${tenantId}/EditTenant`);
+  };
   return (
     <>
       {/* Main Header Nav */}
@@ -63,6 +68,17 @@ const MyComponent = () => {
                     <div className="container">
                       <div className="bg-success rounded-top text-light p-2 d-flex align-items-center justify-content-between">
                         <h1 className="text-light">Tenant Details </h1>
+                        <ul className="view_edit_delete_list mb-0">
+                          <li
+                            className="list-inline-item"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="Edit Tenant"
+                            onClick={() => handleEditTenant(id)}
+                          >
+                            <span className="flaticon-edit text-dark"></span>
+                          </li>
+                        </ul>
                       </div>
 
                       {/* Tab Navigation */}

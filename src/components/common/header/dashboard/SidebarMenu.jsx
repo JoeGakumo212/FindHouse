@@ -96,7 +96,21 @@ const SidebarMenu = () => {
               </Link>
             )}
             </li> */}
-            <li
+             <li
+              className={`treeview ${
+                isSinglePageActive('/my-landlords', route.pathname)
+                  ? 'active'
+                  : ''
+              }`}
+            >
+              <Link href="/my-landlords">
+                <a>
+                  <i className="flaticon-user"></i>
+                  <span> LandLords</span>
+                </a>
+              </Link>
+            </li>
+            {/* <li
               className={`treeview ${
                 isSinglePageActive('/my-message', route.pathname)
                   ? 'active'
@@ -109,7 +123,7 @@ const SidebarMenu = () => {
                   <span> Message</span>
                 </a>
               </Link>
-            </li>
+            </li> */}
           </ul>
         </li>
         {/* End Main */}
@@ -160,7 +174,7 @@ const SidebarMenu = () => {
             </li>
             {/* end properties */}
 
-            <li
+            {/* <li
               className={`treeview ${
                 isParentPageActive(reviews, route.pathname) ? 'active' : ''
               }`}
@@ -181,10 +195,10 @@ const SidebarMenu = () => {
                   </li>
                 ))}
               </ul>
-            </li>
+            </li> */}
             {/* End Review */}
 
-            <li
+            {/* <li
               className={`treeview ${
                 isSinglePageActive('/my-favourites', route.pathname)
                   ? 'active'
@@ -197,7 +211,7 @@ const SidebarMenu = () => {
                   <span> My Favorites</span>
                 </a>
               </Link>
-            </li>
+            </li> */}
             <li
               className={`treeview ${
                 isSinglePageActive('/tenants/TenantsTableData', route.pathname)
@@ -207,7 +221,7 @@ const SidebarMenu = () => {
             >
               <Link href="/tenants">
                 <a>
-                  <i className="flaticon-magnifying-glass"></i>
+                  <i className="flaticon-user"></i>
                   <span> Tenants</span>
                 </a>
               </Link>
@@ -234,7 +248,7 @@ const SidebarMenu = () => {
               <Link href="/LeasesData">
                 <a>
                   <i className="flaticon-magnifying-glass"></i>
-                  <span> LeasesData</span>
+                  <span> Leases</span>
                 </a>
               </Link>
             </li>
@@ -265,17 +279,17 @@ const SidebarMenu = () => {
             </li>
             <li
               className={`treeview ${
-                isSinglePageActive('/Vacants', route.pathname) ? 'active' : ''
+                isSinglePageActive('/Vacate', route.pathname) ? 'active' : ''
               }`}
             >
-              <Link href="/Vacants">
+              <Link href="/Vacate">
                 <a>
                   <i className="flaticon-magnifying-glass"></i>
-                  <span> Vacants</span>
+                  <span> Vacate Notice</span>
                 </a>
               </Link>
             </li>
-            <li
+            {/* <li
               className={`treeview ${
                 isSinglePageActive('/my-saved-search', route.pathname)
                   ? 'active'
@@ -288,7 +302,7 @@ const SidebarMenu = () => {
                   <span> Saved Search</span>
                 </a>
               </Link>
-            </li>
+            </li> */}
           </ul>
         </li>
         {/* End manage listing */}

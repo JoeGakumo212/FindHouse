@@ -81,7 +81,12 @@ const MyComponent = () => {
 
   const { vacant_units } = property;
   const occupied_units = property.total_units - vacant_units.length;
+  const handleEditProperty = () => {
+    
+    router.push(`/my-properties/${id}/EditProperty`);
 
+    
+  };
   return (
     <>
       {/* Main Header Nav */}

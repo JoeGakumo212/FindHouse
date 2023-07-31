@@ -4,6 +4,7 @@ import axios from 'axios';
 import Header from '../../components/common/header/dashboard/Header';
 import SidebarMenu from '../../components/common/header/dashboard/SidebarMenu';
 import MobileMenu from '../../components/common/header/MobileMenu';
+import { useRouter } from 'next/router';
 const Payments = () => {
   const [tenantSearchTerm, setTenantSearchTerm] = useState('');
   const [leaseSearchTerm, setLeaseSearchTerm] = useState('');
@@ -24,6 +25,10 @@ const Payments = () => {
 
   const [paymentMethods, setPaymentMethods] = useState([]);
   // end
+  const router = useRouter(); // Initialize useRouter
+  const handleBack = () => {
+    router.push('/Payments');
+  };
   // fetching paymentIdMethod
   useEffect(() => {
     const cookies = parseCookies();
@@ -302,6 +307,28 @@ const Payments = () => {
       {/* <!-- Our Dashbord --> */}
       <section className="our-dashbord dashbord bgc-f7 pb50">
         <div className="container-fluid ovh">
+          <div className="row">
+            <div className="col-lg-6 mb10">
+              <div className="breadcrumb_content style2">
+                <div className="my_profile_setting_input">
+                  <h3>Add Payments</h3>
+                </div>
+              </div>
+            </div>
+            <div className="col-lg-4 mb10">
+              <div className="breadcrumb_content style2">
+                <div className="my_profile_setting_input">
+                  <button
+                    className="btn float-end btn-danger"
+                    onClick={handleBack}
+                  >
+                    Back to Payment Management
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="col-lg-12">
             <div className="my_dashboard_review mb40">
               <div className="favorite_item_list">
@@ -310,7 +337,6 @@ const Payments = () => {
 
                   <div className="border-dark">
                     <div className="row">
-                      <h3>Add Payments</h3>
                       <div className="col-lg-6">
                         <div className="my_profile_setting_input ui_kit_select_search form-group">
                           <label htmlFor="tenantName">Tenant Name</label>

@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
@@ -5,23 +6,23 @@ import { parseCookies } from 'nookies';
 import Header from '../../components/common/header/dashboard/Header';
 import SidebarMenu from '../../components/common/header/dashboard/SidebarMenu';
 import MobileMenu from '../../components/common/header/MobileMenu';
+
 const InvoiceDetails = () => {
   const router = useRouter();
   const { invoiceId } = router.query;
   const [invoiceData, setInvoiceData] = useState(null);
   const [pdfBlobURL, setPdfBlobURL] = useState('');
-
+  console.log('Invoice ID:', invoiceId);
   useEffect(() => {
     const fetchInvoiceData = async () => {
       try {
         const cookies = parseCookies();
         const tokenFromCookie = cookies.access_token;
-        console.log('Token here', tokenFromCookie);
+
         const headers = {
           Authorization: `Bearer ${tokenFromCookie}`,
           'Content-Type': 'application/json',
         };
-        console.log('Sending API Request with Headers:', headers);
 
         // Create the request payload with the invoiceId and pdf set to true
         const requestPayload = {
@@ -33,11 +34,9 @@ const InvoiceDetails = () => {
         const response = await axios.post(
           'https://cloudagent.co.ke/backend/api/v1/invoices/download',
           requestPayload,
-          { headers } // Pass headers as the third argument
+          { headers }
         );
-
-        console.log('API Response:', response);
-        console.log('Token two', tokenFromCookie);
+        console.log('API Response:', response.data);
         const contentType = response.headers['content-type'];
 
         if (contentType === 'application/pdf') {
@@ -74,13 +73,12 @@ const InvoiceDetails = () => {
     return <div>Loading...</div>;
   }
 
-  // Render the details of the invoice and the preview iframe for the PDF
   return (
     <>
-      {/* <!-- Main Header Nav --> */}
+      {/* Main Header Nav */}
       <Header />
 
-      {/* <!--  Mobile Menu --> */}
+      {/* Mobile Menu */}
       <MobileMenu />
 
       <div className="dashboard_sidebar_menu">
@@ -93,9 +91,7 @@ const InvoiceDetails = () => {
           <SidebarMenu />
         </div>
       </div>
-      {/* End sidebar_menu */}
 
-      {/* <!-- Our Dashbord --> */}
       <section className="our-dashbord dashbord bgc-f7 pb50">
         <div className="container-fluid ovh">
           <div className="row">
@@ -105,7 +101,6 @@ const InvoiceDetails = () => {
                   <div className="row">
                     <div className="col-lg-12 maxw100flex-992">
                       <div className="row">
-                        {/* Start Dashboard Navigation */}
                         <div className="col-lg-12">
                           <div className="dashboard_navigationbar dn db-1024">
                             <div className="dropdown">
@@ -121,17 +116,16 @@ const InvoiceDetails = () => {
                             </div>
                           </div>
                         </div>
-                        {/* End Dashboard Navigation */}
 
                         <div className="bg-success rounded-top text-light p-2 d-flex align-items-center justify-content-between">
                           <div className="breadcrumb_content style ">
                             <p className="breadcrumb_title text-light">
                               Invoice Details
                             </p>
-
                             <h3 className="text-light"></h3>
                           </div>
                         </div>
+
                         <div>
                           {/* Render other invoice details */}
                           <iframe
@@ -153,6 +147,7 @@ const InvoiceDetails = () => {
                 </div>
               </div>
             </div>
+
             <div className="col-lg-3">
               <div className="row">
                 <div className="my_dashboard_review mb40">
@@ -164,12 +159,24 @@ const InvoiceDetails = () => {
                             <p className="breadcrumb_title text-light">
                               Summary
                             </p>
+                            <p>#{invoiceData.invoice_number}</p>
+                          </div>
+                        </div>
+                        <div className="row">
+                          <div className="col-lg-4">
+                            <p>Property: {invoiceData.property}</p>
+                          </div>
+                          <div className="col-lg-4">
+                            <p>Lease: {invoiceData.lease}</p>
+                          </div>
+                          <div className="col-lg-4">
+                            <p>Unit: {invoiceData.unit}</p>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>{' '}
+                </div>
                 <div className="my_dashboard_review mb40">
                   <div className="favorite_item_list">
                     <div className="row">
@@ -184,7 +191,7 @@ const InvoiceDetails = () => {
                       </div>
                     </div>
                   </div>
-                </div>{' '}
+                </div>
                 <div className="my_dashboard_review mb40">
                   <div className="favorite_item_list">
                     <div className="row">
@@ -201,10 +208,9 @@ const InvoiceDetails = () => {
                   </div>
                 </div>
                 <button className="btn btn-danger btn-block ">
-                Waiver Invoice
-              </button>
+                  Waiver Invoice
+                </button>
               </div>
-              
             </div>
           </div>
         </div>

@@ -96,7 +96,7 @@ const TenantsTableData = () => {
   };
 
   const handleAddTenant = () => {
-    router.push('TenantsDetails');
+    router.push('/tenants/TenantsDetails');
   };
 
   const handlePageChange = (page) => {
@@ -151,8 +151,9 @@ const TenantsTableData = () => {
       </nav>
     );
   };
-  const handleEditProperty = (property) => {
-    router.push(``);
+  const handleEditTenant = (tenantId) => {
+    console.log('Clicked here for tenant ID:', tenantId);
+    router.push(`/tenants/${tenantId}/EditTenant`);
   };
   return (
     <>
@@ -258,7 +259,7 @@ const TenantsTableData = () => {
                                     data-toggle="tooltip"
                                     data-placement="top"
                                     title="Edit Tenant"
-                                    onClick={() => handleEditProperty}
+                                    onClick={() => handleEditTenant(tenant.id)}
                                   >
                                     <span className="flaticon-edit"></span>
                                   </li>

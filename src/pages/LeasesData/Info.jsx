@@ -160,6 +160,21 @@ const Info = () => {
           </div>
         </div>
       </div>
+      <div className="row">
+  <div className="col-lg-12">
+    <div class="dropdown col-lg-12 w-100">
+      <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+        Utility Deposit
+      </a>
+
+      <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuLink">
+      Utility: {leaseData.utility_charges.utility_display_name}
+      </ul>
+      
+    </div>
+  </div>
+</div>
+
     </>
   );
 };

@@ -1,12 +1,12 @@
 import dynamic from "next/dynamic";
 import Seo from "../../components/common/seo";
-import MyVacants from "../../components/dashboard/Vacants";
+import Landlords from './Landlords'
 
 const index = () => {
   return (
     <>
-      <Seo pageTitle="My Tenants" />
-      <MyVacants />
+      <Seo pageTitle="My Landlords" />
+     <Landlords />
     </>
   );
 };
