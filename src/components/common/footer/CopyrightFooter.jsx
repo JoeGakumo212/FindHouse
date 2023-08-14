@@ -8,7 +8,7 @@ const CopyrightFooter = () => {
     { id: 4, name: "About Us", routeLink: "/about-us" },
     { id: 5, name: "Blog", routeLink: "/blog-list-2" },
     { id: 6, name: "Contact", routeLink: "/contact" },
-    { id: 6, name: "FAQs", routeLink: "/faq" },
+    { id: 7, name: "FAQs", routeLink: "/faq" },
   ];
 
   return (

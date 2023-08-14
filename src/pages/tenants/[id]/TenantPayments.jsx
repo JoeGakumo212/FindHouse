@@ -1,8 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { parseCookies } from 'nookies';
 
 const TenantPayments = ({ tenantId }) => {
-  const [paymentsData, setPaymentsData] = useState(null);
+  const [paymentsData, setPaymentsData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Fetch the payment data based on the tenantId
@@ -17,6 +19,7 @@ const TenantPayments = ({ tenantId }) => {
 
         if (!tenantId) {
           console.log('No tenant ID found.');
+          setIsLoading(false);
           return;
         }
 
@@ -30,20 +33,25 @@ const TenantPayments = ({ tenantId }) => {
         }
 
         const data = await response.json();
-        setPaymentsData(data);
-        console.log('Payments Data:', data);
+        setPaymentsData(data.data);
+        setIsLoading(false);
+        console.log('Payments Data:', data.data);
       } catch (error) {
         console.error('Error fetching payment data:', error);
-        setPaymentsData([]); // Set paymentsData to an empty array on error
+        setPaymentsData([]);
+        setIsLoading(false);
       }
     };
 
     fetchPaymentsData();
   }, [tenantId]);
 
-  if (paymentsData === null) {
-    // Render a loading message while fetching data
+  if (isLoading) {
     return <p>Loading payment information...</p>;
+  }
+
+  if (paymentsData.length === 0) {
+    return <p>No payment information available for this tenant.</p>;
   }
 
   return (
@@ -62,7 +70,7 @@ const TenantPayments = ({ tenantId }) => {
           </tr>
         </thead>
         <tbody>
-          {paymentsData.data.map((payment) => (
+          {paymentsData.map((payment) => (
             <tr key={payment.id}>
               <td>{payment.amount}</td>
               <td>{payment.payment_date}</td>

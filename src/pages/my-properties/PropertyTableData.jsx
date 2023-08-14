@@ -235,7 +235,7 @@ const PropertyTableData = () => {
                                     title="View Property"
                                     onClick={() => handleEditUnit(property.id)}
                                   >
-                                    <span className="flaticon-edit"></span>
+                                    <span className="flaticon-view"></span>
                                   </li>
                                   <li
                                     className="list-inline-item"

@@ -7,7 +7,8 @@ import Header from '../../components/common/header/dashboard/Header';
 import SidebarMenu from '../../components/common/header/dashboard/SidebarMenu';
 import MobileMenu from '../../components/common/header/MobileMenu';
 import Info from '../Vacate/Info'
-const LeaseTableData = ({ tenantId }) => {
+import jwtDecode from 'jwt-decode';
+const LeaseTableData = () => {
   const [leases, setLeases] = useState([]);
   const [filter, setFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -15,28 +16,52 @@ const LeaseTableData = ({ tenantId }) => {
   const pageSize = 5;
   const router = useRouter();
   const [leaseData, setLeaseData] = useState(null);
+
+  // decoding jwt from token
+const tokenFromLocalStorage = localStorage.getItem('token');
+console.log("tokenFromLocalstorage",tokenFromLocalStorage);
+const useScope = localStorage.getItem('useScope');
+
+console.log('JWT Token:', tokenFromLocalStorage);
+
+const decodedToken = jwtDecode(tokenFromLocalStorage);
+console.log('Decoded Token for tenantid:', decodedToken);
+const tenantId=decodedToken.sub;
+console.log("TenantID after decoding",tenantId);
+
+
   const fetchData = async () => {
-    try {
-      const cookies = parseCookies();
-      const tokenFromCookie = cookies.access_token;
+  try {
+    const cookies = parseCookies();
+    const tokenFromCookie = cookies.access_token;
 
-      const headers = {
-        Authorization: `Bearer ${tokenFromCookie}`,
-        'Content-Type': 'application/json',
-      };
+    const headers = {
+      Authorization: `Bearer ${tokenFromCookie}`,
+      'Content-Type': 'application/json',
+    };
+ 
+    let url = '';
 
-      const response = await axios.get(
-        'https://cloudagent.co.ke/backend/api/v1/leases?filter=&page=0&limit=99999999999999999999999999999999999999999999&sortField=lease_number&sortDirection=desc&whereField=&whereValue=',
-        { headers }
-      );
+    if (localStorage.getItem('useScope') === 'am-admin') {
+      url = 'https://cloudagent.co.ke/backend/api/v1/leases?filter=&page=0&limit=99999999999999999999999999999999999999999999&sortField=lease_number&sortDirection=desc&whereField=&whereValue=';
+    } else if (localStorage.getItem('useScope') === 'am-tenant') {
+      console.log('Tenant ID to return leases data:', tenantId);
+      url = `https://cloudagent.co.ke/backend/api/v1/tenants/${tenantId}/leases?filter=&page=0&limit=0&sortField=&sortDirection=&whereField=&whereValue=`;
+    } 
+
+    if (url) {
+      const response = await axios.get(url, {
+        headers: headers,
+      });
 
       setLeases(response.data.data);
       setTotalPages(Math.ceil(response.data.meta.total / pageSize));
-    } catch (error) {
-      console.log('Error fetching data:', error);
     }
-  };
-
+  } catch (error) {
+    console.log('Error fetching data:', error);
+  }
+};
+    
   useEffect(() => {
     fetchData();
   }, []);
@@ -172,8 +197,10 @@ const LeaseTableData = ({ tenantId }) => {
                       <div className="container">
                         <h2>Leases Management</h2>
                         <div className="row">
+                        {localStorage.getItem('useScope') === 'am-admin' && (
                           <div className="col-lg-4">
                             <div className="my_profile_setting_input">
+                          
                               <button
                                 className="btn btn1 float-start"
                                 onClick={handleAddLease}
@@ -181,7 +208,9 @@ const LeaseTableData = ({ tenantId }) => {
                                 Add Lease
                               </button>
                             </div>
+                           
                           </div>
+                           )}
                           <div className="col-lg-8">
                             <div className="my_profile_setting_input form-group">
                               <input

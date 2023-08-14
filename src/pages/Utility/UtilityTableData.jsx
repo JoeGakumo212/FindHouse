@@ -339,42 +339,40 @@ const UtilityTableData = () => {
                                 </td>
                                 <td>{reading.unit?.unit_name ?? 'N/A'}</td>
                                 <td>
-                                  {/* Dropdown Icon */}
-                                  <FontAwesomeIcon
-                                    icon={faEllipsisV}
-                                    className="icon mx-1"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
-                                    title="View Unit"
-                                    onClick={() =>
-                                      handleViewReadingDetails(reading.id)
-                                    }
-                                    size="1x"
-                                  />
-
-                                  {/* Edit Icon */}
-                                  <FontAwesomeIcon
-                                    icon={faEdit}
-                                    className="icon mx-1"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
-                                    title="Edit Reading"
-                                    onClick={() => handleEditReading(reading)}
-                                    size="1x"
-                                  />
-
-                                  {/* Delete Icon */}
-                                  <FontAwesomeIcon
-                                    icon={faTrash}
-                                    className="icon mx-1 text-danger"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
-                                    title="Delete Unit"
-                                    onClick={() =>
-                                      handleShowDeleteModal(reading)
-                                    }
-                                    size="1x"
-                                  />
+                                <ul className="view_edit_delete_list mb0">
+                                    <li
+                                      className="list-inline-item"
+                                      data-toggle="tooltip"
+                                      data-placement="top"
+                                      title="View Reading"
+                                      onClick={() =>
+                                        handleViewReadingDetails(reading.id)
+                                      }
+                                    >
+                                      <span className="flaticon-view"></span>
+                                    </li>
+                                    <li
+                                      className="list-inline-item"
+                                      data-toggle="tooltip"
+                                      data-placement="top"
+                                      title="Edit Reading"
+                                      onClick={() => handleEditReading(reading)}
+                                    >
+                                      <span className="flaticon-edit"></span>
+                                    </li>
+                                    <li
+                                      className="list-inline-item"
+                                      data-toggle="tooltip"
+                                      data-placement="top"
+                                      title="Delete Reading"
+                                      onClick={() =>
+                                        handleShowDeleteModal(reading)
+                                      }
+                                    >
+                                      <span className="flaticon-mouse-1"></span>
+                                    </li>
+                                  </ul>
+                                 
                                 </td>
                               </tr>
                             ))}

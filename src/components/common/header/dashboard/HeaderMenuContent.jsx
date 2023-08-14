@@ -2,9 +2,19 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import MyAccount from "./MyAccount";
 import {useSession} from 'next-auth/react'
+import { useEffect, useState } from 'react';
+
 const HeaderMenuContent = ({ float = "" }) => {
   const route = useRouter();
-  const {session, loading}=useSession()
+  const [userFirstName, setUserFirstName] = useState('');
+
+  useEffect(() => {
+    // Fetch user's first name from local storage or API response
+    const storedUserFirstName = localStorage.getItem('userFirstName');
+    setUserFirstName(storedUserFirstName || ''); // Set to empty string if not found
+  }, []);
+
+// Rest of your component rendering
 
   const home = [
     {
@@ -244,6 +254,7 @@ const HeaderMenuContent = ({ float = "" }) => {
       className="ace-responsive-menu text-end d-lg-block d-none"
       data-menu-style="horizontal"
     >
+     <h4 className="float-start px-5  d-lg-block d-none mt-4">Welcome back, <span className="text-danger">{userFirstName}</span></h4>
       <li className="dropitem">
         <a
           href="#"
@@ -476,7 +487,7 @@ const HeaderMenuContent = ({ float = "" }) => {
               src="/assets/images/team/e1.png"
               alt="e1.png"
             />
-            {session ? `${session.user.name},`: ''}<span className="dn-1199 ms-1">Jose Gakumo</span>
+           <span className="dn-1199 ms-1">Jose Gakumo</span>
           </a>
           <div className="dropdown-menu">
             <MyAccount />

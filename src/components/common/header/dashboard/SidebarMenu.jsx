@@ -8,7 +8,8 @@ import {
 
 const SidebarMenu = () => {
   const route = useRouter();
-  const { data: session, loading } = useSession();
+  
+
   const myProperties = [
     {
       id: 1,
@@ -31,12 +32,12 @@ const SidebarMenu = () => {
     { id: 2, name: 'Visitor Reviews', route: '/my-review' },
   ];
   const manageAccount = [
-    {
-      id: 1,
-      name: 'My Package',
-      route: '/my-package',
-      icon: 'flaticon-box',
-    },
+    // {
+    //   id: 1,
+    //   name: 'Reports',
+    //   route: '/reports',
+    //   icon: 'flaticon-box',
+    // },
     {
       id: 2,
       name: 'My Profile',
@@ -61,185 +62,85 @@ const SidebarMenu = () => {
           </Link>
         </li>
         {/* End header */}
-
-        <li className="title">
-          <span>Main</span>
-          <ul>
-            <li
-              className={`treeview ${
-                isSinglePageActive('/my-dashboard', route.pathname)
-                  ? 'active'
-                  : ''
-              }`}
-            >
-              <Link href="/my-dashboard">
-                <a>
-                  <i className="flaticon-layers"></i>
-                  <span> Dashboard</span>
-                </a>
-              </Link>
+        {(localStorage.getItem('useScope') === 'am-landlord' ||
+          localStorage.getItem('useScope') === 'am-admin' ||
+          localStorage.getItem('useScope') === 'am-tenant') && (
+          <>
+            <li className="title">
+              <span>Main</span>
+              <ul>
+                <li
+                  className={`treeview ${
+                    isSinglePageActive('/my-dashboard', route.pathname)
+                      ? 'active'
+                      : ''
+                  }`}
+                >
+                  <Link href="/my-dashboard">
+                    <a>
+                      <i className="flaticon-layers"></i>
+                      <span> Dashboard</span>
+                    </a>
+                  </Link>
+                </li>
+              </ul>
             </li>
-            {/* <li
-              className={`treeview ${
-                isSinglePageActive("/create-listing", route.pathname)
-                  ? "active"
-                  : ""
-              }`}
-            >
-              {
-            !loading && !session && (
-              <Link href="/create-listing">
-                <a>
-                  <i className="flaticon-plus"></i>
-                  <span> Create Property</span>
-                </a>
-              </Link>
+
+            {localStorage.getItem('useScope') === 'am-admin' && (
+              <li
+                className={`treeview ${
+                  isSinglePageActive('/my-landlords', route.pathname)
+                    ? 'active'
+                    : ''
+                }`}
+              >
+                <Link href="/my-landlords">
+                  <a>
+                    <i className="flaticon-user"></i>
+                    <span> LandLords</span>
+                  </a>
+                </Link>
+              </li>
             )}
-            </li> */}
-             <li
-              className={`treeview ${
-                isSinglePageActive('/my-landlords', route.pathname)
-                  ? 'active'
-                  : ''
-              }`}
-            >
-              <Link href="/my-landlords">
-                <a>
-                  <i className="flaticon-user"></i>
-                  <span> LandLords</span>
-                </a>
-              </Link>
-            </li>
-            {/* <li
-              className={`treeview ${
-                isSinglePageActive('/my-message', route.pathname)
-                  ? 'active'
-                  : ''
-              }`}
-            >
-              <Link href="/my-message">
-                <a>
-                  <i className="flaticon-envelope"></i>
-                  <span> Message</span>
-                </a>
-              </Link>
-            </li> */}
-          </ul>
-        </li>
-        {/* End Main */}
-
-        <li className="title">
-          <span>Manage Listings</span>
-          <ul>
-            <li
-              className={`treeview ${
-                isParentPageActive(myProperties, route.pathname) ? 'active' : ''
-              }`}
-            >
-              <a data-bs-toggle="collapse" href="#my-property">
-                <i className="flaticon-home"></i> <span>My Properties</span>
-                <i className="fa fa-angle-down pull-right"></i>
-              </a>
-              <ul className="treeview-menu collapse" id="my-property">
-                {/* {myProperties.map((item) => (
-                  <li key={item.id}>
-                    <Link href={item.route}>
-                      <a>
-                        <i className="fa fa-circle"></i> {item.name}
-                      </a>
-                    </Link>
-                  </li>
-                ))} */}
-                {myProperties.map((item) => (
-                  <li
-                    key={item.id}
-                    className={`treeview ${
-                      isParentPageActive(myProperties, route.pathname)
-                        ? 'active'
-                        : ''
-                    }`}
-                  >
-                    <Link
-                      href={item.route}
-                      as={`/my-properties/${item.id}`}
-                      passHref
-                    >
-                      <a>
-                        <i className="fa fa-circle"></i> {item.name}
-                      </a>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </li>
+            {/* End Main */}
+            {(localStorage.getItem('useScope') === 'am-landlord' ||
+              localStorage.getItem('useScope') === 'am-admin') && (
+              <li
+                className={`treeview ${
+                  isParentPageActive(myProperties, route.pathname)
+                    ? 'active'
+                    : ''
+                }`}
+              >
+                <Link href="/my-properties">
+                  <a>
+                    <i className="flaticon-home"></i> <span>My Properties</span>
+                  </a>
+                </Link>
+              </li>
+            )}
             {/* end properties */}
+            {localStorage.getItem('useScope') === 'am-admin' && (
+              <li
+                className={`treeview ${
+                  isSinglePageActive(
+                    '/tenants/TenantsTableData',
+                    route.pathname
+                  )
+                    ? 'active'
+                    : ''
+                }`}
+              >
+                <Link href="/tenants">
+                  <a>
+                    <i className="flaticon-user"></i>
+                    <span> Tenants</span>
+                  </a>
+                </Link>
+              </li>
+            )}
 
-            {/* <li
-              className={`treeview ${
-                isParentPageActive(reviews, route.pathname) ? 'active' : ''
-              }`}
-            >
-              <a data-bs-toggle="collapse" href="#review">
-                <i className="flaticon-chat"></i>
-                <span>Reviews</span>
-                <i className="fa fa-angle-down pull-right"></i>
-              </a>
-              <ul className="treeview-menu collapse" id="review">
-                {reviews.map((item) => (
-                  <li key={item.id}>
-                    <Link href={item.route}>
-                      <a>
-                        <i className="fa fa-circle"></i> {item.name}
-                      </a>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </li> */}
-            {/* End Review */}
-
-            {/* <li
-              className={`treeview ${
-                isSinglePageActive('/my-favourites', route.pathname)
-                  ? 'active'
-                  : ''
-              }`}
-            >
-              <Link href="/my-favourites">
-                <a>
-                  <i className="flaticon-magnifying-glass"></i>
-                  <span> My Favorites</span>
-                </a>
-              </Link>
-            </li> */}
-            <li
-              className={`treeview ${
-                isSinglePageActive('/tenants/TenantsTableData', route.pathname)
-                  ? 'active'
-                  : ''
-              }`}
-            >
-              <Link href="/tenants">
-                <a>
-                  <i className="flaticon-user"></i>
-                  <span> Tenants</span>
-                </a>
-              </Link>
-            </li>
-            <li
-              className={`treeview ${
-                isSinglePageActive('/invoices/Invoice', route.pathname)
-                  ? 'active'
-                  : ''
-              }`}
-            >
-              <Link href="/invoices">
-                <a>
-                  <i className="flaticon-magnifying-glass"></i>
-                  <span> Invoice</span>
-                </a>
-              </Link>
-            </li>
+            {/* Other navigation items that are accessible to all roles */}
             <li
               className={`treeview ${
                 isSinglePageActive('/Leases', route.pathname) ? 'active' : ''
@@ -252,7 +153,7 @@ const SidebarMenu = () => {
                 </a>
               </Link>
             </li>
-            
+
             <li
               className={`treeview ${
                 isSinglePageActive('/Payments', route.pathname) ? 'active' : ''
@@ -260,23 +161,45 @@ const SidebarMenu = () => {
             >
               <Link href="/Payments">
                 <a>
-                  <i className="flaticon-magnifying-glass"></i>
+                  <i className="flaticon-money-bag"></i>
                   <span> Payments</span>
                 </a>
               </Link>
             </li>
-            <li
-              className={`treeview ${
-                isSinglePageActive('/Utility', route.pathname) ? 'active' : ''
-              }`}
-            >
-              <Link href="/Utility">
-                <a>
-                  <i className="flaticon-magnifying-glass"></i>
-                  <span> Utility</span>
-                </a>
-              </Link>
-            </li>
+
+            {/* Invoice navigation item, only accessible to landlords and admins */}
+            {(localStorage.getItem('useScope') === 'am-landlord' ||
+              localStorage.getItem('useScope') === 'am-admin') && (
+              <li
+                className={`treeview ${
+                  isSinglePageActive('/invoices/Invoice', route.pathname)
+                    ? 'active'
+                    : ''
+                }`}
+              >
+                <Link href="/invoices">
+                  <a>
+                    <i className="flaticon-black-back-closed-envelope-shape"></i>
+                    <span> Invoice</span>
+                  </a>
+                </Link>
+              </li>
+            )}
+
+            {localStorage.getItem('useScope') === 'am-admin' && (
+              <li
+                className={`treeview ${
+                  isSinglePageActive('/Utility', route.pathname) ? 'active' : ''
+                }`}
+              >
+                <Link href="/Utility">
+                  <a>
+                    <i className="flaticon-box"></i>
+                    <span> Utilities</span>
+                  </a>
+                </Link>
+              </li>
+            )}
             <li
               className={`treeview ${
                 isSinglePageActive('/Vacate', route.pathname) ? 'active' : ''
@@ -289,43 +212,31 @@ const SidebarMenu = () => {
                 </a>
               </Link>
             </li>
-            {/* <li
-              className={`treeview ${
-                isSinglePageActive('/my-saved-search', route.pathname)
-                  ? 'active'
-                  : ''
-              }`}
-            >
-              <Link href="/my-saved-search">
-                <a>
-                  <i className="flaticon-magnifying-glass"></i>
-                  <span> Saved Search</span>
-                </a>
-              </Link>
-            </li> */}
-          </ul>
-        </li>
-        {/* End manage listing */}
 
-        <li className="title">
-          <span>Manage Account</span>
-          <ul>
-            {manageAccount.map((item) => (
-              <li
-                className={
-                  isSinglePageActive(item.route, route.pathname) ? 'active' : ''
-                }
-                key={item.id}
-              >
-                <Link href={item.route}>
-                  <a>
-                    <i className={item.icon}></i> <span>{item.name}</span>
-                  </a>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </li>
+            <li className="title">
+              <span>Manage Account</span>
+              <ul>
+                {manageAccount.map((item) => (
+                  <li
+                    className={
+                      isSinglePageActive(item.route, route.pathname)
+                        ? 'active'
+                        : ''
+                    }
+                    key={item.id}
+                  >
+                    <Link href={item.route}>
+                      <a>
+                        <i className={item.icon}></i> <span>{item.name}</span>
+                      </a>
+                    </Link>
+                  </li>
+                ))}
+                
+              </ul>
+            </li>
+          </>
+        )}
       </ul>
     </>
   );

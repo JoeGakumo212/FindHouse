@@ -199,9 +199,11 @@ const EditNoticeModal = ({ notice, onCloseModal, onSaveChanges }) => {
         <Button variant="secondary" onClick={handleCloseModal}>
           Close
         </Button>
+        {localStorage.getItem('useScope') === 'am-admin' && (
         <Button variant="danger" onClick={handleSaveChanges}>
           Delete
         </Button>
+        )}
         <Button variant="primary" onClick={handleSaveChanges}>
           Save Changes
         </Button>

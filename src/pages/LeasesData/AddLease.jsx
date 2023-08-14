@@ -473,29 +473,11 @@ const AddLease = () => {
         Authorization: `Bearer ${tokenFromCookie}`,
         'Content-Type': 'application/json',
       };
-      // Extract the IDs of the selected items
-      const selectedLeaseTypeId = supportData.lease_types.find(
-        (leaseType) => leaseType.lease_type_name === selectedLeaseType
-      )?.id;
-      const selectedLateFeeId = supportData.late_fees.find(
-        (lateFee) => lateFee.late_fee_name === selectedLateFee
-      )?.id;
-      const selectedPaymentMethodId = supportData.payment_methods.find(
-        (paymentMethod) =>
-          paymentMethod.payment_method_name === selectedPaymentMethod
-      )?.id;
-      const selectedUtilityId = supportData.utilities.find(
-        (utility) => utility.utility_name === selectedUtility
-      )?.id;
-      const selectedExtraChargeId = supportData.extra_charges.find(
-        (extraCharge) => extraCharge.extra_charge_name === selectedExtraCharge
-      )?.id;
-
+    
       const formData = {
         data: {
           tenants: selectedTenants,
-
-          propertyId: selectedProperty.property_id,
+          propertyId: selectedProperty,
           units: [
             {
               unit_name: unit_name,
@@ -519,11 +501,11 @@ const AddLease = () => {
           utility_base_fee,
           payment_method_description,
           selectedDateLease,
-          leaseTypeId: selectedLeaseTypeId,
-          lateFeeId: selectedLateFeeId,
-          paymentMethodId: selectedPaymentMethodId,
-          utilityId: selectedUtilityId,
-          extraChargeId: selectedExtraChargeId,
+          leaseTypeId: selectedLeaseType,
+          lateFeeId: selectedLateFee,
+          paymentMethodId: selectedPaymentMethod,
+          utilityId: selectedUtility,
+          extraChargeId: selectedExtraCharge,
         },
       };
 
@@ -897,7 +879,7 @@ const AddLease = () => {
                                   Extra Charge Type
                                 </label>
                                 <select
-                                  value={property_id}
+                                  value={extra_charge_type}
                                   onChange={handleLeaseTypeInputChanged}
                                   placeholder="Enter lease type search"
                                   className="selectpicker form-select"

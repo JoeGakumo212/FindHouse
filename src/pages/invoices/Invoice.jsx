@@ -188,9 +188,7 @@ const InvoiceTableData = () => {
                           {filteredAndPaginatedLeases.map((invoice) => (
                             <tr key={invoice.invoice_number}>
                               <td>
-                                <Link
-                                  href={`/invoices/${invoice.id}`}
-                                >
+                                <Link href={`/invoices/${invoice.id}`}>
                                   <a className="btn btn-link">
                                     {invoice.invoice_number}
                                   </a>
@@ -222,7 +220,9 @@ const InvoiceTableData = () => {
                                     data-placement="top"
                                     title="View Invoice"
                                   >
-                                    <span className="flaticon-download"></span>
+                                    <a href={`/invoices/${invoice.id}`}>
+                                      <span className="flaticon-view"></span>
+                                    </a>
                                   </li>
                                 </ul>
                               </td>

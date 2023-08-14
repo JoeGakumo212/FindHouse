@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { parseCookies } from 'nookies';
+import axios from 'axios';
 import Header from '../../components/common/header/dashboard/Header';
 import SidebarMenu from '../../components/common/header/dashboard/SidebarMenu';
 import MobileMenu from '../../components/common/header/MobileMenu';
@@ -19,6 +20,40 @@ const MyComponent = () => {
   const router = useRouter();
   const { id } = router.query;
   const [value, setValue] = useState('1');
+  const [vacateNotices, setVacateNotices] = useState([]);
+  const [vacateNotice, setVacateNotice] = useState(null);
+
+  useEffect(() => {
+    // Fetch all notices and set it to the state
+    const fetchData = async () => {
+      try {
+        const cookies = parseCookies();
+        const tokenFromCookie = cookies.access_token;
+        const headers = {
+          Authorization: `Bearer ${tokenFromCookie}`,
+          'Content-Type': 'application/json',
+        };
+
+        const response = await axios.get(
+          `https://cloudagent.co.ke/backend/api/v1/vacation_notices?filter=&limit=999999999999999999999999999999999999999&sortField=updated_at&sortDirection=desc&whereField=&whereValue=`,
+          {
+            headers: headers,
+          }
+        );
+
+        setVacateNotices(response.data.data);
+       
+
+        // Find the relevant vacate notice based on the id
+        const notice = response.data.data.find((item) => item.id === id);
+        setVacateNotice(notice);
+      } catch (error) {
+        console.error('API Error:', error);
+      }
+    };
+
+    fetchData();
+  }, [id]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -50,9 +85,13 @@ const MyComponent = () => {
           <div className="favorite_item_list">
             <section className="our-dashbord dashbord bgc-f7 pb-5">
               <div className="bg-success rounded-top text-light p-2 d-flex align-items-center justify-content-between">
-                <div>
-                  <h1 className="text-light">Vacate Notice Details</h1>
+                <div className='row'>
+                  <h3 className="text-light">Vacate Notice Details</h3>
+                  <div>
+               <h5 className='text-light'>{vacateNotice ? vacateNotice.lease?.lease_number ?? 'N/A' : ''}</h5>
+               </div>
                 </div>
+               
                 <ul className="view_edit_delete_list mb-0">
                   <li
                     className="list-inline-item"
@@ -86,7 +125,8 @@ const MyComponent = () => {
                               </Box>
 
                               <TabPanel value="1">
-                                <Info id={id}/>
+                                {/* Pass vacateNotices and id to the Info component */}
+                                <Info vacateNotices={vacateNotices} id={id} />
                               </TabPanel>
                             </TabContext>
                           </Box>

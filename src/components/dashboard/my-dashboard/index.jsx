@@ -4,8 +4,16 @@ import MobileMenu from "../../common/header/MobileMenu";
 import Activities from "./Activities";
 import AllStatistics from "./AllStatistics";
 import StatisticsChart from "./StatisticsChart";
-
+import { useRouter } from "next/router";
+import { useEffect } from "react";
+import TenantsDashboard from '../../../pages/TenantsDashboard';
+import LandlordDashboard from '../../../pages/LandlordDashboard'
 const index = () => {
+  const userScope = localStorage.getItem('useScope');
+  const isAdmin = userScope === 'am-admin';
+  const isTenantOrLandlord = userScope === 'am-tenant' || userScope === 'am-landlord';
+
+
   return (
     <>
       {/* <!-- Main Header Nav --> */}
@@ -27,9 +35,11 @@ const index = () => {
       {/* End sidebar_menu */}
 
       {/* <!-- Our Dashbord --> */}
+     
       <section className="our-dashbord dashbord bgc-f7 pb50">
         <div className="container-fluid ovh">
           <div className="row">
+          {localStorage.getItem('useScope') === 'am-admin'  && (
             <div className="col-lg-12 maxw100flex-992">
               <div className="row">
                 {/* Start Dashboard Navigation */}
@@ -49,12 +59,7 @@ const index = () => {
                 </div>
                 {/* End Dashboard Navigation */}
 
-                <div className="col-lg-12 mb10">
-                  <div className="breadcrumb_content style2">
-                    <h2 className="breadcrumb_title">Howdy, Hasan </h2>
-                    <p>We are glad to see you again!</p>
-                  </div>
-                </div>
+              
               </div>
               {/* End .row */}
 
@@ -90,10 +95,18 @@ const index = () => {
               </div>
               {/* End .row */}
             </div>
+              )}
             {/* End .col */}
+
           </div>
         </div>
       </section>
+      {localStorage.getItem('useScope') === 'am-tenant'  && (
+      <TenantsDashboard/>
+      )}  
+ {localStorage.getItem('useScope') === 'am-landlord'  && (
+      <LandlordDashboard/>
+      )}  
     </>
   );
 };

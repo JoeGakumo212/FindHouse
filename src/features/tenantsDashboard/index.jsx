@@ -1,13 +1,14 @@
 import dynamic from "next/dynamic";
 import Seo from "../../components/common/seo";
-import MyDashboard from "../../components/dashboard/my-dashboard";
+import TenantsDashboard from "../../components/common/header/dashboard/TenantsDashboard";
+
 
 const index = ({userRole}) => {
-
+  console.log('userRole pages:', userRole);
   return (
     <>
       <Seo pageTitle="Dashboard" />
-      <MyDashboard  userRole={userRole}/>
+      <TenantsDashboard  userRole={userRole}/>
     
     </>
   );

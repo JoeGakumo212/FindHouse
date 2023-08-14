@@ -1,14 +1,16 @@
 import dynamic from "next/dynamic";
 import Seo from "../../components/common/seo";
-import MyDashboard from "../../components/dashboard/my-dashboard";
+
+import Dashboard from "./Dashboard";
+
 
 const index = ({userRole}) => {
-
+  console.log('User Role set in tenantdashboard:', userRole);
   return (
     <>
-      <Seo pageTitle="Dashboard" />
-      <MyDashboard  userRole={userRole}/>
+      <Seo pageTitle="Tenants Dashboard" />
     
+    <Dashboard/>
     </>
   );
 };

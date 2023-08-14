@@ -224,12 +224,12 @@ const Landlords = () => {
                                     className="list-inline-item"
                                     data-toggle="tooltip"
                                     data-placement="top"
-                                    title="view Landlord"
+                                    title="View Landlord"
                                     onClick={() =>
                                       handleViewLandlord(landlord.id)
                                     }
                                   >
-                                    <span className="flaticon-user"></span>
+                                    <span className="flaticon-view"></span>
                                   </li>
                                   <li
                                     className="list-inline-item"

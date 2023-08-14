@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { parseCookies } from 'nookies';
+import axios from 'axios';
 import Header from '../../components/common/header/dashboard/Header';
 import SidebarMenu from '../../components/common/header/dashboard/SidebarMenu';
 import MobileMenu from '../../components/common/header/MobileMenu';
@@ -11,6 +13,7 @@ import TabPanel from '@material-ui/lab/TabPanel';
 import TenantInfo from './[id]/TenantInfo';
 import TenantLease from './[id]/TenantLease';
 import TenantPayments from './[id]/TenantPayments';
+import TenantsTableData from './TenantsTableData';
 
 const MyComponent = ({ tenantData }) => {
   const router = useRouter();
@@ -18,6 +21,51 @@ const MyComponent = ({ tenantData }) => {
   // Destructure the tenant data
 
   const [activeTab, setActiveTab] = useState('info'); // Default active tab is 'info'
+  // State variables to store tenant data and loading status
+  const [tenant, setTenant] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Function to fetch tenant data
+  const fetchTenantData = async (tenantId) => {
+    try {
+      const cookies = parseCookies();
+      const tokenFromCookie = cookies.access_token;
+
+      const headers = {
+        Authorization: `Bearer ${tokenFromCookie}`,
+        'Content-Type': 'application/json',
+      };
+
+      const response = await axios.get(
+        `https://cloudagent.co.ke/backend/api/v1/tenants/${tenantId}`,
+        { headers }
+      );
+
+      setTenant(response.data); // Set the tenant data
+      console.log("Tenant",response.data);
+      setIsLoading(false); // Set loading to false
+    } catch (error) {
+      console.error('API Error:', error);
+      setIsLoading(false); // Set loading to false even if there's an error
+    }
+  };
+
+  useEffect(() => {
+    // Fetch tenant data when component mounts
+    fetchTenantData(id);
+  }, [id]);
+
+  // ... (rest of the component)
+
+  // Check if tenant data is still loading
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  // Check if tenant data is available
+  if (!tenant) {
+    return <div>Tenant not found</div>;
+  }
 
   // Handle tab change
   const handleTabChange = (event, newTab) => {
@@ -26,12 +74,12 @@ const MyComponent = ({ tenantData }) => {
   };
 
   // Update active tab when clicking on a tab
-  useEffect(() => {
-    const currentTab = router.query.tab;
-    if (currentTab) {
-      setActiveTab(currentTab);
-    }
-  }, [router.query.tab]);
+  // useEffect(() => {
+  //   const currentTab = router.query.tab;
+  //   if (currentTab) {
+  //     setActiveTab(currentTab);
+  //   }
+  // }, [router.query.tab]);
 
   const handleEditTenant = (tenantId) => {
     console.log('Clicked here for tenant ID:', tenantId);
@@ -117,11 +165,11 @@ const MyComponent = ({ tenantData }) => {
                     <div className="bg-success rounded-top text-light p-2 d-flex align-items-center justify-content-between">
                       <h1 className="text-light">Summary </h1>
                     </div>
-                    <p>First Name:</p>
-                    <p>Middle Name:</p>
-                    <p>Last Name</p>
-                    <p>Phone Number</p>
-                    <p>Email</p>
+                    <p>First Name: {tenant.first_name}</p>
+                    <p>Middle Name: {tenant.middle_name}</p>
+                    <p>Last Name: {tenant.last_name}</p>
+                    <p>Phone Number: {tenant.phone}</p>
+                    <p>Email :{tenant.email}</p>
                   </div>
                 </div>
               </div>

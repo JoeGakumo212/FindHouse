@@ -102,7 +102,7 @@ const Vacants = () => {
           { middle_name: { $regex: query, $options: 'i' } },
         ],
         page: 0,
-        limit: 0,
+        limit: 99999999999999999999999999999999999999999999999999990,
         sortField: 'updated_at',
         sortDirection: 'desc',
         whereField: '',
@@ -171,7 +171,7 @@ const Vacants = () => {
       const params = {
         lease_number: { $regex: query, $options: 'i' },
         page: 0,
-        limit: 0,
+        limit: 9999999999999999999999999999999999999999999999999999999999999999999999999999,
         sortField: 'updated_at',
         sortDirection: 'desc',
         whereField: '',
@@ -199,20 +199,55 @@ const Vacants = () => {
     }
   };
 
+  // const fetchLeaseDetails = async (leaseNumber) => {
+  //   try {
+  //     const cookies = parseCookies();
+  //     const tokenFromCookie = cookies.access_token;
+
+  //     const headers = {
+  //       Authorization: `Bearer ${tokenFromCookie}`,
+  //       'Content-Type': 'application/json',
+  //     };
+
+  //     const params = {
+  //       lease_number: leaseNumber,
+  //     };
+
+  //     const response = await axios.get(
+  //       'https://cloudagent.co.ke/backend/api/v1/leases',
+  //       {
+  //         params,
+  //         headers,
+  //       }
+  //     );
+
+  //     if (response.status === 200) {
+  //       const leaseData = response.data;
+  //       setSelectedLease(leaseData);
+  //       console.log('Lease details:', leaseData);
+  //     } else {
+  //       console.error('Failed to fetch lease details:', response.data);
+  //       setSelectedLease(null);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error occurred while fetching lease details:', error);
+  //     setSelectedLease(null);
+  //   }
+  // };
   const fetchLeaseDetails = async (leaseNumber) => {
     try {
       const cookies = parseCookies();
       const tokenFromCookie = cookies.access_token;
-
+  
       const headers = {
         Authorization: `Bearer ${tokenFromCookie}`,
         'Content-Type': 'application/json',
       };
-
+  
       const params = {
         lease_number: leaseNumber,
       };
-
+  
       const response = await axios.get(
         'https://cloudagent.co.ke/backend/api/v1/leases',
         {
@@ -220,11 +255,16 @@ const Vacants = () => {
           headers,
         }
       );
-
+  
       if (response.status === 200) {
-        const leaseData = response.data;
+        const leaseData = response.data.data[0]; // Since it's an array, get the first element
         setSelectedLease(leaseData);
         console.log('Lease details:', leaseData);
+  
+        // Fetch property details using property_id from leaseData
+        if (leaseData.property_id) {
+          await fetchPropertyDetails(leaseData.property_id);
+        }
       } else {
         console.error('Failed to fetch lease details:', response.data);
         setSelectedLease(null);
@@ -234,6 +274,38 @@ const Vacants = () => {
       setSelectedLease(null);
     }
   };
+// fetch property_id 
+const fetchPropertyDetails = async (propertyId) => {
+  try {
+    const cookies = parseCookies();
+    const tokenFromCookie = cookies.access_token;
+
+    const headers = {
+      Authorization: `Bearer ${tokenFromCookie}`,
+      'Content-Type': 'application/json',
+    };
+
+    const response = await axios.get(
+      `https://cloudagent.co.ke/backend/api/v1/properties/${propertyId}`,
+      {
+        headers,
+      }
+    );
+
+    if (response.status === 200) {
+      const propertyData = response.data;
+      // Add property_id to the selectedLease object
+      setSelectedLease((prevLease) => ({
+        ...prevLease,
+        property_id: propertyData,
+      }));
+    } else {
+      console.error('Failed to fetch property details:', response.data);
+    }
+  } catch (error) {
+    console.error('Error occurred while fetching property details:', error);
+  }
+};
 
   useEffect(() => {
     if (leaseQuery.length > 0) {
@@ -247,40 +319,50 @@ const Vacants = () => {
   };
 
   const handleSave = async () => {
-    // Handle save logic here
     try {
       const cookies = parseCookies();
       const tokenFromCookie = cookies.access_token;
-
+  
       const headers = {
         Authorization: `Bearer ${tokenFromCookie}`,
         'Content-Type': 'application/json',
       };
-
-      const data = {
-        first_name: selectedTenantDetails
-          ? selectedTenantDetails.first_name
-          : '',
-        lease_number: selectedLease ? selectedLease.lease_number : '',
-        vacating_date: vacatingDate,
-        vacating_reason: vacatingReason,
-      };
-
-      const response = await axios.post(
-        'https://cloudagent.co.ke/backend/api/v1/vacation_notices',
-        data,
-        {
-          headers: headers,
-        }
-      );
-      alert('Vacation Notice saved Successfully');
-      console.log('Save data:', response.data);
-      console.log('DATA', data);
-      router.push(`/Vacate`)
+  
+      if (selectedTenantDetails && selectedLease) {
+        // Construct the data object for the payload
+        const data = {
+          tenant: {
+            id: selectedTenantDetails.id,
+            // Include other tenant properties if needed
+          },
+          tenant_id: selectedTenantDetails.id,
+          lease_id: selectedLease.id,
+          lease_number: selectedLease.lease_number,
+          property_id: selectedLease.property_id,
+          vacating_date: vacatingDate,
+          vacating_reason: vacatingReason,
+        };
+  
+        // Send the payload to the server using axios.post
+        const response = await axios.post(
+          'https://cloudagent.co.ke/backend/api/v1/vacation_notices',
+          data,
+          {
+            headers: headers,
+          }
+        );
+        alert('Vacation Notice saved Successfully');
+        console.log('Save data:', response.data);
+        console.log('DATA', data);
+        router.push(`/Vacate`);
+      } else {
+        console.error('Selected tenant or lease is missing.');
+      }
     } catch (error) {
       console.error('Error occurred while saving:', error);
     }
   };
+  
   return (
     <>
       {/* <!-- Main Header Nav --> */}

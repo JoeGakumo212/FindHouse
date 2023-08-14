@@ -16,7 +16,8 @@ const Form = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { push } = useRouter();
+  const [userRole, setUserRole] = useState('');
+  const router = useRouter();
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
@@ -33,16 +34,27 @@ const Form = () => {
     );
 
     if (response.ok) {
-      const data = await response.json();
+      const data = await response.json(); // Read the response body once
       localStorage.setItem('token', data.access_token);
-      console.log("I have just set the token")
-      const accessToken = localStorage.getItem('token');
-     
-      localStorage.setItem('accessToken', accessToken);
+      if (data.scope === 'am-landlord' || data.scope === 'am-tenant') {
+        localStorage.setItem('useScope', data.scope);
+      } else {
+        localStorage.setItem('useScope', 'am-admin');
+      }
+      localStorage.setItem('userFirstName', data.first_name);
+      console.log('scope', data.scope);
+      const userScope = data.scope
+        ? data.scope.split(' ')
+        : ['view-dashboard'];
       setLoading(false);
-      toast.notify(`Longed In successfully`);
-      push('my-dashboard');
-    } else {
+      toast.notify(`Logged In successfully`);
+      const firstName = data.first_name;
+      setUserRole(userScope[0]);
+
+      router.push({
+        pathname: '/my-dashboard',
+      });
+    } else  {
       const errorData = await response.json();
       setError(errorData.message);
       setLoading(false);

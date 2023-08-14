@@ -12,7 +12,7 @@ import TabList from '@material-ui/lab/TabList';
 import TabPanel from '@material-ui/lab/TabPanel';
 import Info from './Info';
 import Invoice from './Invoice';
-import { Modal, Button } from 'react-bootstrap'
+import { Modal, Button } from 'react-bootstrap';
 const LeasesDataPage = () => {
   const router = useRouter();
   const { leaseId } = router.query;
@@ -20,7 +20,7 @@ const LeasesDataPage = () => {
   const [selectedTab, setSelectedTab] = useState('info');
   const [showModal, setShowModal] = useState(false);
   const [terminationReason, setTerminationReason] = useState('');
-  const [dateTerminated, setDateTerminated]=useState('')
+  const [dateTerminated, setDateTerminated] = useState('');
   useEffect(() => {
     const fetchLeaseData = async () => {
       try {
@@ -65,26 +65,25 @@ const LeasesDataPage = () => {
     }
   };
 
-  if (!leaseData) {
-    // Render a loading message while fetching the lease data
-    return <p>Loading lease information...</p>;
-  }
+  // if (!leaseData) {
+  //   // Render a loading message while fetching the lease data
+  //   return <p>Loading lease information...</p>;
+  // }
   const handleTerminateLease = async () => {
     // First, show the modal to collect the termination reason
     setShowModal(true);
   };
-   // Function to handle terminating the lease
-   const handleSubmitTermination  = async () => {
-  
+  // Function to handle terminating the lease
+  const handleSubmitTermination = async () => {
     try {
-        // Close the modal
-        setShowModal(false);
+      // Close the modal
+      setShowModal(false);
 
-        // ... Your existing code to get the access token and other headers ...
-  
-        // Assuming you have the terminationReason state set appropriately
-        const terminationData = { reason: terminationReason };
-      const dateTerminated={date: dateTerminated};
+      // ... Your existing code to get the access token and other headers ...
+
+      // Assuming you have the terminationReason state set appropriately
+      const terminationData = { reason: terminationReason };
+      const dateTerminated = { date: dateTerminated };
       const cookies = parseCookies();
       const tokenFromCookie = cookies.access_token;
 
@@ -101,7 +100,8 @@ const LeasesDataPage = () => {
       // Send a POST request to the terminate endpoint
       const response = await axios.post(
         `https://cloudagent.co.ke/backend/api/v1/leases/${leaseId}/terminate`,
-        terminationData,dateTerminated,
+        terminationData,
+        dateTerminated,
         { headers }
       );
 
@@ -230,39 +230,51 @@ const LeasesDataPage = () => {
                       </div>
                     </div>
                   </div>
-                  <button className="btn btn-danger d-flex align-items-center justify-content-between m-2"  onClick={handleTerminateLease}>
+                  <button
+                    className="btn btn-danger d-flex align-items-center justify-content-between m-2"
+                    onClick={handleTerminateLease}
+                  >
                     Terminate Lease ({leaseData.lease_number})
                   </button>
-                   {/* Modal to collect termination reason */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title> Terminate  Lease ({leaseData.lease_number})</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-        <input
-            type="date"
-            value={dateTerminated}
-            onChange={(e) => setDateTerminated(e.target.value)}
-            placeholder="Enter the reason for termination"
-            className="form-control"
-          />
-          <textarea
-            type="text"
-            value={terminationReason}
-            onChange={(e) => setTerminationReason(e.target.value)}
-            placeholder="Enter the reason for termination"
-            className="form-control"
-          />
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Cancel
-          </Button>
-          <Button variant="danger" onClick={handleSubmitTermination}>
-            Terminate Lease ({leaseData.lease_number})
-          </Button>
-        </Modal.Footer>
-      </Modal>
+                  {/* Modal to collect termination reason */}
+                  <Modal show={showModal} onHide={() => setShowModal(false)}>
+                    <Modal.Header closeButton>
+                      <Modal.Title>
+                        {' '}
+                        Terminate Lease ({leaseData.lease_number})
+                      </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                      <input
+                        type="date"
+                        value={dateTerminated}
+                        onChange={(e) => setDateTerminated(e.target.value)}
+                        placeholder="Enter the reason for termination"
+                        className="form-control"
+                      />
+                      <textarea
+                        type="text"
+                        value={terminationReason}
+                        onChange={(e) => setTerminationReason(e.target.value)}
+                        placeholder="Enter the reason for termination"
+                        className="form-control"
+                      />
+                    </Modal.Body>
+                    <Modal.Footer>
+                      <Button
+                        variant="secondary"
+                        onClick={() => setShowModal(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="danger"
+                        onClick={handleSubmitTermination}
+                      >
+                        Terminate Lease ({leaseData.lease_number})
+                      </Button>
+                    </Modal.Footer>
+                  </Modal>
                 </div>
               </div>
             </div>

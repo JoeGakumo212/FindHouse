@@ -7,6 +7,7 @@ import Header from '../../components/common/header/dashboard/Header';
 import SidebarMenu from '../../components/common/header/dashboard/SidebarMenu';
 import MobileMenu from '../../components/common/header/MobileMenu';
 import EditNoticeModal from './EditNoticeModal';
+import jwtDecode from 'jwt-decode';
 
 const VacateTableData = () => {
   const [vacateNotices, setVacateNotices] = useState([]);
@@ -23,28 +24,44 @@ const VacateTableData = () => {
     router.push(`/Vacate/${vacateNoticeId}`);
   };
 
+    // decoding jwt from token
+const tokenFromLocalStorage = localStorage.getItem('token');
+console.log("tokenFromLocalstorage",tokenFromLocalStorage);
+const useScope = localStorage.getItem('useScope');
+
+console.log('JWT Token:', tokenFromLocalStorage);
+
+const decodedToken = jwtDecode(tokenFromLocalStorage);
+console.log('Decoded Token for tenantid:', decodedToken);
+const tenantId=decodedToken.sub;
+console.log("TenantID after decoding",tenantId);
+
   const fetchData = async () => {
     try {
       const cookies = parseCookies();
       const tokenFromCookie = cookies.access_token;
-      console.log('Token here', tokenFromCookie);
+     
       const headers = {
         Authorization: `Bearer ${tokenFromCookie}`,
         'Content-Type': 'application/json',
       };
+          const page = currentPage - 1; // Subtract 1 from currentPage to align with 0-based indexing
+      let url = '';
 
-      const page = currentPage - 1; // Subtract 1 from currentPage to align with 0-based indexing
-      const response = await axios.get(
-        `https://cloudagent.co.ke/backend/api/v1/vacation_notices?filter=&limit=999999999999999999999999999999999999999&sortField=updated_at&sortDirection=desc&whereField=&whereValue=`,
-        {
+      if (localStorage.getItem('useScope') === 'am-admin') {
+        url =         `https://cloudagent.co.ke/backend/api/v1/vacation_notices?filter=&limit=999999999999999999999999999999999999999&sortField=updated_at&sortDirection=desc&whereField=&whereValue=`;
+      } else if (localStorage.getItem('useScope') === 'am-tenant') {
+        console.log('Tenant ID to return vacate notices:', tenantId);
+        url = `https://cloudagent.co.ke/backend/api/v1/tenants/${tenantId}/notices?filter=&page=0&limit=0&sortField=&sortDirection=&whereField=&whereValue=`;
+      }
+      if (url) {
+        const response = await axios.get(url, {
           headers: headers,
-        }
-      );
+        });
 
-      setVacateNotices(response.data.data);
-      console.log('Vacate Data:', response.data.data);
+      setVacateNotices(response.data.data);    
 
-      setTotalPages(Math.ceil(response.data.total / pageSize)); // Use response.data.total to calculate total pages
+      setTotalPages(Math.ceil(response.data.total / pageSize)); }
     } catch (error) {
       console.error('API Error:', error);
     }
@@ -84,34 +101,33 @@ const VacateTableData = () => {
         Authorization: `Bearer ${tokenFromCookie}`,
         'Content-Type': 'application/json',
       };
-  
+
       const response = await axios.get(
         `https://cloudagent.co.ke/backend/api/v1/tenants/${tenantId}/leases?filter=&page=0&limit=0&sortField=&sortDirection=&whereField=&whereValue=`,
         {
           headers: headers,
         }
       );
-  
+
       setLeases(response.data.data);
     } catch (error) {
       console.error('API Error:', error);
     }
   };
-  
+
   const handleEditNotice = async (vacateNoticeId) => {
- 
     const selectedNotice = vacateNotices.find(
       (notice) => notice.id === vacateNoticeId
     );
-  
+
     setSelectedVacateNotice(selectedNotice);
-  
+
     // Fetch Tenant and Lease data for the selected notice's Tenant ID
     if (selectedNotice && selectedNotice.tenant_id) {
       // Call the locally defined fetchLeasesByTenantId function
       await fetchLeasesByTenantId(selectedNotice.tenant_id);
     }
-  
+
     setIsModalOpen(true);
   };
 
@@ -129,6 +145,9 @@ const VacateTableData = () => {
     setVacateNotices(updatedNotices);
     setIsModalOpen(false);
   };
+  const handleAddVacate = () => {
+    router.push('/Vacate/VacateForm');
+  };
 
   const handleInputChange = (e) => {
     setSearchTerm(e.target.value);
@@ -140,10 +159,6 @@ const VacateTableData = () => {
       return;
     }
     setCurrentPage(page);
-  };
-
-  const handleAddVacate = () => {
-    router.push('/Vacate/VacateForm');
   };
 
   const renderPagination = () => {
@@ -173,11 +188,7 @@ const VacateTableData = () => {
             </a>
           </li>
           {pages}
-          <li
-            className={`page-item ${
-              currentPage === totalPages ? 'disabled' : ''
-            }`}
-          >
+          <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
             <a
               className="page-link"
               href="#"
@@ -190,7 +201,6 @@ const VacateTableData = () => {
       </nav>
     );
   };
-
   return (
     <>
       {/* <!-- Main Header Nav --> */}
@@ -276,7 +286,8 @@ const VacateTableData = () => {
                                   <button
                                     className="btn btn-link"
                                     onClick={() =>
-                                      handleViewVacateNoticeDetails(notice.id)}
+                                      handleViewVacateNoticeDetails(notice.id)
+                                    }
                                   >
                                     {notice.vacating_date_display ?? 'N/A'}
                                   </button>
@@ -286,7 +297,12 @@ const VacateTableData = () => {
                                 <td>
                                   {notice.property?.property_name ?? 'N/A'}
                                 </td>
-                                <td>{notice.unit_names ?? 'N/A'}</td>
+                                <td>
+                                  {notice.lease?.units?.length > 0
+                                    ? notice.lease.units[0].unit_name
+                                    : 'N/A'}
+                                </td>
+
                                 <td>
                                   <ul className="view_edit_delete_list mb0">
                                     <li
@@ -294,16 +310,20 @@ const VacateTableData = () => {
                                       data-toggle="tooltip"
                                       data-placement="top"
                                       title="View Notice"
-                                      onClick={() => handleViewVacateNoticeDetails(notice.id)}
+                                      onClick={() =>
+                                        handleViewVacateNoticeDetails(notice.id)
+                                      }
                                     >
-                                      <span className="flaticon-edit"></span>
+                                      <span className="flaticon-view"></span>
                                     </li>
                                     <li
                                       className="list-inline-item"
                                       data-toggle="tooltip"
                                       data-placement="top"
                                       title="Edit Notice"
-                                      onClick={() => handleEditNotice(notice.id)}
+                                      onClick={() =>
+                                        handleEditNotice(notice.id)
+                                      }
                                     >
                                       <span className="flaticon-edit"></span>
                                     </li>
@@ -314,12 +334,12 @@ const VacateTableData = () => {
                         </tbody>
                       </table>
                       {isModalOpen && (
-        <EditNoticeModal
-          notice={selectedVacateNotice}
-          onCloseModal={handleCloseModal}
-          onSaveChanges={handleSaveChanges}
-        />
-      )}
+                        <EditNoticeModal
+                          notice={selectedVacateNotice}
+                          onCloseModal={handleCloseModal}
+                          onSaveChanges={handleSaveChanges}
+                        />
+                      )}
                     </div>
                   </div>
 
