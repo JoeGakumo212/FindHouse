@@ -58,6 +58,7 @@
     "sass": "^1.54.9",
     "slick-carousel": "^1.8.1",
     "styled-components": "^6.0.4",
+    "sweetalert2": "^11.7.22",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

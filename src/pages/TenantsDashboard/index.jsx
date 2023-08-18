@@ -5,7 +5,7 @@ import Dashboard from "./Dashboard";
 
 
 const index = ({userRole}) => {
-  console.log('User Role set in tenantdashboard:', userRole);
+ 
   return (
     <>
       <Seo pageTitle="Tenants Dashboard" />

@@ -363,7 +363,7 @@ const InvoiceDetails = () => {
                     </div>
                   </div>
                 </div>
-
+                {localStorage.getItem('useScope') === 'am-admin' && (
                 <button
                   type="button"
                   class="btn btn-danger"
@@ -372,7 +372,7 @@ const InvoiceDetails = () => {
                 >
                   Waiver Invoice {invoicedata?.invoice_number}
                 </button>
-
+                )}
                 {/* <!-- Modal --> */}
                 <div
                   class="modal fade"

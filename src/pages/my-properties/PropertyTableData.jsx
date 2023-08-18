@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { parseCookies } from 'nookies';
 import axios from 'axios';
 import Link from 'next/link';
+import jwtDecode from 'jwt-decode';
 import { useRouter } from 'next/router';
 import Header from '../../components/common/header/dashboard/Header';
 import SidebarMenu from '../../components/common/header/dashboard/SidebarMenu';
@@ -16,9 +17,17 @@ const PropertyTableData = () => {
   const pageSize = 5;
   const router = useRouter(); // Initialize useRouter
   const [activeTab, setActiveTab] = useState('Info');
+  const [isLoading, setIsLoading] = useState(true);
+
+  // decoding jwt from token
+  const tokenFromLocalStorage = localStorage.getItem('token');
+  const useScope = localStorage.getItem('useScope');
+  const decodedToken = jwtDecode(tokenFromLocalStorage);
+  const landlordId = decodedToken.sub;
 
   const fetchData = async () => {
     try {
+      setIsLoading(true);
       const cookies = parseCookies();
       const tokenFromCookie = cookies.access_token;
 
@@ -27,20 +36,26 @@ const PropertyTableData = () => {
         'Content-Type': 'application/json',
       };
 
-      const response = await axios.get(
-        'https://cloudagent.co.ke/backend/api/v1/properties?filter=&page=&limit=999999999999999999999999999999999&sortField=updated_at&sortDirection=desc&whereField=&whereValue=',
-        {
-          headers: {
-            Authorization: `Bearer ${tokenFromCookie}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      let url = '';
 
-      setProperties(response.data.data);
-      setTotalPages(Math.ceil(response.data.meta.total / pageSize));
+      if (localStorage.getItem('useScope') === 'am-admin') {
+        url =
+          'https://cloudagent.co.ke/backend/api/v1/properties?filter=&page=&limit=999999999999999999999999999999999&sortField=updated_at&sortDirection=desc&whereField=&whereValue=';
+      } else if (localStorage.getItem('useScope') === 'am-landlord') {
+        url = `https://cloudagent.co.ke/backend/api/v1/landlords/${landlordId}/properties?filter=&page=0&limit=999999999999999999999999999999999999999999999&sortField=&sortDirection=&whereField=&whereValue=`;
+      }
+      if (url) {
+        const response = await axios.get(url, {
+          headers: headers,
+        });
+
+        setProperties(response.data.data);
+        setTotalPages(Math.ceil(response.data.meta.total / pageSize));
+      }
     } catch (error) {
       console.log('Error fetching data:', error);
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -158,16 +173,18 @@ const PropertyTableData = () => {
                   <h2>Property Management</h2>
 
                   <div className="row">
-                    <div className="col-lg-4">
-                      <div className="my_profile_setting_input">
-                        <button
-                          className="btn btn1 float-start"
-                          onClick={handleAddProperty}
-                        >
-                          Add Property
-                        </button>
+                    {localStorage.getItem('useScope') === 'am-admin' && (
+                      <div className="col-lg-4">
+                        <div className="my_profile_setting_input">
+                          <button
+                            className="btn btn1 float-start"
+                            onClick={handleAddProperty}
+                          >
+                            Add Property
+                          </button>
+                        </div>
                       </div>
-                    </div>
+                    )}
                     <div className="col-lg-8">
                       <div className="my_profile_setting_input form-group">
                         <input
@@ -192,64 +209,98 @@ const PropertyTableData = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredProperties
-                          .slice(
-                            (currentPage - 1) * pageSize,
-                            currentPage * pageSize
-                          )
-                          .map((property, index) => (
-                            <tr
-                              key={property.id}
-                              className={
-                                index % 2 === 0 ? 'table-light' : 'table-light'
-                              }
-                            >
-                              <td>
-                                <button
-                                  className="btn btn-link"
-                                  onClick={(event) =>
-                                    handlePropertyClick(property.id, event)
-                                  }
+                        {isLoading ? (
+                          <tr>
+                            <td colSpan="5" className="text-center">
+                              <div className="d-flex align-items-center">
+                                <strong className="text-info">
+                                  Loading...
+                                </strong>
+                                <div
+                                  class="spinner-grow spinner-grow text-info"
+                                  role="status"
                                 >
-                                  {property.property_code}
-                                </button>
-                              </td>
-                              <td>
-                                <button
-                                  className="btn btn-link"
-                                  onClick={(event) =>
-                                    handlePropertyClick(property.id, event)
-                                  }
-                                >
-                                  {property.property_name}
-                                </button>
-                              </td>
-                              <td>{property.location}</td>
-                              <td>{property.unit_total}</td>
-                              <td>
-                                <ul className="view_edit_delete_list mb0">
-                                  <li
-                                    className="list-inline-item"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
-                                    title="View Property"
-                                    onClick={() => handleEditUnit(property.id)}
+                                  <span class="visually-hidden">
+                                    Loading...
+                                  </span>
+                                </div>
+                                <div
+                                  className="spinner-border text-info ms-auto"
+                                  role="status"
+                                  aria-hidden="true"
+                                ></div>
+                              </div>
+                            </td>
+                          </tr>
+                        ) : (
+                          filteredProperties
+                            .slice(
+                              (currentPage - 1) * pageSize,
+                              currentPage * pageSize
+                            )
+                            .map((property, index) => (
+                              <tr
+                                key={property.id}
+                                className={
+                                  index % 2 === 0
+                                    ? 'table-light'
+                                    : 'table-light'
+                                }
+                              >
+                                <td>
+                                  <button
+                                    className="btn btn-link"
+                                    onClick={(event) =>
+                                      handlePropertyClick(property.id, event)
+                                    }
                                   >
-                                    <span className="flaticon-view"></span>
-                                  </li>
-                                  <li
-                                    className="list-inline-item"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
-                                    title="Edit Unit"
-                                    onClick={() => handleEditUnit(property.id)}
+                                    {property.property_code}
+                                  </button>
+                                </td>
+                                <td>
+                                  <button
+                                    className="btn btn-link"
+                                    onClick={(event) =>
+                                      handlePropertyClick(property.id, event)
+                                    }
                                   >
-                                    <span className="flaticon-edit"></span>
-                                  </li>
-                                </ul>
-                              </td>
-                            </tr>
-                          ))}
+                                    {property.property_name}
+                                  </button>
+                                </td>
+                                <td>{property.location}</td>
+                                <td>{property.unit_total}</td>
+                                <td>
+                                  <ul className="view_edit_delete_list mb0">
+                                    <li
+                                      className="list-inline-item"
+                                      data-toggle="tooltip"
+                                      data-placement="top"
+                                      title="View Property"
+                                      onClick={() =>
+                                        handleEditUnit(property.id)
+                                      }
+                                    >
+                                      <span className="flaticon-view"></span>
+                                    </li>
+                                    {localStorage.getItem('useScope') ===
+                                      'am-admin' && (
+                                      <li
+                                        className="list-inline-item"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Edit Unit"
+                                        onClick={() =>
+                                          handleEditUnit(property.id)
+                                        }
+                                      >
+                                        <span className="flaticon-edit"></span>
+                                      </li>
+                                    )}
+                                  </ul>
+                                </td>
+                              </tr>
+                            ))
+                        )}
                       </tbody>
                     </table>
                   </div>

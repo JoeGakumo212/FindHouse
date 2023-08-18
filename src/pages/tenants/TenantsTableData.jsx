@@ -37,7 +37,7 @@ const TenantsTableData = () => {
       };
 
       const response = await axios.get(
-        `https://cloudagent.co.ke/backend/api/v1/tenants?filter=&page=1&limit=9999&sortField=first_name&sortDirection=desc&whereField=&whereValue=`,
+        `https://cloudagent.co.ke/backend/api/v1/tenants?filter=&page=1&limit=9999999999999999999999999999999999999&sortField=first_name&sortDirection=desc&whereField=&whereValue=`,
         {
           headers: headers,
         }
@@ -182,9 +182,12 @@ const TenantsTableData = () => {
             <div className="my_dashboard_review mb40">
               <div className="favorite_item_list">
                 <div className="container">
+                {localStorage.getItem('useScope') === 'am-admin' && (
                   <h2>Tenants Management</h2>
-
+                )}
+                 
                   <div className="border-dark">
+                     {localStorage.getItem('useScope') === 'am-admin' && (
                     <div className="row">
                       <div className="col-lg-4">
                         <div className="my_profile_setting_input">
@@ -208,7 +211,10 @@ const TenantsTableData = () => {
                         </div>
                       </div>
                     </div>
+                     )}
+                      {localStorage.getItem('useScope') === 'am-admin' && (
                     <h1>Tenants Table</h1>
+                      )}
                     <div className="table-responsive">
                     <table className="table table-striped">
                       <thead>

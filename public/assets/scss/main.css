@@ -19741,3 +19741,22 @@ button.gm-ui-hover-effect:focus {
 .pro-sidebar .pro-menu a.ui-active {
   color: var(--color-primary) !important;
 }
+
+
+.autocomplete-options {
+  max-height: 150px; /* Adjust this value as needed */
+  overflow-y: auto;
+  border: 1px solid #ccc; /* Optional border style */
+  padding: 5px; /* Optional padding */
+}
+
+  .autocomplete-options {
+    max-height: 150px; /* Adjust this value as needed */
+    overflow-y: auto;
+    border: 1px solid #ccc; /* Optional border style */
+    padding: 5px; /* Optional padding */
+  }
+
+
+
+

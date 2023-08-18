@@ -101,12 +101,7 @@ const index = () => {
           </div>
         </div>
       </section>
-      {localStorage.getItem('useScope') === 'am-tenant'  && (
-      <TenantsDashboard/>
-      )}  
- {localStorage.getItem('useScope') === 'am-landlord'  && (
-      <LandlordDashboard/>
-      )}  
+     
     </>
   );
 };

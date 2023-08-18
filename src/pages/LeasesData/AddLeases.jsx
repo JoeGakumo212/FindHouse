@@ -7,7 +7,7 @@ import MobileMenu from '../../components/common/header/MobileMenu';
 import { useRouter } from 'next/router';
 
 const AddLease = () => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState([]); 
   const [selectedUnit, setSelectedUnit] = useState(null); // Store the selected unit object
   const [property_name, setPropertyName] = useState('');
   const [unit_name, setUnitName] = useState('');
@@ -310,6 +310,9 @@ const AddLease = () => {
     setSelectedUnit(unit);
     setUnitName(unit.unit_name);
     setUnitOptions([]); // Clear the unit options after selection
+    console.log('Selected Unit:', selectedUnit); // Log the entire selected unit object
+    console.log('Selected Unit Name:', selectedUnit.unit_name);
+    console.log('Selected Unit ID:', selectedUnit.id);
   };
   // finding property and it id
 
@@ -376,7 +379,7 @@ const AddLease = () => {
   if (selectedProperty && selectedProperty.length > 0) {
     const propertyId = selectedProperty[0].property_id;
 
-    console.log('Property selected ID', propertyId);
+    console.log("Property selected ID",propertyId);
     // Now you can use the propertyId in your formData
   } else {
     // Handle the case where no property is selected
@@ -463,61 +466,66 @@ const AddLease = () => {
     let propertyId = null;
     if (selectedProperty) {
       propertyId = selectedProperty.property_id;
-      console.log('Selected property to send', propertyId);
+      console.log("Selected property to send",propertyId);
     }
-    if (selectedUnit)
-      try {
-        const cookies = parseCookies();
-        const tokenFromCookie = cookies.access_token;
+    if(selectedUnit){
+      console.log('Selected Unit:', selectedUnit); // Log the entire selected unit object
+      console.log('Selected Unit Name:', selectedUnit.unit_name);
+      console.log('Selected Unit ID:', selectedUnit.id);
+    }
+    try {
+      const cookies = parseCookies();
+      const tokenFromCookie = cookies.access_token;
 
-        const headers = {
-          Authorization: `Bearer ${tokenFromCookie}`,
-          'Content-Type': 'application/json',
-        };
+      const headers = {
+        Authorization: `Bearer ${tokenFromCookie}`,
+        'Content-Type': 'application/json',
+      };
+    
+      const formData = {
+        data: {
+          tenants: selectedTenants,
+          propertyId: propertyId,
+          unit_id: selectedUnit.id,
+          unit_name: selectedUnit.unit_name,
+          start_date,
+          due_date,
+          rent_deposit,
+          utilityDeposits: deposit_amount,
+          extra_charge_Value,
+          extra_charge_frequency,
+          late_fee_name,
+          late_fee_value,
+          late_fee_type,
+          grace_period,
+          late_fee_frequency,
+          utility_display_name,
+          utility_unit_cost,
+          utility_base_fee,
+          payment_method_description,
+          selectedDateLease,
+          leaseTypeId: selectedLeaseType,
+          lateFeeId: selectedLateFee,
+          paymentMethodId: selectedPaymentMethod,
+          utilityId: selectedUtility,
+          extraChargeId: selectedExtraCharge,
+        },
+      };
 
-        const formData = {
-          data: {
-            tenants: selectedTenants,
-            property_id: propertyId,
-            unit: selectedUnit,
-            start_date,
-            due_date,
-            rent_deposit,
-            utilityDeposits: deposit_amount,
-            extra_charge_Value,
-            extra_charge_frequency,
-            late_fee_name,
-            late_fee_value,
-            late_fee_type,
-            grace_period,
-            late_fee_frequency,
-            utility_display_name,
-            utility_unit_cost,
-            utility_base_fee,
-            payment_method_description,
-            selectedDateLease,
-            leaseTypeId: selectedLeaseType,
-            lateFeeId: selectedLateFee,
-            paymentMethodId: selectedPaymentMethod,
-            utilityId: selectedUtility,
-            extraChargeId: selectedExtraCharge,
-          },
-        };
+      const response = await axios.post(
+        'https://cloudagent.co.ke/backend/api/v1/leases',
+        formData,
+        {
+          headers,
+        }
+      );
 
-        const response = await axios.post(
-          'https://cloudagent.co.ke/backend/api/v1/leases',
-          formData,
-          {
-            headers,
-          }
-        );
-
-        alert('Data submitted successfully');
-        console.log('Submitted Data:', response.data);
-      } catch (error) {
-        console.error('Error submitting data:', error);
-        alert('Error submitting data. Please try again.');
-      }
+      alert('Data submitted successfully');
+      console.log('Submitted Data:', response.data);
+    } catch (error) {
+      console.error('Error submitting data:', error);
+      alert('Error submitting data. Please try again.');
+    }
   }
   // ends here
   return (
@@ -582,70 +590,6 @@ const AddLease = () => {
                   </div>
                 </div>
                 <div className="col-lg-12">
-  <div className="my_dashboard_review mb40">
-    <div className="favorite_item_list">
-      {currentSection === 'lease' && (
-        <div className="lease-section">
-          <div className="row">
-            <h3>Lease Info</h3>
-            <div className="col-lg-4">
-              <div className="my_profile_setting_input ui_kit_select_search form-group">
-                <label htmlFor="PropertyName">Property Name</label>
-                <input
-                  type="text"
-                  value={property_name}
-                  onChange={handlePropertyInputChanged}
-                  onClick={() => setShowOptions(true)}
-                  placeholder="Find property by Name"
-                  className="selectpicker form-select"
-                />
-                {showOptions && propertyOptions.length > 0 && (
-                  <ul className="autocomplete-options">
-                    {propertyOptions.map((option, index) => (
-                      <li
-                        key={index}
-                        onClick={() =>
-                          handlePropertyOptionClicked(option)
-                        }
-                      >
-                        {option.property_name} - {option.id}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-
-            <div className="col-lg-4">
-              <div className="my_profile_setting_input ui_kit_select_search form-group">
-                <label htmlFor="unitname">Unit Name</label>
-                <input
-                  type="text"
-                  value={unit_name}
-                  onChange={handleUnitInputChange}
-                  placeholder="Find Unit ..."
-                  className="selectpicker form-select"
-                />
-                {unitOptions.length > 0 && (
-                  <ul className="autocomplete-options">
-                    {unitOptions.map((option, index) => (
-                      <li
-                        key={index}
-                        onClick={() =>
-                          handleUnitOptionClick(option)
-                        }
-                      >
-                        {option.unit_name}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-          
-
-
-                {/* <div className="col-lg-12">
                   <div className="my_dashboard_review mb40">
                     <div className="favorite_item_list">
                       {currentSection === 'lease' && (
@@ -681,8 +625,7 @@ const AddLease = () => {
                                 )}
                               </div>
                             </div>
-
-                            <div className="col-lg-4">
+                            {/* <div className="col-lg-4">
                               <div className="my_profile_setting_input ui_kit_select_search form-group">
                                 <label htmlFor="unitname">Unit Name</label>
                                 <input
@@ -701,13 +644,34 @@ const AddLease = () => {
                                           handleUnitOptionClick(option)
                                         }
                                       >
-                                        {option.unit_name}
+                                        {option}
                                       </li>
                                     ))}
                                   </ul>
                                 )}
                               </div>
                             </div> */}
+                            <div className="col-lg-4">
+        <div className="my_profile_setting_input ui_kit_select_search form-group">
+          <label htmlFor="unitname">Unit Name</label>
+          <input
+            type="text"
+            value={unit_name}
+            onChange={handleUnitInputChange}
+            placeholder="Find Unit ..."
+            className="selectpicker form-select"
+          />
+          {unitOptions.length > 0 && (
+            <ul className="autocomplete-options">
+              {unitOptions.map((option, index) => (
+                <li key={index} onClick={() => handleUnitOptionClick(option)}>
+                  {option.unit_name}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
 
                             <div className="col-lg-4 col-xl-0">
                               <div className="my_profile_setting_input form-group">

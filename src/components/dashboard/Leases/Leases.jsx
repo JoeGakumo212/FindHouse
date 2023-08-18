@@ -93,7 +93,7 @@ const Leases = () => {
     const selectedId = supportData.lease_types.find(
       (leaseType) => leaseType.lease_type_name === selectedName
     )?.id;
-   
+
     setSelectedLeaseType(selectedName);
   };
   const handleLateFeeChange = (event) => {
@@ -102,7 +102,7 @@ const Leases = () => {
 
     if (selectedLateFee) {
       const selectedId = selectedLateFee.id;
-     
+
       setSelectedLateFee(selectedName);
     }
   };
@@ -112,7 +112,7 @@ const Leases = () => {
     const selectedId = supportData.payment_methods.find(
       (paymentMethod) => paymentMethod.payment_method_name === selectedName
     )?.id;
-  
+
     setSelectedPaymentMethod(selectedName);
   };
 
@@ -121,7 +121,7 @@ const Leases = () => {
     const selectedId = supportData.utilities.find(
       (utility) => utility.utility_name === selectedName
     )?.id;
-   
+
     setSelectedUtility(selectedName);
   };
 
@@ -130,7 +130,7 @@ const Leases = () => {
     const selectedId = supportData.extra_charges.find(
       (extraCharge) => extraCharge.extra_charge_name === selectedName
     )?.id;
-   
+
     setSelectedExtraCharge(selectedName);
   };
   // end
@@ -377,7 +377,7 @@ const Leases = () => {
     (option) => option.property_name === property_name
   );
   const propertyId = selectedProperty ? selectedProperty.id : null;
-console.log("Property Id",propertyId)  
+  console.log('Property Id', propertyId);
   // tenants search logic
 
   const handleSearchInputChange = (event) => {
@@ -486,7 +486,7 @@ console.log("Property Id",propertyId)
       const formData = {
         data: {
           tenants: selectedTenants,
-        
+
           propertyId: selectedProperty.property_id,
           units: [
             {
@@ -498,7 +498,7 @@ console.log("Property Id",propertyId)
           start_date,
           due_date,
           rent_deposit,
-          utilityDeposits: deposit_amount,            
+          utilityDeposits: deposit_amount,
           extra_charge_Value,
           extra_charge_frequency,
           late_fee_name,
@@ -541,6 +541,7 @@ console.log("Property Id",propertyId)
         <div className="lease-section">
           <div className="row">
             <h3>Lease Info</h3>
+
             <div className="col-lg-4">
               <div className="my_profile_setting_input ui_kit_select_search form-group">
                 <label htmlFor="PropertyName">Property Name</label>

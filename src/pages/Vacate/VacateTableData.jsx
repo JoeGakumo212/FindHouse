@@ -26,15 +26,14 @@ const VacateTableData = () => {
 
     // decoding jwt from token
 const tokenFromLocalStorage = localStorage.getItem('token');
-console.log("tokenFromLocalstorage",tokenFromLocalStorage);
+
 const useScope = localStorage.getItem('useScope');
 
-console.log('JWT Token:', tokenFromLocalStorage);
 
 const decodedToken = jwtDecode(tokenFromLocalStorage);
-console.log('Decoded Token for tenantid:', decodedToken);
+
 const tenantId=decodedToken.sub;
-console.log("TenantID after decoding",tenantId);
+const landlordId=decodedToken.sub;
 
   const fetchData = async () => {
     try {
@@ -49,10 +48,13 @@ console.log("TenantID after decoding",tenantId);
       let url = '';
 
       if (localStorage.getItem('useScope') === 'am-admin') {
-        url =         `https://cloudagent.co.ke/backend/api/v1/vacation_notices?filter=&limit=999999999999999999999999999999999999999&sortField=updated_at&sortDirection=desc&whereField=&whereValue=`;
+        url =`https://cloudagent.co.ke/backend/api/v1/vacation_notices?filter=&limit=999999999999999999999999999999999999999&sortField=updated_at&sortDirection=desc&whereField=&whereValue=`;
       } else if (localStorage.getItem('useScope') === 'am-tenant') {
         console.log('Tenant ID to return vacate notices:', tenantId);
         url = `https://cloudagent.co.ke/backend/api/v1/tenants/${tenantId}/notices?filter=&page=0&limit=0&sortField=&sortDirection=&whereField=&whereValue=`;
+      }else if (localStorage.getItem('useScope')==='am-landlord'){
+        url=`https://cloudagent.co.ke/backend/api/v1/landlords/${landlordId}/notices?filter=&page=0&limit=0&sortField=&sortDirection=&whereField=&whereValue=`;
+      
       }
       if (url) {
         const response = await axios.get(url, {
@@ -232,6 +234,7 @@ console.log("TenantID after decoding",tenantId);
 
                   <div className="border-dark">
                     <div className="row">
+                    {localStorage.getItem('useScope') === 'am-admin' && (
                       <div className="col-lg-4">
                         <div className="my_profile_setting_input">
                           <button
@@ -242,6 +245,7 @@ console.log("TenantID after decoding",tenantId);
                           </button>
                         </div>
                       </div>
+                    )}
                       <div className="col-lg-8">
                         <div className="my_profile_setting_input form-group">
                           <input
@@ -316,6 +320,7 @@ console.log("TenantID after decoding",tenantId);
                                     >
                                       <span className="flaticon-view"></span>
                                     </li>
+                                    {localStorage.getItem('useScope') === 'am-admin' && (
                                     <li
                                       className="list-inline-item"
                                       data-toggle="tooltip"
@@ -327,6 +332,7 @@ console.log("TenantID after decoding",tenantId);
                                     >
                                       <span className="flaticon-edit"></span>
                                     </li>
+                                    )}
                                   </ul>
                                 </td>
                               </tr>

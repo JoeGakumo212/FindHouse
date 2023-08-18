@@ -8,7 +8,6 @@ import {
 
 const SidebarMenu = () => {
   const route = useRouter();
-  
 
   const myProperties = [
     {

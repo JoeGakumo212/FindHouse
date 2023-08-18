@@ -5,11 +5,13 @@ import axios from 'axios';
 
 const Info = ({ id }) => {
   const [landlord, setLandlord] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Function to fetch landlord details
     const fetchLandlordDetails = async () => {
       try {
+        setIsLoading(true);
         const cookies = parseCookies();
         const tokenFromCookie = cookies.access_token;
         console.log('oken', tokenFromCookie);
@@ -30,6 +32,8 @@ const Info = ({ id }) => {
         console.log('Data returned', response.data);
       } catch (error) {
         console.log('Error fetching landlord details:', error);
+      } finally {
+        setIsLoading(false); // Stop loading
       }
     };
 
@@ -39,7 +43,16 @@ const Info = ({ id }) => {
   }, [id]);
 
   if (!landlord) {
-    return <div>Loading landlord details...</div>;
+    return <div class="d-flex align-items-center">
+    <strong className="text-info">
+      Loading...
+    </strong>
+    <div
+      class="spinner-border text-info ms-auto"
+      role="status"
+      aria-hidden="true"
+    ></div>
+  </div>;
   }
   return (
     <div className="container">

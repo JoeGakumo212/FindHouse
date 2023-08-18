@@ -7,11 +7,15 @@ import { useEffect, useState } from 'react';
 const HeaderMenuContent = ({ float = "" }) => {
   const route = useRouter();
   const [userFirstName, setUserFirstName] = useState('');
+  const [userSecondName, setUserSecondName]=useState('')
+  
 
   useEffect(() => {
     // Fetch user's first name from local storage or API response
     const storedUserFirstName = localStorage.getItem('userFirstName');
     setUserFirstName(storedUserFirstName || ''); // Set to empty string if not found
+    const storedUserSecondName = localStorage.getItem('userSecondName');
+    setUserSecondName(storedUserSecondName || '')
   }, []);
 
 // Rest of your component rendering
@@ -248,13 +252,15 @@ const HeaderMenuContent = ({ float = "" }) => {
     { id: 10, name: "Terms & Conditions", routerPath: "/terms" },
   ];
 
-  return (
+  return (<>
+    <h4 className="float-start px-5  d-lg-block d-none mt-4">Welcome back, <span className="text-danger">{userFirstName} {userSecondName}</span></h4>
+    {localStorage.getItem('useScope') === 'am-admin' && (
     <ul
       id="respMenu"
       className="ace-responsive-menu text-end d-lg-block d-none"
       data-menu-style="horizontal"
     >
-     <h4 className="float-start px-5  d-lg-block d-none mt-4">Welcome back, <span className="text-danger">{userFirstName}</span></h4>
+     
       <li className="dropitem">
         <a
           href="#"
@@ -506,6 +512,8 @@ const HeaderMenuContent = ({ float = "" }) => {
       </li>
       {/* End .dropitem */}
     </ul>
+    )}
+    </>
   );
 };
 

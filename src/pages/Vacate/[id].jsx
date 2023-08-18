@@ -91,7 +91,7 @@ const MyComponent = () => {
                <h5 className='text-light'>{vacateNotice ? vacateNotice.lease?.lease_number ?? 'N/A' : ''}</h5>
                </div>
                 </div>
-               
+                {localStorage.getItem('useScope') === 'am-admin' && (
                 <ul className="view_edit_delete_list mb-0">
                   <li
                     className="list-inline-item"
@@ -103,6 +103,7 @@ const MyComponent = () => {
                     <span className="flaticon-edit text-dark"></span>
                   </li>
                 </ul>
+                )}
               </div>
 
               <div className="container-fluid ovh">

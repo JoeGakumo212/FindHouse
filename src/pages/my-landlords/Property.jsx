@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { parseCookies } from 'nookies';
+
 const Property = () => {
   const router = useRouter();
   const { id } = router.query; // Get the 'id' from the query parameter
@@ -12,9 +13,12 @@ const Property = () => {
   const pageSize = 5;
   const [properties, setProperties] = useState([]);
   const [propertyCount, setPropertyCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
   const fetchData = async () => {
     console.log('ID', id);
     try {
+      setIsLoading(true);
       const cookies = parseCookies();
       const tokenFromCookie = cookies.access_token;
 
@@ -30,17 +34,18 @@ const Property = () => {
           headers,
         }
       );
-      const properties = response.data.data;
-      setProperties(properties); // Update properties state with the fetched data
-      setPropertyCount(properties.length); //
+
+      const propertiesData = response.data.data;
+      setProperties(propertiesData); // Update properties state with the fetched data
+      setPropertyCount(propertiesData.length);
       console.log('API Response:', response.data.data);
       console.log('Token', tokenFromCookie);
-      setProperties(response.data.data);
       console.log('Property data', response.data);
-      setTotalPages(Math.ceil(properties.length / pageSize));
+      setTotalPages(Math.ceil(propertiesData.length / pageSize));
     } catch (error) {
-      setLoading(false);
-      setError('Error fetching data. Please try again later.');
+      console.log('Error fetching data:', error);
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -53,7 +58,7 @@ const Property = () => {
     setCurrentPage(1); // Reset the current page when the filter changes
   };
 
-  const filteredproperties = Array.isArray(properties)
+  const filteredProperties = Array.isArray(properties)
     ? properties.filter((property) => {
         const searchTerm = filter.toLowerCase();
         const { property_code, property_name, location } = property;
@@ -73,10 +78,8 @@ const Property = () => {
   const handleViewPropertyUnit = (propertyId) => {
     router.push(`/my-properties/${propertyId}`);
   };
-  
 
   const renderPagination = () => {
-    console.log('filteredproperties:', filteredproperties);
     const pages = [];
     for (let i = 1; i <= totalPages; i++) {
       pages.push(
@@ -123,44 +126,59 @@ const Property = () => {
 
   return (
     <>
-      <div className="table-responsive">
-        <table className="table table-striped">
-          <thead>
-            <tr className="bg-dark text-danger">
-              <th className="text-light">Code</th>
-              <th className="text-light">Name</th>
-              <th className="text-light">Location</th>
-              <th className="text-light">Unit</th>
-              {/* Add more columns as needed */}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredproperties
-              .slice((currentPage - 1) * pageSize, currentPage * pageSize)
-              .map((property, index) => (
-                <tr
-                  key={property.id}
-                  className={index % 2 === 0 ? 'table-light' : 'table-light'}
-                >
-                  <td>
-                    {' '}
-                    <button
-                      className="btn btn-link"
-                      onClick={() => handleViewPropertyUnit(property.id)}
+      {isLoading ? (
+        <div className="d-flex align-items-center text-center my-5">
+          <strong className="text-info">Loading...</strong>
+          <div className="spinner-border text-info ms-auto" role="status" aria-hidden="true"></div>
+        </div>
+      ) : (
+        <div className="table-responsive">
+          <table className="table table-striped">
+            <thead>
+              <tr className="bg-dark text-danger">
+                <th className="text-light">Code</th>
+                <th className="text-light">Name</th>
+                <th className="text-light">Location</th>
+                <th className="text-light">Unit</th>
+                {/* Add more columns as needed */}
+              </tr>
+            </thead>
+            <tbody>
+              {filteredProperties.length > 0 ? (
+                filteredProperties
+                  .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+                  .map((property, index) => (
+                    <tr
+                      key={property.id}
+                      className={index % 2 === 0 ? 'table-light' : 'table-light'}
                     >
-                      {property.property_code || '-'}
-                    </button>
+                      <td>
+                        {' '}
+                        <button
+                          className="btn btn-link"
+                          onClick={() => handleViewPropertyUnit(property.id)}
+                        >
+                          {property.property_code || '-'}
+                        </button>
+                      </td>
+                      <td>{property.property_name}</td>
+                      <td>{property.location}</td>
+                      <td>{property.unit_total || 0}</td>{' '}
+                      {/* Display 0 if no unit */}
+                      {/* Add more columns as needed */}
+                    </tr>
+                  ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="text-center">
+                    No available data
                   </td>
-                  <td>{property.property_name}</td>
-                  <td>{property.location}</td>
-                  <td>{property.unit_total || 0}</td>{' '}
-                  {/* Display 0 if no unit */}
-                  {/* Add more columns as needed */}
                 </tr>
-              ))}
-          </tbody>
-        </table>
-      </div>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
       {renderPagination()}
     </>
   );

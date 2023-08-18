@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import Header from '../../components/common/header/dashboard/Header';
 import SidebarMenu from '../../components/common/header/dashboard/SidebarMenu';
 import MobileMenu from '../../components/common/header/MobileMenu';
-import Info from '../Vacate/Info'
+import Info from '../Vacate/Info';
 import jwtDecode from 'jwt-decode';
 const LeaseTableData = () => {
   const [leases, setLeases] = useState([]);
@@ -18,50 +18,50 @@ const LeaseTableData = () => {
   const [leaseData, setLeaseData] = useState(null);
 
   // decoding jwt from token
-const tokenFromLocalStorage = localStorage.getItem('token');
-console.log("tokenFromLocalstorage",tokenFromLocalStorage);
-const useScope = localStorage.getItem('useScope');
+  const tokenFromLocalStorage = localStorage.getItem('token');
 
-console.log('JWT Token:', tokenFromLocalStorage);
+  const useScope = localStorage.getItem('useScope');
 
-const decodedToken = jwtDecode(tokenFromLocalStorage);
-console.log('Decoded Token for tenantid:', decodedToken);
-const tenantId=decodedToken.sub;
-console.log("TenantID after decoding",tenantId);
+  const decodedToken = jwtDecode(tokenFromLocalStorage);
 
+  const tenantId = decodedToken.sub;
+
+  const landlordId = decodedToken.sub;
 
   const fetchData = async () => {
-  try {
-    const cookies = parseCookies();
-    const tokenFromCookie = cookies.access_token;
+    try {
+      const cookies = parseCookies();
+      const tokenFromCookie = cookies.access_token;
 
-    const headers = {
-      Authorization: `Bearer ${tokenFromCookie}`,
-      'Content-Type': 'application/json',
-    };
- 
-    let url = '';
+      const headers = {
+        Authorization: `Bearer ${tokenFromCookie}`,
+        'Content-Type': 'application/json',
+      };
 
-    if (localStorage.getItem('useScope') === 'am-admin') {
-      url = 'https://cloudagent.co.ke/backend/api/v1/leases?filter=&page=0&limit=99999999999999999999999999999999999999999999&sortField=lease_number&sortDirection=desc&whereField=&whereValue=';
-    } else if (localStorage.getItem('useScope') === 'am-tenant') {
-      console.log('Tenant ID to return leases data:', tenantId);
-      url = `https://cloudagent.co.ke/backend/api/v1/tenants/${tenantId}/leases?filter=&page=0&limit=0&sortField=&sortDirection=&whereField=&whereValue=`;
-    } 
+      let url = '';
 
-    if (url) {
-      const response = await axios.get(url, {
-        headers: headers,
-      });
+      if (localStorage.getItem('useScope') === 'am-admin') {
+        url =
+          'https://cloudagent.co.ke/backend/api/v1/leases?filter=&page=0&limit=99999999999999999999999999999999999999999999&sortField=lease_number&sortDirection=desc&whereField=&whereValue=';
+      } else if (localStorage.getItem('useScope') === 'am-tenant') {
+        url = `https://cloudagent.co.ke/backend/api/v1/tenants/${tenantId}/leases?filter=&page=0&limit=99999999999999999999999999999999999999999999999999&sortField=&sortDirection=&whereField=&whereValue=`;
+      } else if (localStorage.getItem('useScope') === 'am-landlord') {
+        url = `https://cloudagent.co.ke/backend/api/v1/landlords/${landlordId}/leases?filter=&page=0&limit=9999999999999999999999999999999999999999999999999999999&sortField=&sortDirection=&whereField=&whereValue=`;
+      }
 
-      setLeases(response.data.data);
-      setTotalPages(Math.ceil(response.data.meta.total / pageSize));
+      if (url) {
+        const response = await axios.get(url, {
+          headers: headers,
+        });
+
+        setLeases(response.data.data);
+        setTotalPages(Math.ceil(response.data.meta.total / pageSize));
+      }
+    } catch (error) {
+      console.log('Error fetching data:', error);
     }
-  } catch (error) {
-    console.log('Error fetching data:', error);
-  }
-};
-    
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -195,22 +195,22 @@ console.log("TenantID after decoding",tenantId);
                   <div className="my_dashboard_review mb40">
                     <div className="favorite_item_list">
                       <div className="container">
+                      {localStorage.getItem('useScope') === 'am-admin' && (
                         <h2>Leases Management</h2>
+                      )}
                         <div className="row">
-                        {localStorage.getItem('useScope') === 'am-admin' && (
-                          <div className="col-lg-4">
-                            <div className="my_profile_setting_input">
-                          
-                              <button
-                                className="btn btn1 float-start"
-                                onClick={handleAddLease}
-                              >
-                                Add Lease
-                              </button>
+                          {localStorage.getItem('useScope') === 'am-admin' && (
+                            <div className="col-lg-4">
+                              <div className="my_profile_setting_input">
+                                <button
+                                  className="btn btn1 float-start"
+                                  onClick={handleAddLease}
+                                >
+                                  Add Lease
+                                </button>
+                              </div>
                             </div>
-                           
-                          </div>
-                           )}
+                          )}
                           <div className="col-lg-8">
                             <div className="my_profile_setting_input form-group">
                               <input
@@ -248,7 +248,10 @@ console.log("TenantID after decoding",tenantId);
                                 .map((lease) => (
                                   <tr key={lease.id}>
                                     <td>
-                                      <button    className="btn btn-link" href={`/[leaseId]/${lease.id}`}>
+                                      <button
+                                        className="btn btn-link"
+                                        href={`/[leaseId]/${lease.id}`}
+                                      >
                                         <a
                                           onClick={() =>
                                             handleViewLeaseDetails(lease.id)
@@ -259,7 +262,10 @@ console.log("TenantID after decoding",tenantId);
                                       </button>
                                     </td>
                                     <td>
-                                      <button    className="btn btn-link" href={`/[leaseId]/${lease.id}`}>
+                                      <button
+                                        className="btn btn-link"
+                                        href={`/[leaseId]/${lease.id}`}
+                                      >
                                         <a
                                           onClick={() =>
                                             handleViewLeaseDetails(lease.id)
@@ -296,7 +302,7 @@ console.log("TenantID after decoding",tenantId);
                             </tbody>
                           </table>
                         </div>
-                       
+
                         {renderPagination()}
                       </div>
                     </div>

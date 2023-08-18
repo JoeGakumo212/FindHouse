@@ -82,10 +82,7 @@ const MyComponent = () => {
   const { vacant_units } = property;
   const occupied_units = property.total_units - vacant_units.length;
   const handleEditProperty = () => {
-    
     router.push(`/my-properties/${id}/EditProperty`);
-
-    
   };
   return (
     <>
@@ -109,80 +106,104 @@ const MyComponent = () => {
 
       {/* Our Dashbord */}
       <div className="col-lg-12">
-                  <div className="my_dashboard_review mb40">
-                    <div className="favorite_item_list">
-      <section className="our-dashbord dashbord bgc-f7 pb-5">
-        <div className="bg-success rounded-top text-light p-2 d-flex align-items-center justify-content-between">
-          <div>
-            <h1 className="text-light">Property Details</h1>
-            <h3 className="text-light">{property.property_name}</h3>
-          </div>
-          <ul className="view_edit_delete_list mb-0">
-            <li
-              className="list-inline-item"
-              data-toggle="tooltip"
-              data-placement="top"
-              title="Edit"
-              onClick={() => handleEditProperty(property)}
-            >
-              <span className="flaticon-edit text-dark"></span>
-            </li>
-          </ul>
-        </div>
-
-        <div className="container-fluid ovh">
-          <div className="container">
-            <div className="row">
-              <div className="col">
-                <nav className="row">
-                  <div className="col">
-                    <Box sx={{ width: '100%', typography: 'body1' }}>
-                      <TabContext value={value}>
-                        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                          <TabList
-                            onChange={handleChange}
-                            aria-label="lab API tabs example"
-                          >
-                          
-                            <Tab label="Info" value="1" />
-                            <Tab label="Units" value="2" />
-                            <Tab label="Lease" value="3" />
-                            <Tab label="Invoices" value="4" />
-                            <Tab label="Vacate-Notice" value="5" />
-                          
-                          </TabList>{' '}
-                        </Box>
-                       
-                        <TabPanel value="1">
-                          <Info />
-                        </TabPanel>
-                        <TabPanel value="2">
-                          <Unit />
-                        </TabPanel>
-                        <TabPanel value="3">
-                          <Lease />
-                        </TabPanel>
-                        <TabPanel value="4">
-                          <Invoice />
-                        </TabPanel>
-                        <TabPanel value="5">
-                          <VacateNotice />
-                        </TabPanel>
-                       
-                       
-                      </TabContext>
-                    </Box>
-                  </div>
-                </nav>
+        <div className="my_dashboard_review mb40">
+          <div className="favorite_item_list">
+            <section className="our-dashbord dashbord bgc-f7 pb-5">
+              <div className="bg-success rounded-top text-light p-2 d-flex align-items-center justify-content-between">
+                <div>
+                  <h1 className="text-light">Property Details</h1>
+                  <h3 className="text-light">{property.property_name}</h3>
+                </div>
+                {localStorage.getItem('useScope') === 'am-admin' && (
+                  <ul className="view_edit_delete_list mb-0">
+                    <li
+                      className="list-inline-item"
+                      data-toggle="tooltip"
+                      data-placement="top"
+                      title="Edit"
+                      onClick={() => handleEditProperty(property)}
+                    >
+                      <span className="flaticon-edit text-dark"></span>
+                    </li>
+                  </ul>
+                )}
               </div>
-            </div>
-            <hr />
+
+              <div className="container-fluid ovh">
+                <div className="container">
+                  <div className="row">
+                    <div className="col">
+                      <nav className="row">
+                        <div className="col">
+                          <Box sx={{ width: '100%', typography: 'body1' }}>
+                            <TabContext value={value}>
+                              <Box
+                                sx={{ borderBottom: 1, borderColor: 'divider' }}
+                              >
+                                <TabList
+                                  onChange={handleChange}
+                                  aria-label="lab API tabs example"
+                                >
+                                  <Tab label="Info" value="1" />
+                                  <Tab label="Units" value="2" />
+                                  <Tab label="Lease" value="3" />
+                                  <Tab label="Invoices" value="4" />
+                                  <Tab label="Vacate-Notice" value="5" />
+                                </TabList>{' '}
+                              </Box>
+
+                              <TabPanel value="1">
+                                <Info />
+                              </TabPanel>
+                              <TabPanel value="2">
+                                <Unit />
+                              </TabPanel>
+                              <TabPanel value="3">
+                                <Lease />
+                              </TabPanel>
+                              <TabPanel value="4">
+                                <Invoice />
+                              </TabPanel>
+                              <TabPanel value="5">
+                                <VacateNotice />
+                              </TabPanel>
+                            </TabContext>
+                          </Box>
+                        </div>
+                      </nav>
+                    </div>
+                    <div className="col-3 mt-5">
+                      <table className="table">
+                        <thead>
+                          <tr className="bg-success text-light">
+                            <th>Total Units</th>
+                            <th>Occupied Units</th>
+                            <th>Vacant Units</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>{property.total_units}</td>
+                            <td>{occupied_units}</td>
+                            <td>{vacant_units.length}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                      <p>Property Name: {property.property_name}</p>
+                      <p>Location: {property.location}</p>
+                      <p>Property Code: {property.property_code}</p>
+                    </div>
+                  </div>
+                  <hr />
+                </div>
+              </div>
+              {localStorage.getItem('useScope') === 'am-admin' && (
+                <PropertyUnitPage propertyId={id} />
+              )}
+            </section>
           </div>
         </div>
-        <PropertyUnitPage propertyId={id} />
-      </section>
-      </div>
-      </div>
       </div>
     </>
   );

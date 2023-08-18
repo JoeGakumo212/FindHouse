@@ -7,10 +7,11 @@ const Info = () => {
   const [property, setProperty] = useState(null);
   const router = useRouter();
   const { id, link } = router.query;
-
+const[isLoading,setIsLoading]=useState(true)
   useEffect(() => {
     const fetchPropertyDetails = async () => {
       try {
+        setIsLoading(true);
         const cookies = parseCookies();
         const tokenFromCookie = cookies.access_token;
         console.log('Token:', tokenFromCookie);
@@ -41,6 +42,8 @@ const Info = () => {
         console.log('Error fetching property details:', error);
         console.log('Response data:', error.response.data);
         setProperty(null);
+      } finally {
+        setIsLoading(false); // Stop loading
       }
     };
 
@@ -50,7 +53,18 @@ const Info = () => {
   }, [id]);
 
   if (!id || !property) {
-    return;
+    return (
+      <div class="d-flex align-items-center">
+      <strong className="text-primary">
+        Loading...
+      </strong>
+      <div
+        class="spinner-border text-primary ms-auto"
+        role="status"
+        aria-hidden="true"
+      ></div>
+    </div>
+    );
   }
   const { vacant_units } = property;
   const handleLinkClick = (link) => {
@@ -69,7 +83,7 @@ const Info = () => {
 
     <div className="container">           
       <div className="row">
-        <div className="col-9">
+        <div className="col-12">
           <div className="row">
             <div className="col">
               <div className="form-group">
@@ -130,28 +144,7 @@ const Info = () => {
             </div>
           </div>
         </div>
-        <div className="col-3">
-          <table className="table">
-            <thead>
-              <tr className="bg-success text-light">
-                <th>Total Units</th>
-                <th>Occupied Units</th>
-                <th>Vacant Units</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{property.total_units}</td>
-                <td>{occupied_units}</td>
-                <td>{vacant_units.length}</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <p>Property Name: {property.property_name}</p>
-          <p>Location: {property.location}</p>
-          <p>Property Code: {property.property_code}</p>
-        </div>
+      
       </div>
     </div>
   

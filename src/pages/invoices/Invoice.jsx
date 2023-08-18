@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import Header from '../../components/common/header/dashboard/Header';
 import SidebarMenu from '../../components/common/header/dashboard/SidebarMenu';
 import MobileMenu from '../../components/common/header/MobileMenu';
+import jwtDecode from 'jwt-decode';
 const InvoiceTableData = () => {
   const [leases, setLeases] = useState([]);
   const [filter, setFilter] = useState('');
@@ -15,6 +16,13 @@ const InvoiceTableData = () => {
   const router = useRouter();
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
+// decoding jwt from token
+const tokenFromLocalStorage = localStorage.getItem('token');
+const useScope = localStorage.getItem('useScope');
+const decodedToken = jwtDecode(tokenFromLocalStorage);
+
+const landlordId =decodedToken.sub;
+
 
   const fetchData = async () => {
     try {
@@ -26,14 +34,27 @@ const InvoiceTableData = () => {
         'Content-Type': 'application/json',
       };
 
-      const response = await axios.get(
-        'https://cloudagent.co.ke/backend/api/v1/invoices?filter=&page=0&limit=090&sortField=updated_at&sortDirection=desc&whereField=&whereValue=',
-        { headers }
-      );
+
+      
+      let url = '';
+
+      if (localStorage.getItem('useScope') === 'am-admin') {
+        url ='https://cloudagent.co.ke/backend/api/v1/invoices?filter=&page=0&limit=9999999999999999999999999999999999999999999999999999&sortField=updated_at&sortDirection=desc&whereField=&whereValue=';
+      }else if (localStorage.getItem('useScope')==='am-landlord'){
+
+        url=`https://cloudagent.co.ke/backend/api/v1/landlords/${landlordId}/invoices?filter=&page=0&limit=9999999999999999999999999999999999999999999999999999999999999&sortField=&sortDirection=&whereField=&whereValue=`;
+      }
+
+      if (url) {
+        const response = await axios.get(url, {
+          headers: headers,
+        });
+      
 
       setLeases(response.data.data);
       setTotalPages(Math.ceil(response.data.meta.total / pageSize));
-      console.log('Invoice data', response.data.data);
+     
+    }
     } catch (error) {
       console.log('Error fetching data:', error);
     }

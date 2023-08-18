@@ -40,7 +40,8 @@ const LoginSignup = () => {
           localStorage.setItem('useScope', 'am-admin');
         }
         localStorage.setItem('userFirstName', data.first_name);
-        console.log('scope', data.scope);
+        localStorage.setItem('userSecondName',data.last_name)
+        
         const userScope = data.scope
           ? data.scope.split(' ')
           : ['view-dashboard'];
@@ -60,7 +61,7 @@ const LoginSignup = () => {
           duration: 5,
           type: 'error',
         });
-        console.log(errorData.message);
+       
       }
     } catch (error) {
       console.error('Error:', error);
@@ -200,7 +201,7 @@ const LoginSignup = () => {
                       Remember me
                     </label>
 
-                    <a className="btn-fpswd float-end" href="#">
+                    <a className="btn-fpswd float-end" href="/ForgotPassword">
                       Lost your password?
                     </a>
                   </div>

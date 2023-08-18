@@ -547,7 +547,7 @@ const MobileMenuContent = () => {
       <SidebarFooter>
         <Link href="/create-listing">
           <a className="btn btn-block btn-lg btn-thm circle">
-            <span className="flaticon-plus"></span> Create Listing
+            <span className="flaticon-plus"></span> Create Property
           </a>
         </Link>
       </SidebarFooter>

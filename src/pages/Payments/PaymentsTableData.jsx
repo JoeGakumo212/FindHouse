@@ -8,6 +8,8 @@ import MobileMenu from '../../components/common/header/MobileMenu';
 import { useRouter } from 'next/router';
 import { Modal, Tab, Nav, Button } from 'react-bootstrap';
 import Link from 'next/link';
+import Swal from 'sweetalert2'; 
+
 const PaymentsTableData = () => {
   const [payments, setPayments] = useState([]);
 
@@ -28,15 +30,11 @@ const PaymentsTableData = () => {
   // accessing usescope
 // decoding jwt from token
 const tokenFromLocalStorage = localStorage.getItem('token');
-console.log("tokenFromLocalstorage",tokenFromLocalStorage);
 const useScope = localStorage.getItem('useScope');
-
-console.log('JWT Token:', tokenFromLocalStorage);
-
 const decodedToken = jwtDecode(tokenFromLocalStorage);
-console.log('Decoded Token for tenantid:', decodedToken);
 const tenantId=decodedToken.sub;
-console.log("TenantID after decoding",tenantId);
+const landlordId =decodedToken.sub;
+
   const fetchData = async () => {
   
     try {
@@ -55,8 +53,11 @@ console.log("TenantID after decoding",tenantId);
         url ='https://cloudagent.co.ke/backend/api/v1/payments?filter=&page=0&limit=9999999999999999999999999999999999&sortField=updated_at&sortDirection=desc&whereField=&whereValue='
 
       } else if (localStorage.getItem('useScope') === 'am-tenant'){
-        console.log('Tenant ID to return payments data:',tenantId);
+       
         url = `https://cloudagent.co.ke/backend/api/v1/tenants/${tenantId}/payments?filter=&page=&limit=999999999999999999999999999999999999999999999999999&sortField=&sortDirection=&whereField=&whereValue=`; 
+      }else if (localStorage.getItem('useScope')==='am-landlord'){
+        console.log('landlord payments data:',landlordId);
+        url=`https://cloudagent.co.ke/backend/api/v1/landlords/${landlordId}/payments?filter=&page=0&limit=999999999999999999999999999999999999999999999&sortField=&sortDirection=&whereField=&whereValue=`;
       }
 
       if (url) {
@@ -149,6 +150,7 @@ console.log("TenantID after decoding",tenantId);
   };
   // Function to handle the approval action
   const handleApproval = async () => {
+    alert("You do Not Have Permissio to Access This!!!!")
     try {
       const cookies = parseCookies();
       const tokenFromCookie = cookies.access_token;
@@ -172,12 +174,22 @@ console.log("TenantID after decoding",tenantId);
       // Optionally, you can refetch the updated payment data after approval
       await fetchPaymentDetails(selectedPaymentId);
       alert('Payment has been approved successfully!');
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Payment has been approved successfully!',
+      });
+  
       // Close the action modal after successful approval
       setShowActionModal(false);
     } catch (error) {
       console.error('API Error:', error);
       // Handle error and show appropriate message to the user
     }
+     // Display an error alert if the response status is 403 (Forbidden)
+     if (error.response && error.response.status === 403) {
+      alert('You do not have permission to access this resource.');
+    } 
   };
   // handle cancel payment
 

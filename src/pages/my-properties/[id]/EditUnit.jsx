@@ -2,7 +2,7 @@ import { parseCookies } from 'nookies';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
-
+import Swal from 'sweetalert2';
 import { Button, Modal, Form } from 'react-bootstrap';
 import { IoIosArrowUp, IoIosArrowDown } from 'react-icons/io';
 import Header from '../../../components/common/header/dashboard/Header';
@@ -244,13 +244,22 @@ useEffect(() => {
       );
 
       console.log('Unit creation response:', createUnitResponse.data);
-      alert('Unit created successfully');
-        // Add the newly created unit to the existing list of units
+      Swal.fire({
+        icon: 'success',
+        title: 'Unit Added',
+        text: 'Your Unithas been added successfully!',
+      });
         setUnits((prevUnits) => [...prevUnits, createUnitResponse.data]);
            // Update the unitAdded state to true after successful unit creation
       setUnitAdded(true); // Set the unitAdded state to true after successful unit creation
       clearInputFields();
     } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong!',
+        footer: '<a href="#">Contact Administrator for more Assistance?</a>'
+      })
       console.error('Error creating unit:', error);
     }
     setShowModal(false);

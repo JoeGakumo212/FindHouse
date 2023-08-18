@@ -8,6 +8,7 @@ import Header from '../../components/common/header/dashboard/Header';
 import SidebarMenu from '../../components/common/header/dashboard/SidebarMenu';
 import MobileMenu from '../../components/common/header/MobileMenu';
 import { useRouter } from 'next/router';
+import Swal from 'sweetalert2';
 
 const AddLandlord = () => {
   const [profile, setProfile] = useState(null);
@@ -170,7 +171,13 @@ const AddLandlord = () => {
 
       if (response.status === 200) {
         console.log('Data successfully posted:', response.data);
-        alert('Landlord Created Successfully!!!!');
+        Swal.fire({
+          position: 'top-end',
+          icon: 'success',
+          title: 'Landlord Created Successfully!!!!`',
+          showConfirmButton: false,
+          timer: 1500
+        })
         router.push(`/my-landlords`)
         toast.notify(`Landlord Created Successfully!!!!`);
         return;

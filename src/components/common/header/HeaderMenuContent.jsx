@@ -320,7 +320,7 @@ const HeaderMenuContent = ({ float = "" }) => {
         <Link href="/create-listing">
           <a>
             <span className="flaticon-plus"></span>
-            <span className="dn-lg"> Create Listing</span>
+            <span className="dn-lg"> Create Property</span>
           </a>
         </Link>
       </li>

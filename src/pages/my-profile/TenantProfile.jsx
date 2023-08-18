@@ -3,17 +3,20 @@ import axios from 'axios';
 import { parseCookies } from 'nookies';
 import { useRouter } from 'next/router';
 import { Modal, Button } from 'react-bootstrap';
-import Header from '../../../components/common/header/dashboard/Header';
-import SidebarMenu from '../../../components/common/header/dashboard/SidebarMenu';
-import MobileMenu from '../../../components/common/header/MobileMenu';
+import Header from '../../components/common/header/dashboard/Header';
+import SidebarMenu from '../../components/common/header/dashboard/SidebarMenu';
+import MobileMenu from '../../components/common/header/MobileMenu';
+import jwtDecode from 'jwt-decode';
 import Swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 // ... other imports
 
-const EditTenant = () => {
+const TenantProfile = () => {
   const router = useRouter();
-  const { id } = router.query; // Access tenantId using the variable 'id'
-  console.log('ID', id);
+  // decoding jwt from token
+  const tokenFromLocalStorage = localStorage.getItem('token');
+  const decodedToken = jwtDecode(tokenFromLocalStorage);
+  const tenantId = decodedToken.sub;
 
   // State variables for tenant details
   const [tenant_type, setTenant_Type] = useState('');
@@ -87,7 +90,7 @@ const EditTenant = () => {
   useEffect(() => {
     fetchTenantTypes();
     fetchTenantData();
-  }, [id]);
+  }, [tenantId]);
 
   // Fetch tenant types
   const fetchTenantTypes = async () => {
@@ -124,7 +127,7 @@ const EditTenant = () => {
       };
 
       const response = await axios.get(
-        `https://cloudagent.co.ke/backend/api/v1/tenants/${id}`, // Endpoint to get tenant details by ID
+        `https://cloudagent.co.ke/backend/api/v1/tenants/${tenantId}`, // Endpoint to get tenant details by ID
         { headers }
       );
       console.log('Tenant fetched data', response.data);
@@ -244,8 +247,9 @@ const EditTenant = () => {
         title: 'Tenants Profile Updated',
         text: 'Your Tenants profile has been updated successfully!',
       });
-      router.push(`/tenants`);
+      router.push(`/my-dashboard`);
     } catch (error) {
+      // Handle any errors that occurred during the form submission process
       if (error.response && error.response.data && error.response.data.errors) {
         const errorMessages = error.response.data.errors;
         const phoneError = errorMessages.phone ? errorMessages.phone[0] : '';
@@ -262,7 +266,6 @@ const EditTenant = () => {
           text: errorMessage,
         });
       } 
-      // Handle any errors that occurred during the form submission process
       console.error('Error updating tenant data:', error.message);
     }
   };
@@ -283,7 +286,7 @@ const EditTenant = () => {
         'Content-Type': 'application/json',
       };
 
-      const apiUrl = `https://cloudagent.co.ke/backend/api/v1/tenants/${id}`;
+      const apiUrl = `https://cloudagent.co.ke/backend/api/v1/tenants/${tenantId}`;
 
       // Make a DELETE request to the API to delete the tenant
       await axios.delete(apiUrl, { headers });
@@ -417,9 +420,9 @@ const EditTenant = () => {
                               }
                             />
                           </div>
-                        
-
                        
+
+                        
                           <div className="col-lg-4">
                             <label>Status</label>
                             <input
@@ -451,7 +454,7 @@ const EditTenant = () => {
                           </div>
                         
 
-                      
+                        
                           <div className="col-lg-4">
                             <label>Country</label>
                             <input
@@ -479,9 +482,8 @@ const EditTenant = () => {
                               onChange={(e) => setpostal_code(e.target.value)}
                             />
                           </div>
-                        
-
                        
+
                           <div className="col-lg-4">
                             <label>Postal Address</label>
                             <input
@@ -504,12 +506,11 @@ const EditTenant = () => {
                               }
                             />
                           </div>
-                          
                           <div className="row">
                           <div className="col-lg-6">
                             <label>Password</label>
                             <input
-                              type="password"
+                              type="text"
                               className="form-control"
                               value={password}
                               onChange={(e) => setpassword(e.target.value)}
@@ -520,26 +521,28 @@ const EditTenant = () => {
                         <div className="col-lg-6">
                           <label>Confirm Password</label>
                           <input
-                            type="password"
+                            type="text"
                             className="form-control"
                             value={password_confirmation}
                             onChange={(e) =>
                               setpassword_confirmation(e.target.value)
                             }
                           />
-                          </div>
+                        </div>
                         </div>
                       </div>
                     )}
                     {/* Next of Kin Section */}
-                    <div className="row">
-                      <h3
-                        onClick={() => toggleSection('nextOfKin')}
-                        className="text text-success"
-                      >
-                        2. Edit Next of Kin
-                      </h3>
-                    </div>
+                  {localStorage.getItem('useScope')==='am-admin' && (
+                      <div className="row">
+                        <h3
+                          onClick={() => toggleSection('nextOfKin')}
+                          className="text text-success"
+                        >
+                          2. Edit Next of Kin
+                        </h3>
+                      </div>
+                  )}
                     {nextOfKinExpanded && (
                       <div className="row">
                         <div className="col-lg-4">
@@ -651,14 +654,16 @@ const EditTenant = () => {
                     )}
 
                     {/* Emergency section */}
-                    <div className="row">
-                      <h3
-                        onClick={() => toggleSection('emergency')}
-                        className="text text-success"
-                      >
-                        3. Edit Emergency
-                      </h3>
-                    </div>
+                    {localStorage.getItem('useScope')==='am-admin' && (
+                      <div className="row">
+                        <h3
+                          onClick={() => toggleSection('emergency')}
+                          className="text text-success"
+                        >
+                          3. Edit Emergency
+                        </h3>
+                      </div>
+                    )}
                     {emergencyExpanded && (
                       <div className="row">
                         <div className="col-lg-4">
@@ -740,12 +745,14 @@ const EditTenant = () => {
                     )}
                     <div className="col-xl-12 text-right mt-3">
                       <div className="my_profile_setting_input">
-                        <button
-                          className="btn btn1 float-start"
-                          onClick={handleDelete}
-                        >
-                          Delete
-                        </button>
+                        {localStorage.getItem('useScope') === 'am-admin' && (
+                          <button
+                            className="btn btn1 float-start"
+                            onClick={handleDelete}
+                          >
+                            Delete
+                          </button>
+                        )}
                         {/* Modal to collect Delete reason */}
                         <Modal
                           show={showModal}
@@ -777,7 +784,7 @@ const EditTenant = () => {
                           className="btn btn2 float-end"
                           onClick={handleSubmit}
                         >
-                          Save Tenant
+                          Update Tenant
                         </button>
                       </div>
                     </div>
@@ -792,4 +799,4 @@ const EditTenant = () => {
   );
 };
 
-export default EditTenant;
+export default TenantProfile;

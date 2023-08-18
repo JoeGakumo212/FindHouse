@@ -6,6 +6,8 @@ import { Modal, Button } from 'react-bootstrap';
 import Header from '../../../components/common/header/dashboard/Header';
 import SidebarMenu from '../../../components/common/header/dashboard/SidebarMenu';
 import MobileMenu from '../../../components/common/header/MobileMenu';
+import Swal from 'sweetalert2';
+
 const EditForm = () => {
   // State to hold the landlord details
   const router = useRouter();
@@ -137,8 +139,11 @@ const EditForm = () => {
       // Handle the response from the server
       console.log('Landlord details updated:', response.data);
 
-      // Optionally, you can show a success message to the user
-      alert('Landlord details updated successfully!');
+      Swal.fire({
+        icon: 'success',
+        title: 'Landlords Profile Updated',
+        text: 'Your Landlords profile has been updated successfully!',
+      });
       router.push(`/my-landlords`);
     } catch (error) {
       console.log('Error updating landlord details:', error);
@@ -153,41 +158,96 @@ const EditForm = () => {
   };
 
   // Function to handle delete landlord
+  // const handleSubmitDelete = async () => {
+  //   try {
+  //     // Get the access token from cookies
+  //     const cookies = parseCookies();
+  //     const tokenFromCookie = cookies.access_token;
+
+  //     // Set headers for the DELETE request
+  //     const headers = {
+  //       Authorization: `Bearer ${tokenFromCookie}`,
+  //       'Content-Type': 'application/json',
+  //     };
+
+  //     // Make the DELETE request to delete the landlord
+  //     const response = await axios.delete(
+  //       `https://cloudagent.co.ke/backend/api/v1/landlords/${id}`,
+  //       {
+  //         headers,
+  //       }
+  //     );
+
+  //     // Handle the response from the server
+  //     console.log('Landlord deleted:', response.data);
+
+  //     // Optionally, you can show a success message to the user
+  //     alert('Landlord deleted successfully!');
+  //     router.push(`/my-landlords`);
+
+  //     // Redirect the user to the desired page after successful deletion
+  //     router.push(`/my-landlords`);
+  //   } catch (error) {
+  //     console.log('Error deleting landlord:', error);
+  //     // Optionally, you can show an error message to the user
+  //     alert('Error deleting landlord. Please try again later.');
+  //   }
+  // };
   const handleSubmitDelete = async () => {
     try {
-      // Get the access token from cookies
-      const cookies = parseCookies();
-      const tokenFromCookie = cookies.access_token;
-
-      // Set headers for the DELETE request
-      const headers = {
-        Authorization: `Bearer ${tokenFromCookie}`,
-        'Content-Type': 'application/json',
-      };
-
-      // Make the DELETE request to delete the landlord
-      const response = await axios.delete(
-        `https://cloudagent.co.ke/backend/api/v1/landlords/${id}`,
-        {
-          headers,
+      // Show SweetAlert confirmation
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          // Get the access token from cookies
+          const cookies = parseCookies();
+          const tokenFromCookie = cookies.access_token;
+  
+          // Set headers for the DELETE request
+          const headers = {
+            Authorization: `Bearer ${tokenFromCookie}`,
+            'Content-Type': 'application/json',
+          };
+  
+          // Make the DELETE request to delete the landlord
+          const response = await axios.delete(
+            `https://cloudagent.co.ke/backend/api/v1/landlords/${id}`,
+            {
+              headers,
+            }
+          );
+  
+          // Handle the response from the server
+          console.log('Landlord deleted:', response.data);
+  
+          // Show SweetAlert success message
+          Swal.fire(
+            'Deleted!',
+            'Landlord Deleted Successfully!!!!.',
+            'success'
+          ).then(() => {
+            router.push(`/my-landlords`); // Redirect after successful deletion
+          });
         }
-      );
-
-      // Handle the response from the server
-      console.log('Landlord deleted:', response.data);
-
-      // Optionally, you can show a success message to the user
-      alert('Landlord deleted successfully!');
-      router.push(`/my-landlords`);
-
-      // Redirect the user to the desired page after successful deletion
-      router.push(`/my-landlords`);
+      });
     } catch (error) {
       console.log('Error deleting landlord:', error);
-      // Optionally, you can show an error message to the user
-      alert('Error deleting landlord. Please try again later.');
+      // Show SweetAlert error message
+      Swal.fire(
+        'Error',
+        'An error occurred while deleting the landlord. Please try again later.',
+        'error'
+      );
     }
   };
+  
 
   // Render the form to edit the landlord details using the 'landlord' state
   return (

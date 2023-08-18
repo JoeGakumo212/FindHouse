@@ -7,17 +7,20 @@ import Header from '../../components/common/header/dashboard/Header';
 import SidebarMenu from '../../components/common/header/dashboard/SidebarMenu';
 import MobileMenu from '../../components/common/header/MobileMenu';
 
+
 const Landlords = () => {
   const [landlords, setLandlords] = useState([]);
   const [selectedLandlord, setSelectedLandlord] = useState(null);
   const [filter, setFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
   const pageSize = 5;
   const router = useRouter(); // Initialize useRouter
 
   const fetchData = async () => {
     try {
+      setIsLoading(true);
       const cookies = parseCookies();
       const tokenFromCookie = cookies.access_token;
 
@@ -42,6 +45,8 @@ const Landlords = () => {
       setTotalPages(Math.ceil(response.data.meta.total / pageSize));
     } catch (error) {
       console.log('Error fetching data:', error);
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -72,7 +77,7 @@ const Landlords = () => {
   const handleAddLandlords = () => {
     router.push('/my-landlords/AddLandLord'); // Navigate to the /createList route
   };
- 
+
   const renderPagination = () => {
     console.log('filteredLandlords:', filteredLandlords);
     const pages = [];
@@ -152,6 +157,7 @@ const Landlords = () => {
       {/* End sidebar_menu */}
 
       {/* <!-- Our Dashbord --> */}
+
       <section className="our-dashbord dashbord bgc-f7 pb50">
         <div className="container-fluid ovh">
           <div className="col-lg-12">
@@ -183,6 +189,8 @@ const Landlords = () => {
                       </div>
                     </div>
                   </div>
+                  {/* Loader */}
+
                   <div className="table-responsive">
                     <table className="table table-striped">
                       <thead>
@@ -195,55 +203,77 @@ const Landlords = () => {
                           <th className="text-light">Actions</th>
                         </tr>
                       </thead>
+
                       <tbody>
-                        {filteredLandlords
-                          .slice(
-                            (currentPage - 1) * pageSize,
-                            currentPage * pageSize
-                          )
-                          .map((landlord, index) => (
-                            <tr
-                              key={landlord.id}
-                              className={
-                                index % 2 === 0 ? 'table-light' : 'table-light'
-                              }
-                            >
-                              <td>
-                                {/* Assuming there is a unique identifier for landlords */}
-                                <Link href={`/my-landlords/${landlord.id}`}>
-                                  <a>{landlord.first_name}</a>
-                                </Link>
-                              </td>
-                              <td>{landlord.last_name || '-'}</td>
-                              <td>{landlord.phone}</td>
-                              <td>{landlord.email}</td>
-                              <td>
-                                <ul className="view_edit_delete_list mb0">
-                                  {/* Assuming there is an Edit Landlord page */}
-                                  <li
-                                    className="list-inline-item"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
-                                    title="View Landlord"
-                                    onClick={() =>
-                                      handleViewLandlord(landlord.id)
-                                    }
-                                  >
-                                    <span className="flaticon-view"></span>
-                                  </li>
-                                  <li
-                                    className="list-inline-item"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
-                                    title="Edit Landlord"
-                                    onClick={() => handleEditLandlord(landlord.id)}
-                                  >
-                                    <span className="flaticon-edit"></span>
-                                  </li>
-                                </ul>
-                              </td>
-                            </tr>
-                          ))}
+                        {isLoading ? (
+                          <tr>
+                            <td colSpan="5" className="text-center">
+                              <div class="d-flex align-items-center">
+                                <strong className="text-info">
+                                  Loading...
+                                </strong>
+                                <div
+                                  class="spinner-border text-info ms-auto"
+                                  role="status"
+                                  aria-hidden="true"
+                                ></div>
+                              </div>
+                            </td>
+                          </tr>
+                        ) : (
+                          filteredLandlords
+                            .slice(
+                              (currentPage - 1) * pageSize,
+                              currentPage * pageSize
+                            )
+                            .map((landlord, index) => (
+                              <tr
+                                key={landlord.id}
+                                className={
+                                  index % 2 === 0
+                                    ? 'table-light'
+                                    : 'table-light'
+                                }
+                              >
+                                <td>
+                                  {/* Assuming there is a unique identifier for landlords */}
+                                  <Link href={`/my-landlords/${landlord.id}`}>
+                                    <a>{landlord.first_name}</a>
+                                  </Link>
+                                </td>
+                                <td>{landlord.last_name || '-'}</td>
+                                <td>{landlord.phone}</td>
+                                <td>{landlord.email}</td>
+                                <td>
+                                  <ul className="view_edit_delete_list mb0">
+                                    {/* Assuming there is an Edit Landlord page */}
+                                    <li
+                                      className="list-inline-item"
+                                      data-toggle="tooltip"
+                                      data-placement="top"
+                                      title="View Landlord"
+                                      onClick={() =>
+                                        handleViewLandlord(landlord.id)
+                                      }
+                                    >
+                                      <span className="flaticon-view"></span>
+                                    </li>
+                                    <li
+                                      className="list-inline-item"
+                                      data-toggle="tooltip"
+                                      data-placement="top"
+                                      title="Edit Landlord"
+                                      onClick={() =>
+                                        handleEditLandlord(landlord.id)
+                                      }
+                                    >
+                                      <span className="flaticon-edit"></span>
+                                    </li>
+                                  </ul>
+                                </td>
+                              </tr>
+                            ))
+                        )}
                       </tbody>
                     </table>
                   </div>
