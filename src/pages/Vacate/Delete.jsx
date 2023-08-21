@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { parseCookies } from 'nookies'; // Import parseCookies from the appropriate location
+import { useEffect } from 'react'; // Import useEffect if needed
 
 const deleteVacationNotice = async (id) => {
   try {
@@ -23,3 +25,6 @@ const deleteVacationNotice = async (id) => {
     console.error('API Error:', error);
   }
 };
+
+// Export the function if needed
+export default deleteVacationNotice;

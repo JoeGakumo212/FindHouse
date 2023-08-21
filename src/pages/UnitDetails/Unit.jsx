@@ -1,11 +1,11 @@
 import { parseCookies } from 'nookies';
 import { useRouter } from 'next/router';
 import axios from 'axios';
-import { useState,useEffect} from 'react';
+import { useState, useEffect } from 'react';
 
 import { Button, Modal, Form } from 'react-bootstrap';
 import { IoIosArrowUp, IoIosArrowDown } from 'react-icons/io';
-constUnit =  ({ createdUnit })=> {
+const Unit = ({ createdUnit }) => {
   const [showModal, setShowModal] = useState(false);
   const [unit_name, setunit_name] = useState('');
   const [unit_floor, setFloorUnit] = useState(0);
@@ -17,7 +17,6 @@ constUnit =  ({ createdUnit })=> {
   const [total_rooms, setTotalRooms] = useState(0);
   const [square_foot, setSquareFoot] = useState(0);
   const [shouldPreventClose, setShouldPreventClose] = useState(false);
-
 
   const [unitTypes, setUnitTypes] = useState([]);
   const [utility_id, setUtilityId] = useState('');
@@ -56,8 +55,6 @@ constUnit =  ({ createdUnit })=> {
       console.log(selectedUtility.id); // Log the selected utility ID
     }
   };
-
-
 
   useState('');
   const handleOpenModal = () => {
@@ -175,18 +172,18 @@ constUnit =  ({ createdUnit })=> {
     // Close the modal
     setShowModal(false);
   };
-  
+
   // end
   const handleContinue = async () => {
     // Handle saving the data along with other input fields on the main page
     try {
       const cookies = parseCookies();
       const tokenFromCookie = cookies.access_token;
-  
+
       const unitDetails = {
         unit_name: unit_name,
         unit_floor: unit_floor,
-        unit_type_id:  utility_id,
+        unit_type_id: utility_id,
         unit_mode: unit_mode,
         rent_amount: rent_amount,
         bed_rooms: bed_rooms,
@@ -194,30 +191,27 @@ constUnit =  ({ createdUnit })=> {
         total_rooms: total_rooms,
         square_foot: square_foot,
       };
-  
+
       const headers = {
         Authorization: `Bearer ${tokenFromCookie}`,
       };
-  
+
       const createUnitResponse = await axios.post(
         'https://cloudagent.co.ke/backend/api/v1/units',
         unitDetails,
         { headers }
       );
-  
+
       console.log('Unit creation response:', createUnitResponse.data);
-      alert("Unit created Successfully")
+      alert('Unit created Successfully');
 
-    clearInputFields(); // Clear input fields after successful unit creation
-  
-
+      clearInputFields(); // Clear input fields after successful unit creation
     } catch (error) {
       console.error('Error creating unit:', error);
     }
     setShowModal(false);
   };
-  
-  
+
   const closeModal = () => {
     if (!shouldPreventClose) {
       setShowModal(false);
@@ -341,26 +335,26 @@ constUnit =  ({ createdUnit })=> {
                   </div>
                 </div>
                 <div className="col-lg-12">
-      <div className="my_profile_setting_input ui_kit_select_search form-group">
-        <label>Utility Name</label>
-        <select
-          className="selectpicker form-select"
-          data-live-search="true"
-          data-width="100%"
-          value={utility_id}
-          onChange={handleUtilityChange}
-        >
-          <option value="" disabled>
-            Utility Name 
-          </option>
-          {unitTypes.map((utility) => (
-            <option key={utility.id} value={utility.unit_type_name}>
-              {utility.unit_type_display_name}
-            </option>
-          ))}
-        </select>
-      </div>
-    </div>
+                  <div className="my_profile_setting_input ui_kit_select_search form-group">
+                    <label>Utility Name</label>
+                    <select
+                      className="selectpicker form-select"
+                      data-live-search="true"
+                      data-width="100%"
+                      value={utility_id}
+                      onChange={handleUtilityChange}
+                    >
+                      <option value="" disabled>
+                        Utility Name
+                      </option>
+                      {unitTypes.map((utility) => (
+                        <option key={utility.id} value={utility.unit_type_name}>
+                          {utility.unit_type_display_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
                 <div className="row">
                   <div className="col-lg-6 col-xs-6">
                     <div className="my_profile_setting_input form-group">
@@ -493,7 +487,7 @@ constUnit =  ({ createdUnit })=> {
               </>
             )}
           </Modal.Body>
-        
+
           <Modal.Footer show={showModal} onHide={closeModal}>
             <Button variant="secondary" onClick={handleCloseModal}>
               Cancel
@@ -502,7 +496,7 @@ constUnit =  ({ createdUnit })=> {
               <Button
                 variant="primary"
                 onClick={() => {
-                 handleContinue();
+                  handleContinue();
                   closeModal();
                 }}
               >
@@ -511,7 +505,6 @@ constUnit =  ({ createdUnit })=> {
             )}
           </Modal.Footer>
         </Modal>
-        
       </div>
 
       {/* end */}
@@ -520,4 +513,3 @@ constUnit =  ({ createdUnit })=> {
 };
 
 export default Unit;
-
