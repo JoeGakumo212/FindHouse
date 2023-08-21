@@ -14,7 +14,7 @@ import TabList from '@material-ui/lab/TabList';
 import TabPanel from '@material-ui/lab/TabPanel';
 import Info from './[id]/Info';
 import Unit from './[id]/Unit';
-import SimpleTable from './test';
+
 import VacateNotice from './[id]/Vacate-notice';
 import Invoice from './[id]/Invoice';
 import Lease from './[id]/Lease';

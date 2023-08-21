@@ -172,12 +172,12 @@ const InvoiceDetails = () => {
                         <div className="container mt-5">
                           {/* Show loading spinner and "Loading..." text when data is fetching */}
                           {isLoading ? (
-                            <div class="d-flex align-items-center">
+                            <div className="d-flex align-items-center">
                               <strong className=" text-primary">
                                 Downloading Invoice...
                               </strong>
                               <div
-                                class="spinner-border ms-auto  text-primary"
+                                className="spinner-border ms-auto  text-primary"
                                 role="status"
                                 aria-hidden="true"
                               ></div>
@@ -264,7 +264,7 @@ const InvoiceDetails = () => {
                             </p>
                           </div>
                         </div>
-                        <div class="dropdown mt-3">
+                        <div className="dropdown mt-3">
                           <button
                             className="btn btn dropdown-toggle"
                             type="button"
@@ -366,7 +366,7 @@ const InvoiceDetails = () => {
                 {localStorage.getItem('useScope') === 'am-admin' && (
                 <button
                   type="button"
-                  class="btn btn-danger"
+                  className="btn btn-danger"
                   data-bs-toggle="modal"
                   data-bs-target="#staticBackdrop"
                 >
@@ -375,32 +375,32 @@ const InvoiceDetails = () => {
                 )}
                 {/* <!-- Modal --> */}
                 <div
-                  class="modal fade"
+                  className="modal fade"
                   id="staticBackdrop"
                   data-bs-backdrop="static"
                   data-bs-keyboard="false"
-                  tabindex="-1"
+                  tabIndex="-1"
                   aria-labelledby="staticBackdropLabel"
                   aria-hidden="true"
                 >
-                  <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                      <div class="modal-header bg-secondary">
+                  <div className="modal-dialog modal-dialog-centered">
+                    <div className="modal-content">
+                      <div className="modal-header bg-secondary">
                         <h3
-                          class="modal-title text-dark"
+                          className="modal-title text-dark"
                           id="staticBackdropLabel"
                         >
                           Invoice Waiver {invoicedata?.invoice_number}
                         </h3>
                         <button
                           type="button"
-                          class="btn-close"
+                          className="btn-close"
                           data-bs-dismiss="modal"
                           aria-label="Close"
                         ></button>
                       </div>
 
-                      <div class="modal-body">
+                      <div className="modal-body">
                         <div className="col-lg-12">
                         <div className="my_profile_setting_input form-group">
                           <label htmlFor="waiver_date">Waiver Date</label>
@@ -439,10 +439,10 @@ const InvoiceDetails = () => {
                         </div>
                       </div>
                       </div>
-                      <div class="modal-footer">
+                      <div className="modal-footer">
                         <button
                           type="button"
-                          class="btn btn-secondary"
+                          className="btn btn-secondary"
                           data-bs-dismiss="modal"
                         >
                           Close
@@ -450,13 +450,13 @@ const InvoiceDetails = () => {
                         <button
                           type="button"
                           onClick={handleSubmit}
-                          class="btn btn-secondary"
+                          className="btn btn-secondary"
                         >
                           Add Waiver
                         </button>
                       </div>
                       {isSuccess && (
-        <div class="alert alert-success" role="alert">
+        <div className="alert alert-success" role="alert">
           Waiver submitted successfully!
         </div>
       )}

@@ -208,12 +208,12 @@ const Landlords = () => {
                         {isLoading ? (
                           <tr>
                             <td colSpan="5" className="text-center">
-                              <div class="d-flex align-items-center">
+                              <div className="d-flex align-items-center">
                                 <strong className="text-info">
                                   Loading...
                                 </strong>
                                 <div
-                                  class="spinner-border text-info ms-auto"
+                                  className="spinner-border text-info ms-auto"
                                   role="status"
                                   aria-hidden="true"
                                 ></div>

@@ -5,6 +5,9 @@ import { useRouter } from 'next/router';
 import Header from '../../components/common/header/dashboard/Header';
 import SidebarMenu from '../../components/common/header/dashboard/SidebarMenu';
 import MobileMenu from '../../components/common/header/MobileMenu';
+import Big from 'big.js'; 
+
+
 const Vacants = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -18,6 +21,7 @@ const Vacants = () => {
   const [selectedLease, setSelectedLease] = useState(null);
   const [vacatingDate, setVacatingDate] = useState('');
   const [vacatingReason, setVacatingReason] = useState('');
+  const largeLimit = new Big('9999999999999999999999999999999999999999999999999999');
   const router = useRouter();
   const handleBack = () => {
     router.push('/Vacate');
@@ -102,7 +106,7 @@ const Vacants = () => {
           { middle_name: { $regex: query, $options: 'i' } },
         ],
         page: 0,
-        limit: 99999999999999999999999999999999999999999999999999990,
+        limit: largeLimit.toString(),
         sortField: 'updated_at',
         sortDirection: 'desc',
         whereField: '',
@@ -171,7 +175,7 @@ const Vacants = () => {
       const params = {
         lease_number: { $regex: query, $options: 'i' },
         page: 0,
-        limit: 9999999999999999999999999999999999999999999999999999999999999999999999999999,
+        limit: largeLimit.toString(),
         sortField: 'updated_at',
         sortDirection: 'desc',
         whereField: '',

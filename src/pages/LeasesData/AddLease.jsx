@@ -5,6 +5,7 @@ import Header from '../../components/common/header/dashboard/Header';
 import SidebarMenu from '../../components/common/header/dashboard/SidebarMenu';
 import MobileMenu from '../../components/common/header/MobileMenu';
 import { useRouter } from 'next/router';
+import Big from 'big.js';
 
 const AddLease = () => {
   const [data, setData] = useState([]);
@@ -52,6 +53,7 @@ const AddLease = () => {
   const [selectedUtility, setSelectedUtility] = useState('');
   const [selectedExtraCharge, setSelectedExtraCharge] = useState('');
 
+  const largeLimit = new Big('999999999999999999999999999999999999');
   const router = useRouter(); // Initialize useRouter
   const handleBack = () => {
     router.push('/LeasesData');
@@ -283,7 +285,7 @@ const AddLease = () => {
           params: {
             unit: query,
             page: 1,
-            limit: 99999999999999999, // Adjust limit as needed
+            limit: largeLimit.toString(), // Adjust limit as needed
           },
           headers, // Include the headers in the request
         }

@@ -217,10 +217,10 @@ const PropertyTableData = () => {
                                   Loading...
                                 </strong>
                                 <div
-                                  class="spinner-grow spinner-grow text-info"
+                                  className="spinner-grow spinner-grow text-info"
                                   role="status"
                                 >
-                                  <span class="visually-hidden">
+                                  <span className="visually-hidden">
                                     Loading...
                                   </span>
                                 </div>

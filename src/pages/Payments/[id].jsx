@@ -218,7 +218,7 @@ const ReceiptPage = () => {
                                   <input
                                     type="text"
                                     className="form-control"
-                                    Value={selectedPaymentForModal?.amount}
+                                    value={selectedPaymentForModal?.amount}
                                     readOnly
                                   />
                                 </div>
@@ -227,7 +227,7 @@ const ReceiptPage = () => {
                                   <input
                                     type="text"
                                     className="form-control"
-                                    Value={
+                                    value={
                                       selectedPaymentForModal?.payment_date
                                     }
                                     readOnly
@@ -253,7 +253,7 @@ const ReceiptPage = () => {
                                   <input
                                     type="text"
                                     className="form-control"
-                                    Value={
+                                    value={
                                       selectedPaymentForModal?.lease_number ??
                                       'N/A'
                                     }
@@ -265,7 +265,7 @@ const ReceiptPage = () => {
                                   <input
                                     type="text"
                                     className="form-control"
-                                    Value={
+                                    value={
                                       selectedPaymentForModal?.lease?.units[0]
                                         ?.unit_name ?? 'N/A'
                                     }
@@ -277,7 +277,7 @@ const ReceiptPage = () => {
                                   <input
                                     type="text"
                                     className="form-control"
-                                    Value={`${
+                                    value={`${
                                       selectedPaymentForModal?.tenant
                                         ?.first_name ?? 'N/A'
                                     } ${

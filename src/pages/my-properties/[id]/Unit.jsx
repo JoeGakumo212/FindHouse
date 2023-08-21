@@ -67,10 +67,10 @@ const Unit = () => {
 
   if (isLoading) {
     return (
-      <div class="d-flex align-items-center">
+      <div className="d-flex align-items-center">
         <strong className="text-primary">Loading...</strong>
         <div
-          class="spinner-border text-primary ms-auto"
+          className="spinner-border text-primary ms-auto"
           role="status"
           aria-hidden="true"
         ></div>

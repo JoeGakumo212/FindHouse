@@ -43,12 +43,12 @@ const Info = ({ id }) => {
   }, [id]);
 
   if (!landlord) {
-    return <div class="d-flex align-items-center">
+    return <div className="d-flex align-items-center">
     <strong className="text-info">
       Loading...
     </strong>
     <div
-      class="spinner-border text-info ms-auto"
+      className="spinner-border text-info ms-auto"
       role="status"
       aria-hidden="true"
     ></div>

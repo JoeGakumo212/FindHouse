@@ -506,7 +506,7 @@ const landlordId =decodedToken.sub;
                       <input
                         type="text"
                         className="form-control"
-                        Value={selectedPaymentForModal?.amount}
+                        value={selectedPaymentForModal?.amount}
                         readOnly
                       />
                     </div>
@@ -515,7 +515,7 @@ const landlordId =decodedToken.sub;
                       <input
                         type="text"
                         className="form-control"
-                        Value={selectedPaymentForModal?.payment_date}
+                        value={selectedPaymentForModal?.payment_date}
                         readOnly
                       />
                     </div>
@@ -538,7 +538,7 @@ const landlordId =decodedToken.sub;
                       <input
                         type="text"
                         className="form-control"
-                        Value={`${
+                        value={`${
                           selectedPaymentForModal?.tenant?.first_name ?? 'N/A'
                         } ${
                           selectedPaymentForModal?.tenant?.middle_name ?? ''
@@ -554,7 +554,7 @@ const landlordId =decodedToken.sub;
                     <input
                       type="text"
                       className="form-control"
-                      Value={
+                      value={
                         selectedPaymentForModal?.tenant?.first_name ?? 'N/A'
                       }
                       readOnly
@@ -565,7 +565,7 @@ const landlordId =decodedToken.sub;
                     <input
                       type="text"
                       className="form-control"
-                      Value={selectedPaymentForModal?.notes ?? 'N/A'}
+                      value={selectedPaymentForModal?.notes ?? 'N/A'}
                       readOnly
                     />
                   </div>
@@ -685,7 +685,7 @@ const landlordId =decodedToken.sub;
                       <input
                         type="text"
                         className="form-control"
-                        Value={selectedPaymentForModal?.amount}
+                        value={selectedPaymentForModal?.amount}
                         readOnly
                       />
                     </div>
@@ -694,7 +694,7 @@ const landlordId =decodedToken.sub;
                       <input
                         type="text"
                         className="form-control"
-                        Value={selectedPaymentForModal?.payment_date}
+                        value={selectedPaymentForModal?.payment_date}
                         readOnly
                       />
                     </div>
@@ -717,7 +717,7 @@ const landlordId =decodedToken.sub;
                       <input
                         type="text"
                         className="form-control"
-                        Value={`${
+                        value={`${
                           selectedPaymentForModal?.tenant?.first_name ?? 'N/A'
                         } ${
                           selectedPaymentForModal?.tenant?.middle_name ?? ''
@@ -733,7 +733,7 @@ const landlordId =decodedToken.sub;
                     <input
                       type="text"
                       className="form-control"
-                      Value={
+                      value={
                         selectedPaymentForModal?.tenant?.first_name ?? 'N/A'
                       }
                       readOnly
@@ -744,7 +744,7 @@ const landlordId =decodedToken.sub;
                     <input
                       type="text"
                       className="form-control"
-                      Value={selectedPaymentForModal?.notes ?? 'N/A'}
+                      value={selectedPaymentForModal?.notes ?? 'N/A'}
                       readOnly
                     />
                   </div>
@@ -777,20 +777,7 @@ const landlordId =decodedToken.sub;
         </Modal>
       )}
 
-      <style jsx global>{`
-        /* ... Custom CSS ... */
-
-        /* Custom CSS to display the modal vertically */
-        .custom-modal-dialog {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-        }
-        .td-pointer {
-          cursor: pointer;
-        }
-      `}</style>
+      
 
       <Modal
         show={showStatusModal}
@@ -815,7 +802,7 @@ const landlordId =decodedToken.sub;
               <input
                 type="text"
                 className="form-control"
-                Value={selectedPayment?.amount}
+                value={selectedPayment?.amount}
                 readOnly
               />
             </div>
@@ -824,7 +811,7 @@ const landlordId =decodedToken.sub;
               <input
                 type="text"
                 className="form-control"
-                Value={selectedPayment?.payment_date}
+                value={selectedPayment?.payment_date}
                 readOnly
               />
             </div>
@@ -847,7 +834,7 @@ const landlordId =decodedToken.sub;
               <input
                 type="text"
                 className="form-control"
-                Value={`${selectedPayment?.tenant?.first_name ?? 'N/A'} ${
+                value={`${selectedPayment?.tenant?.first_name ?? 'N/A'} ${
                   selectedPayment?.tenant?.middle_name ?? ''
                 } ${selectedPayment?.tenant?.last_name ?? 'N/A'}`}
                 readOnly
@@ -859,7 +846,7 @@ const landlordId =decodedToken.sub;
             <input
               type="text"
               className="form-control"
-              Value={selectedPayment?.tenant?.first_name ?? 'N/A'}
+              value={selectedPayment?.tenant?.first_name ?? 'N/A'}
               readOnly
             />
           </div>
@@ -868,7 +855,7 @@ const landlordId =decodedToken.sub;
             <input
               type="text"
               className="form-control"
-              Value={selectedPayment?.notes ?? 'N/A'}
+              value={selectedPayment?.notes ?? 'N/A'}
               readOnly
             />
           </div>

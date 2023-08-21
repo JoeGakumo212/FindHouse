@@ -1,4 +1,4 @@
-import LeaseDetails from '../../../pages/[leasesId]';
+// import LeaseDetails from '../../../pages/[leasesId]';
 import Header from '../../common/header/dashboard/Header';
 import SidebarMenu from '../../common/header/dashboard/SidebarMenu';
 import MobileMenu from '../../common/header/MobileMenu';
