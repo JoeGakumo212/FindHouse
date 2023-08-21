@@ -171,7 +171,7 @@ const LeasesDataPage = () => {
                             </p>
                             <h3 className="text-light">
                               {' '}
-                              {leaseData.lease_number}
+                              {leaseData?.lease_number}
                             </h3>
                           </div>
                         </div>
@@ -222,11 +222,11 @@ const LeasesDataPage = () => {
                         </div>
                       </div>
                       <div className="col m-2">
-                        <h5>Lease: {leaseData.lease_number}</h5>
-                        <p>Property Code: {leaseData.property.property_name}</p>
-                        <p>Unit Names: {leaseData.unit_names}</p>
-                        <p>Tenant: {leaseData.tenant_names}</p>
-                        <p>Start Date: {leaseData.start_date}</p>
+                        <h5>Lease: {leaseData?.lease_number}</h5>
+                        <p>Property Code: {leaseData?.property.property_name}</p>
+                        <p>Unit Names: {leaseData?.unit_names}</p>
+                        <p>Tenant: {leaseData?.tenant_names}</p>
+                        <p>Start Date: {leaseData?.start_date}</p>
                       </div>
                     </div>
                   </div>
@@ -234,14 +234,14 @@ const LeasesDataPage = () => {
                     className="btn btn-danger d-flex align-items-center justify-content-between m-2"
                     onClick={handleTerminateLease}
                   >
-                    Terminate Lease ({leaseData.lease_number})
+                    Terminate Lease ({leaseData?.lease_number})
                   </button>
                   {/* Modal to collect termination reason */}
                   <Modal show={showModal} onHide={() => setShowModal(false)}>
                     <Modal.Header closeButton>
                       <Modal.Title>
                         {' '}
-                        Terminate Lease ({leaseData.lease_number})
+                        Terminate Lease ({leaseData?.lease_number})
                       </Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
@@ -271,7 +271,7 @@ const LeasesDataPage = () => {
                         variant="danger"
                         onClick={handleSubmitTermination}
                       >
-                        Terminate Lease ({leaseData.lease_number})
+                        Terminate Lease ({leaseData?.lease_number})
                       </Button>
                     </Modal.Footer>
                   </Modal>

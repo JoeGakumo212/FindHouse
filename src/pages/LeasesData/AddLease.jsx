@@ -480,6 +480,8 @@ const AddLease = () => {
             tenants: selectedTenants,
             property_id: propertyId,
             unit: selectedUnit,
+            property:selectedProperty,
+            rent_amount,            
             start_date,
             due_date,
             rent_deposit,
