@@ -17,37 +17,35 @@ const LeaseTableData = () => {
   const router = useRouter();
   const [leaseData, setLeaseData] = useState(null);
 
-  // decoding jwt from token
-  const tokenFromLocalStorage = localStorage.getItem('token');
-
-  const useScope = localStorage.getItem('useScope');
-
-  const decodedToken = jwtDecode(tokenFromLocalStorage);
-
-  const tenantId = decodedToken.sub;
-
-  const landlordId = decodedToken.sub;
-
   const fetchData = async () => {
     try {
       const cookies = parseCookies();
       const tokenFromCookie = cookies.access_token;
-
+  
       const headers = {
         Authorization: `Bearer ${tokenFromCookie}`,
         'Content-Type': 'application/json',
       };
+  
+  let url = '';
+  let tenantId = '';
+  let landlordId = '';
 
-      let url = '';
+  if (typeof window !== 'undefined') { // Check if running in browser environment
+    const useScope = localStorage.getItem('useScope');
+    const tokenFromLocalStorage = localStorage.getItem('token');
+    const decodedToken = jwtDecode(tokenFromLocalStorage);
+    tenantId = decodedToken.sub;
+    landlordId = decodedToken.sub;
 
-      if (localStorage.getItem('useScope') === 'am-admin') {
-        url =
-          'https://cloudagent.co.ke/backend/api/v1/leases?filter=&page=0&limit=99999999999999999999999999999999999999999999&sortField=lease_number&sortDirection=desc&whereField=&whereValue=';
-      } else if (localStorage.getItem('useScope') === 'am-tenant') {
-        url = `https://cloudagent.co.ke/backend/api/v1/tenants/${tenantId}/leases?filter=&page=0&limit=99999999999999999999999999999999999999999999999999&sortField=&sortDirection=&whereField=&whereValue=`;
-      } else if (localStorage.getItem('useScope') === 'am-landlord') {
-        url = `https://cloudagent.co.ke/backend/api/v1/landlords/${landlordId}/leases?filter=&page=0&limit=9999999999999999999999999999999999999999999999999999999&sortField=&sortDirection=&whereField=&whereValue=`;
-      }
+    if (useScope === 'am-admin') {
+      url = 'https://cloudagent.co.ke/backend/api/v1/leases?filter=&page=0&limit=99999999999999999999999999999999999999999999&sortField=lease_number&sortDirection=desc&whereField=&whereValue=';
+    } else if (useScope === 'am-tenant') {
+      url = `https://cloudagent.co.ke/backend/api/v1/tenants/${tenantId}/leases?filter=&page=0&limit=99999999999999999999999999999999999999999999999999&sortField=&sortDirection=&whereField=&whereValue=`;
+    } else if (useScope === 'am-landlord') {
+      url = `https://cloudagent.co.ke/backend/api/v1/landlords/${landlordId}/leases?filter=&page=0&limit=9999999999999999999999999999999999999999999999999999999&sortField=&sortDirection=&whereField=&whereValue=`;
+    }
+  }
 
       if (url) {
         const response = await axios.get(url, {
@@ -195,11 +193,11 @@ const LeaseTableData = () => {
                   <div className="my_dashboard_review mb40">
                     <div className="favorite_item_list">
                       <div className="container">
-                      {localStorage.getItem('useScope') === 'am-admin' && (
+                      {typeof window !== 'undefined' && localStorage.getItem('useScope') === 'am-admin' && (
                         <h2>Leases Management</h2>
                       )}
                         <div className="row">
-                          {localStorage.getItem('useScope') === 'am-admin' && (
+                        {typeof window !== 'undefined' && localStorage.getItem('useScope')  === 'am-admin' && (
                             <div className="col-lg-4">
                               <div className="my_profile_setting_input">
                                 <button

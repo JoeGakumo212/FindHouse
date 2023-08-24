@@ -2,46 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 import { parseCookies } from 'nookies';
+import Swal from 'sweetalert2';
+import { useRouter } from 'next/router';
 
 const EditNoticeModal = ({ notice, onCloseModal, onSaveChanges }) => {
   const [tenants, setTenants] = useState([]);
-  const [selectedTenant, setSelectedTenant] = useState(notice.tenant_id || null);
+  const [selectedTenant, setSelectedTenant] = useState(notice?.tenant_id || null);
   const [leases, setLeases] = useState([]);
-  const [selectedLease, setSelectedLease] = useState(notice.lease_id || null);
+  const [selectedLease, setSelectedLease] = useState(notice?.lease_id || null);
   const [vacatingDate, setVacatingDate] = useState(
-    notice.vacating_date_display || ''
+    notice?.vacating_date_display || ''
   );
-  const [vacateReason, setVacateReason] = useState(notice.vacate_reason || '');
+  const [vacateReason, setVacateReason] = useState(notice?.vacate_reason || '');
   const [searchedTenants, setSearchedTenants] = useState([]);
-  const [selectedSearchedTenant, setSelectedSearchedTenant] = useState(null);
+  const [selectedSearchedTenant, setSelectedSearchedTenant] = useState(notice?.tenant || null); // Initialize with notice's tenant data
+  const router=useRouter()
 
-  useEffect(() => {
-    fetchTenants();
-  }, []);
 
-  const fetchTenants = async () => {
-    try {
-      const cookies = parseCookies();
-      const tokenFromCookie = cookies.access_token;
-      const headers = {
-        Authorization: `Bearer ${tokenFromCookie}`,
-        'Content-Type': 'application/json',
-      };
-
-      const response = await axios.get(
-        'https://cloudagent.co.ke/backend/api/v1/tenants/leases?filter=&page=0&limit=0&sortField=&sortDirection=&whereField=&whereValue=',
-        {
-          headers: headers,
-        }
-      );
-
-      setTenants(response.data.data);
-    } catch (error) {
-      console.error('API Error:', error);
-    }
-  };
-
-  const fetchLeasesByTenantId = async (tenantId) => {
+  const fetchTenant = async (tenantId) => {
     try {
       const cookies = parseCookies();
       const tokenFromCookie = cookies.access_token;
@@ -95,14 +73,19 @@ const EditNoticeModal = ({ notice, onCloseModal, onSaveChanges }) => {
         'Content-Type': 'application/json',
       };
 
-      const updatedNotice = {
-        ...notice,
-        tenant_id: selectedTenant,
-        lease_id: selectedLease,
-        vacating_date_display: vacatingDate,
-        vacate_reason: vacateReason,
-      };
+       const updatedNotice = {
+      ...notice,
+      tenant_id: selectedTenant,
+      lease_id: selectedLease,
+      vacating_date_display: vacatingDate,
+      vacate_reason: vacateReason,
+    };
 
+    // Update the local state with the new notice data before sending the request
+    setSelectedTenant(updatedNotice.tenant_id);
+    setSelectedLease(updatedNotice.lease_id);
+    setVacatingDate(updatedNotice.vacating_date_display);
+    setVacateReason(updatedNotice.vacate_reason);
       await axios.put(
         `https://cloudagent.co.ke/backend/api/v1/vacation_notices/${notice.id}`,
         updatedNotice,
@@ -110,18 +93,98 @@ const EditNoticeModal = ({ notice, onCloseModal, onSaveChanges }) => {
           headers: headers,
         }
       );
-
-      onSaveChanges(updatedNotice); // Call the parent component's function to update the notice in the list
+ // Call the parent component's function to update the notice in the list
       onCloseModal();
+      onSaveChanges(updatedNotice);
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Notice updated successfully!',
+        confirmButtonText: 'OK',
+      });
     } catch (error) {
       console.error('API Error:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'An error occurred. Please try again later.',
+        confirmButtonText: 'OK',
+      });
     }
   };
 
   const handleCloseModal = () => {
     onCloseModal();
   };
+  // handle delete
+  const deleteVacationNotice = async (id) => {
+    try {
+      const cookies = parseCookies();
+      const tokenFromCookie = cookies.access_token;
 
+      const headers = {
+        Authorization: `Bearer ${tokenFromCookie}`,
+        'Content-Type': 'application/json',
+      };
+
+      await axios.delete(
+        `https://cloudagent.co.ke/backend/api/v1/vacation_notices/${notice.id}`,
+        {
+          headers: headers,
+        }
+      );
+      onCloseModal();
+       
+      // Display a success alert upon successful deletion
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Vacation notice deleted successfully!',
+        confirmButtonText: 'OK',
+      });
+      fetchVacationNotices();
+      // The vacation notice has been successfully deleted
+      // You may want to update the UI or take other actions accordingly
+    } catch (error) {
+      console.error('API Error:', error);
+
+      // Display an error alert if deletion fails
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'An error occurred while deleting the vacation notice. Please try again later.',
+        confirmButtonText: 'OK',
+      });
+    }
+  };
+  // update the vacate notice
+  
+    // Fetch the updated list of vacation notices
+    const fetchVacationNotices = async () => {
+      try {
+        const cookies = parseCookies();
+        const tokenFromCookie = cookies.access_token;
+  
+        const headers = {
+          Authorization: `Bearer ${tokenFromCookie}`,
+          'Content-Type': 'application/json',
+        };
+  
+        const response = await axios.get(
+          'https://cloudagent.co.ke/backend/api/v1/vacation_notices',
+          {
+            headers: headers,
+          }
+        );
+  
+        // Update the UI with the updated list of vacation notices
+        // You may want to call the onSaveChanges function or update your state accordingly
+        onSaveChanges(response.data);
+  
+      } catch (error) {
+        console.error('API Error:', error);
+      }
+    };
   return (
     <Modal show={true} onHide={handleCloseModal}>
       <Modal.Header closeButton className="bg-success">
@@ -199,8 +262,8 @@ const EditNoticeModal = ({ notice, onCloseModal, onSaveChanges }) => {
         <Button variant="secondary" onClick={handleCloseModal}>
           Close
         </Button>
-        {localStorage.getItem('useScope') === 'am-admin' && (
-        <Button variant="danger" onClick={handleSaveChanges}>
+        {typeof window !== 'undefined' && localStorage.getItem('useScope') === 'am-admin' && (
+        <Button variant="danger" onClick={deleteVacationNotice}>
           Delete
         </Button>
         )}

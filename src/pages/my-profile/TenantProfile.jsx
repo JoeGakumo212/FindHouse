@@ -14,10 +14,7 @@ import 'sweetalert2/dist/sweetalert2.min.css';
 const TenantProfile = () => {
   const router = useRouter();
   // decoding jwt from token
-  const tokenFromLocalStorage = localStorage.getItem('token');
-  const decodedToken = jwtDecode(tokenFromLocalStorage);
-  const tenantId = decodedToken.sub;
-
+  
   // State variables for tenant details
   const [tenant_type, setTenant_Type] = useState('');
   const [first_name, setFirst_name] = useState('');
@@ -90,7 +87,7 @@ const TenantProfile = () => {
   useEffect(() => {
     fetchTenantTypes();
     fetchTenantData();
-  }, [tenantId]);
+  }, []);
 
   // Fetch tenant types
   const fetchTenantTypes = async () => {
@@ -120,61 +117,77 @@ const TenantProfile = () => {
     try {
       const cookies = parseCookies();
       const tokenFromCookie = cookies.access_token;
-
+  
       const headers = {
         Authorization: `Bearer ${tokenFromCookie}`,
         'Content-Type': 'application/json',
       };
-
-      const response = await axios.get(
-        `https://cloudagent.co.ke/backend/api/v1/tenants/${tenantId}`, // Endpoint to get tenant details by ID
-        { headers }
-      );
-      console.log('Tenant fetched data', response.data);
-      const tenantData = response.data;
-      // Update state variables with the retrieved tenant data
-      setTenant_Type(tenantData.tenant_type);
-      setFirst_name(tenantData.first_name);
-      setMiddle_name(tenantData.middle_name);
-      setLast_name(tenantData.last_name);
-      setGender(tenantData.gender);
-      setDate_of_birth(tenantData.date_of_birth);
-      setid_passport_number(tenantData.id_passport_number);
-      setmarital_status(tenantData.marital_status);
-      setphone(tenantData.phone);
-      setemail(tenantData.email);
-      setcountry(tenantData.country);
-      setCity(tenantData.city);
-      setpostal_address(tenantData.postal_address);
-      setphysical_address(tenantData.physical_address);
-      setpostal_code(tenantData.postal_code);
-      // next of kin
-      setNext_of_kin_name(tenantData.next_of_kin_name);
-      setNext_of_kin_phone(tenantData.next_of_kin_phone);
-      setNext_of_kin_relation(tenantData.next_of_kin_relation);
-      setEmergency_contact_name(tenantData.emergency_contact_name);
-      setEmergency_contact_phone(tenantData.emergency_contact_phone);
-      setEmergency_contact_email(tenantData.emergency_contact_email);
-      setEmergency_contact_relationship(
-        tenantData.emergency_contact_relationship
-      );
-      setEmergency_contact_physical_address(
-        tenantData.emergency_contact_physical_address
-      );
-      setEmergency_contact_postal_address(
-        tenantData.emergency_contact_postal_address
-      );
-      // Employe details
-      setEmployment_status(tenantData.employment_status);
-      setEmployment_position(tenantData.employment_position);
-      setEmployer_contact_phone(tenantData.employer_contact_phone);
-      setEmployer_contact_email(tenantData.employer_contact_email);
-      setEmployment_postal_address(tenantData.employment_postal_address);
-      setEmployment_physical_address(tenantData.employment_physical_address);
+      
+      let url = '';
+      let tenantId = '';
+      let landlordId = '';
+  
+      if (typeof window !== 'undefined') {
+        const useScope = localStorage.getItem('useScope');
+        const tokenFromLocalStorage = localStorage.getItem('token');
+        const decodedToken = jwtDecode(tokenFromLocalStorage);
+        tenantId = decodedToken.sub;
+        landlordId = decodedToken.sub;
+        
+        if (useScope === 'am-tenant') {
+          url = `https://cloudagent.co.ke/backend/api/v1/tenants/${tenantId}`;
+        }
+      }
+  
+      if (url) {
+        const response = await axios.get(url, {
+          headers: headers,
+        });
+  
+        console.log('Tenant fetched data', response.data);
+        const tenantData = response.data;
+  
+        // Update state variables with the retrieved tenant data
+        setTenant_Type(tenantData.tenant_type);
+        setFirst_name(tenantData.first_name);
+        setMiddle_name(tenantData.middle_name);
+        setLast_name(tenantData.last_name);
+        setGender(tenantData.gender);
+        setDate_of_birth(tenantData.date_of_birth);
+        setid_passport_number(tenantData.id_passport_number);
+        setmarital_status(tenantData.marital_status);
+        setphone(tenantData.phone);
+        setemail(tenantData.email);
+        setcountry(tenantData.country);
+        setCity(tenantData.city);
+        setpostal_address(tenantData.postal_address);
+        setphysical_address(tenantData.physical_address);
+        setpostal_code(tenantData.postal_code);
+        
+        // Next of kin
+        setNext_of_kin_name(tenantData.next_of_kin_name);
+        setNext_of_kin_phone(tenantData.next_of_kin_phone);
+        setNext_of_kin_relation(tenantData.next_of_kin_relation);
+        setEmergency_contact_name(tenantData.emergency_contact_name);
+        setEmergency_contact_phone(tenantData.emergency_contact_phone);
+        setEmergency_contact_email(tenantData.emergency_contact_email);
+        setEmergency_contact_relationship(tenantData.emergency_contact_relationship);
+        setEmergency_contact_physical_address(tenantData.emergency_contact_physical_address);
+        setEmergency_contact_postal_address(tenantData.emergency_contact_postal_address);
+        
+        // Employee details
+        setEmployment_status(tenantData.employment_status);
+        setEmployment_position(tenantData.employment_position);
+        setEmployer_contact_phone(tenantData.employer_contact_phone);
+        setEmployer_contact_email(tenantData.employer_contact_email);
+        setEmployment_postal_address(tenantData.employment_postal_address);
+        setEmployment_physical_address(tenantData.employment_physical_address);
+      }
     } catch (error) {
       console.error('API Error:', error);
     }
   };
+  
 
   const isValidEmail = (email) => {
     // Email validation regex pattern
@@ -533,7 +546,7 @@ const TenantProfile = () => {
                       </div>
                     )}
                     {/* Next of Kin Section */}
-                  {localStorage.getItem('useScope')==='am-admin' && (
+                    {typeof window !== 'undefined' && localStorage.getItem('useScope') ==='am-admin' && (
                       <div className="row">
                         <h3
                           onClick={() => toggleSection('nextOfKin')}
@@ -654,7 +667,7 @@ const TenantProfile = () => {
                     )}
 
                     {/* Emergency section */}
-                    {localStorage.getItem('useScope')==='am-admin' && (
+                    {typeof window !== 'undefined' && localStorage.getItem('useScope') ==='am-admin' && (
                       <div className="row">
                         <h3
                           onClick={() => toggleSection('emergency')}
@@ -745,7 +758,7 @@ const TenantProfile = () => {
                     )}
                     <div className="col-xl-12 text-right mt-3">
                       <div className="my_profile_setting_input">
-                        {localStorage.getItem('useScope') === 'am-admin' && (
+                      {typeof window !== 'undefined' && localStorage.getItem('useScope')  === 'am-admin' && (
                           <button
                             className="btn btn1 float-start"
                             onClick={handleDelete}

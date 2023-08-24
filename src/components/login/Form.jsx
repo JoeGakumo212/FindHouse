@@ -10,7 +10,6 @@ import 'react-notification-alert/dist/animate.css';
 import { toast, ToastContainer } from 'react-nextjs-toast';
 import { signIn } from 'next-auth/react';
 
-
 const Form = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -29,7 +28,6 @@ const Form = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
-        
       }
     );
 
@@ -43,9 +41,7 @@ const Form = () => {
       }
       localStorage.setItem('userFirstName', data.first_name);
       console.log('scope', data.scope);
-      const userScope = data.scope
-        ? data.scope.split(' ')
-        : ['view-dashboard'];
+      const userScope = data.scope ? data.scope.split(' ') : ['view-dashboard'];
       setLoading(false);
       toast.notify(`Logged In successfully`);
       const firstName = data.first_name;
@@ -54,7 +50,7 @@ const Form = () => {
       router.push({
         pathname: '/my-dashboard',
       });
-    } else  {
+    } else {
       const errorData = await response.json();
       setError(errorData.message);
       setLoading(false);
@@ -131,10 +127,9 @@ const Form = () => {
             >
               Remember me
             </label>
-
-            <a className="btn-fpswd float-end" href="/ForgotPassword">
-              Forgot password?
-            </a>
+            <Link href="/ForgotPassword">
+              <a className="btn-fpswd float-end">Forgot password?</a>
+            </Link>
           </div>
           {/* End .form-group */}
 

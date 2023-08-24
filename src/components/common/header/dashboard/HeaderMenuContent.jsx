@@ -8,14 +8,18 @@ const HeaderMenuContent = ({ float = "" }) => {
   const route = useRouter();
   const [userFirstName, setUserFirstName] = useState('');
   const [userSecondName, setUserSecondName]=useState('')
-  
+  const [useScope, setUseScope] = useState('');
 
   useEffect(() => {
-    // Fetch user's first name from local storage or API response
-    const storedUserFirstName = localStorage.getItem('userFirstName');
-    setUserFirstName(storedUserFirstName || ''); // Set to empty string if not found
-    const storedUserSecondName = localStorage.getItem('userSecondName');
-    setUserSecondName(storedUserSecondName || '')
+    if (typeof window !== 'undefined') {
+      // Perform localStorage action
+      const storedUserFirstName = localStorage.getItem('userFirstName');
+      setUserFirstName(storedUserFirstName || '');
+      const storedUserSecondName = localStorage.getItem('userSecondName');
+      setUserSecondName(storedUserSecondName || '');
+      const storedUseScope = localStorage.getItem('useScope');
+      setUseScope(storedUseScope || '');
+    }
   }, []);
 
 // Rest of your component rendering
@@ -254,7 +258,7 @@ const HeaderMenuContent = ({ float = "" }) => {
 
   return (<>
     <h4 className="float-start px-5  d-lg-block d-none mt-4">Welcome back, <span className="text-danger">{userFirstName} {userSecondName}</span></h4>
-    {localStorage.getItem('useScope') === 'am-admin' && (
+    {useScope === 'am-admin' && (
     <ul
       id="respMenu"
       className="ace-responsive-menu text-end d-lg-block d-none"

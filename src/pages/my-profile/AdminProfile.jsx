@@ -25,10 +25,7 @@ const AdminProfile = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   // ... (continue with other state variables)
 
-  // decoding jwt from token
-  const tokenFromLocalStorage = localStorage.getItem('token');
-  const decodedToken = jwtDecode(tokenFromLocalStorage);
-  const adminId = decodedToken.sub;
+  
 
   useEffect(() => {
     const fetchAdminDetails = async () => {
@@ -106,6 +103,7 @@ const AdminProfile = () => {
         // ... (continue with other properties)
       };
 
+     
       const cookies = parseCookies();
       const tokenFromCookie = cookies.access_token;
 
@@ -113,25 +111,43 @@ const AdminProfile = () => {
         Authorization: `Bearer ${tokenFromCookie}`,
         'Content-Type': 'application/json',
       };
-
-      await axios.put(
-        `https://cloudagent.co.ke/backend/api/v1/user_profile/${adminId}`,
-        updatedAdminData,
-        {
-          headers,
+      let adminId = '';
+      let url = '';
+      if (typeof window !== 'undefined') {
+        const useScope = localStorage.getItem('useScope');
+        const tokenFromLocalStorage = localStorage.getItem('token');
+        const decodedToken = jwtDecode(tokenFromLocalStorage);
+        adminId = decodedToken.sub;
+      
+      
+      
+        if (useScope === 'am-admin') {
+          url = `https://cloudagent.co.ke/backend/api/v1/user_profile/${adminId}`;
         }
-      );
-      Swal.fire({
-        icon: 'success',
-        title: 'Admin Profile Updated',
-        text: 'Your admin profile has been updated successfully!',
-      });
-      router.push('/login');
-      // You may want to fetch and update the admin details again after the update
+      
+        if (url) {
+          try {
+            const response = await axios.put(url, updatedAdminData, {
+              headers,
+            });
+            
+            Swal.fire({
+              icon: 'success',
+              title: 'Admin Profile Updated',
+              text: 'Your admin profile has been updated successfully!',
+            });
+            router.push('/login');
+            // You may want to fetch and update the admin details again after the update
+          } catch (error) {
+            console.error('Error updating admin profile:', error);
+          }
+        }
+      }
     } catch (error) {
       console.error('Error updating admin profile:', error);
     }
   };
+
 
   return (
     <>

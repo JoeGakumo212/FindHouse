@@ -27,14 +27,7 @@ const PaymentsTableData = () => {
   const pageSize = 5;
 
   const router = useRouter();
-  // accessing usescope
-// decoding jwt from token
-const tokenFromLocalStorage = localStorage.getItem('token');
-const useScope = localStorage.getItem('useScope');
-const decodedToken = jwtDecode(tokenFromLocalStorage);
-const tenantId=decodedToken.sub;
-const landlordId =decodedToken.sub;
-
+ 
   const fetchData = async () => {
   
     try {
@@ -48,18 +41,26 @@ const landlordId =decodedToken.sub;
 
       
       let url = '';
+  let tenantId = '';
+  let landlordId = '';
 
-      if (localStorage.getItem('useScope') === 'am-admin') {
+  if (typeof window !== 'undefined') { // Check if running in browser environment
+    const useScope = localStorage.getItem('useScope');
+    const tokenFromLocalStorage = localStorage.getItem('token');
+    const decodedToken = jwtDecode(tokenFromLocalStorage);
+    tenantId = decodedToken.sub;
+    landlordId = decodedToken.sub;
+
+      if (useScope  === 'am-admin') {
         url ='https://cloudagent.co.ke/backend/api/v1/payments?filter=&page=0&limit=9999999999999999999999999999999999&sortField=updated_at&sortDirection=desc&whereField=&whereValue='
 
-      } else if (localStorage.getItem('useScope') === 'am-tenant'){
-       
+      } else if (useScope === 'am-tenant'){       
         url = `https://cloudagent.co.ke/backend/api/v1/tenants/${tenantId}/payments?filter=&page=&limit=999999999999999999999999999999999999999999999999999&sortField=&sortDirection=&whereField=&whereValue=`; 
-      }else if (localStorage.getItem('useScope')==='am-landlord'){
+      }else if (useScope  ==='am-landlord'){
         console.log('landlord payments data:',landlordId);
         url=`https://cloudagent.co.ke/backend/api/v1/landlords/${landlordId}/payments?filter=&page=0&limit=999999999999999999999999999999999999999999999&sortField=&sortDirection=&whereField=&whereValue=`;
       }
-
+    }
       if (url) {
         const response = await axios.get(url, {
           headers: headers,
@@ -314,7 +315,7 @@ const landlordId =decodedToken.sub;
                   <div className="border-dark">
                  
                     <div className="row">
-                    {localStorage.getItem('useScope') === 'am-admin' && (
+                    {typeof window !== 'undefined' && localStorage.getItem('useScope') === 'am-admin' && (
                       <div className="col-lg-4">
                         <div className="my_profile_setting_input">
                           <button
@@ -458,7 +459,7 @@ const landlordId =decodedToken.sub;
                   <Nav.Link eventKey="cancel">Cancel</Nav.Link>
                 </Nav.Item> */}
              {/* Show 'Approve' tab only if the selectedPayment is not canceled or approved */}
-             {localStorage.getItem('useScope') === 'am-admin' && (
+             {typeof window !== 'undefined' && localStorage.getItem('useScope') === 'am-admin' && (
               <>
         {!selectedPaymentId ||
         !['canceled', 'approved'].includes(selectedPayment?.status?.status_text) ? (
@@ -895,6 +896,3 @@ const landlordId =decodedToken.sub;
 };
 
 export default PaymentsTableData;
-// https:\/\/cloudagent.co.ke\/backend\/api\/v1\/tenants\/e5ed98d2-7cc7-4738-aa7d-ecde4e566c63\/payments",
-
-// [App\\Models\\Landlord] d50ee6f1-96ec-4de5-a082-e788f61c665e"

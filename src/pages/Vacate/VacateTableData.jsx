@@ -24,16 +24,7 @@ const VacateTableData = () => {
     router.push(`/Vacate/${vacateNoticeId}`);
   };
 
-    // decoding jwt from token
-const tokenFromLocalStorage = localStorage.getItem('token');
-
-const useScope = localStorage.getItem('useScope');
-
-
-const decodedToken = jwtDecode(tokenFromLocalStorage);
-
-const tenantId=decodedToken.sub;
-const landlordId=decodedToken.sub;
+   
 
   const fetchData = async () => {
     try {
@@ -45,17 +36,28 @@ const landlordId=decodedToken.sub;
         'Content-Type': 'application/json',
       };
           const page = currentPage - 1; // Subtract 1 from currentPage to align with 0-based indexing
-      let url = '';
+      
+          let url = '';
+          let tenantId = '';
+          let landlordId = '';
+        
+          if (typeof window !== 'undefined') { // Check if running in browser environment
+            const useScope = localStorage.getItem('useScope');
+            const tokenFromLocalStorage = localStorage.getItem('token');
+            const decodedToken = jwtDecode(tokenFromLocalStorage);
+            tenantId = decodedToken.sub;
+            landlordId = decodedToken.sub;
 
-      if (localStorage.getItem('useScope') === 'am-admin') {
+      if (useScope === 'am-admin') {
         url =`https://cloudagent.co.ke/backend/api/v1/vacation_notices?filter=&limit=999999999999999999999999999999999999999&sortField=updated_at&sortDirection=desc&whereField=&whereValue=`;
-      } else if (localStorage.getItem('useScope') === 'am-tenant') {
+      } else if (useScope === 'am-tenant') {
         console.log('Tenant ID to return vacate notices:', tenantId);
         url = `https://cloudagent.co.ke/backend/api/v1/tenants/${tenantId}/notices?filter=&page=0&limit=0&sortField=&sortDirection=&whereField=&whereValue=`;
-      }else if (localStorage.getItem('useScope')==='am-landlord'){
+      }else if (useScope  ==='am-landlord'){
         url=`https://cloudagent.co.ke/backend/api/v1/landlords/${landlordId}/notices?filter=&page=0&limit=0&sortField=&sortDirection=&whereField=&whereValue=`;
       
       }
+    }
       if (url) {
         const response = await axios.get(url, {
           headers: headers,
@@ -234,7 +236,7 @@ const landlordId=decodedToken.sub;
 
                   <div className="border-dark">
                     <div className="row">
-                    {localStorage.getItem('useScope') === 'am-admin' && (
+                    {typeof window !== 'undefined' && localStorage.getItem('useScope') === 'am-admin' && (
                       <div className="col-lg-4">
                         <div className="my_profile_setting_input">
                           <button
@@ -320,7 +322,7 @@ const landlordId=decodedToken.sub;
                                     >
                                       <span className="flaticon-view"></span>
                                     </li>
-                                    {localStorage.getItem('useScope') === 'am-admin' && (
+                                    {typeof window !== 'undefined' && localStorage.getItem('useScope') === 'am-admin' && (
                                     <li
                                       className="list-inline-item"
                                       data-toggle="tooltip"

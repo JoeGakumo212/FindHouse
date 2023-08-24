@@ -3,6 +3,7 @@ import axios from 'axios';
 import { parseCookies } from 'nookies';
 
 const AdminSummaryComponent = () => {
+  
   const [allStatistics, setAllStatistics] = useState([
     {
       id: 1,
@@ -80,7 +81,7 @@ const AdminSummaryComponent = () => {
           <div className="col-sm-6 col-md-6 col-lg-6 col-xl-3" key={item.id}>
             <div className={`ff_one ${item.blockStyle}`}>
               <div className="detais">
-                <div className="timer text-danger">
+                <div className="timer text-warning">
                   {getTimerValue(item.timerKey)}
                 </div>
                 <p>{item.name}</p>

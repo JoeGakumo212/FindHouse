@@ -16,23 +16,37 @@ const Info = ({ vacateNotices, id }) => {
   }
 
   return (
-    <div className='row'>
+    <div className="row">
       <div className="col-lg-4">
-      <p>Vacating Date: <strong>{vacateNotice.vacating_date_display ?? 'N/A'}</strong></p>
-      <p>Lease Number: <strong>{vacateNotice.lease?.lease_number ?? 'N/A'}</strong></p>
-      <p>Vacating Reason: <strong>{vacateNotice.vacating_reason ?? 'N/A'}</strong></p>
+        <p>
+          Vacating Date:{' '}
+          <strong>{vacateNotice.vacating_date_display ?? 'N/A'}</strong>
+        </p>
+        <p>
+          Lease Number:{' '}
+          <strong>{vacateNotice.lease?.lease_number ?? 'N/A'}</strong>
+        </p>
+        <p>
+          Vacating Reason:{' '}
+          <strong>{vacateNotice.vacating_reason ?? 'N/A'}</strong>
+        </p>
       </div>
-     <div className="col-lg-4">
-     <p>Property: <strong>{vacateNotice.property?.property_name ?? 'N/A'}</strong></p>
-     </div>
-     <div className="col-lg-4">
-
-     <p>Unit: <strong >{vacateNotice.lease?.units?.length > 0
-                                    ? vacateNotice.lease.units[0].unit_name
-                                    : 'N/A'}</strong></p>
-     </div>
-    
-     
+      <div className="col-lg-4">
+        <p>
+          Property:{' '}
+          <strong>{vacateNotice.property?.property_name ?? 'N/A'}</strong>
+        </p>
+      </div>
+      <div className="col-lg-4">
+        <p>
+          Unit:{' '}
+          <strong>
+            {vacateNotice.lease?.units?.length > 0
+              ? vacateNotice.lease.units[0].unit_name
+              : 'N/A'}
+          </strong>
+        </p>
+      </div>
     </div>
   );
 };

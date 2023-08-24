@@ -16,7 +16,8 @@
         "sourceType": "module"
     },
     "plugins": [
-        "react"
+        "react",
+         "@next/next" 
     ],
     
     "rules": {
@@ -28,5 +29,11 @@
         "no-undef": "off",
         "react/prop-types": "off"
 
+    },
+    "settings": {
+        "react": {
+          "version": "17.0"
+        }
     }
-}
+      
+    }

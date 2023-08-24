@@ -1,41 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import { Doughnut } from 'react-chartjs-2';
 import axios from 'axios';
 import { parseCookies } from 'nookies';
-import { Line } from 'react-chartjs-2';
-import { faker } from '@faker-js/faker';
 
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
+import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement } from 'chart.js';
+ChartJS.register(Title, Tooltip, Legend, ArcElement);
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
-
-const AdminSummaryComponent = () => {
-  const [allStatistics, setAllStatistics] = useState([
-    // ... (your statistic objects)
-  ]);
-
-  const [adminSummary, setAdminSummary] = useState({});
+const StatisticsChart = () => {
   const [periodicalBilling, setPeriodicalBilling] = useState([]);
+  const [selectedMonth, setSelectedMonth] = useState(null);
   const [selectedMonthBilling, setSelectedMonthBilling] = useState(null);
 
   useEffect(() => {
-    // Fetch data when the component mounts
     const fetchData = async () => {
       try {
         const cookies = parseCookies();
@@ -47,12 +23,12 @@ const AdminSummaryComponent = () => {
         };
 
         const response = await axios.get(
-          'https://cloudagent.co.ke/backend/api/v1/admin_summaries?filter=&page=1&limit=1&sortField=&sortDirection=&whereField=&whereValue=',
+          'https://cloudagent.co.ke/backend/api/v1/admin_summaries',
           { headers }
         );
 
-        setAdminSummary(response.data);
         setPeriodicalBilling(response.data.periodical_billing);
+        setSelectedMonth(response.data.periodical_billing[0]?.period_name);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -61,69 +37,111 @@ const AdminSummaryComponent = () => {
     fetchData();
   }, []);
 
-  const getTimerValue = (timerKey) => {
-    return adminSummary[timerKey];
-  };
+  useEffect(() => {
+    const selectedBilling = periodicalBilling.find(
+      (billingItem) => billingItem.period_name === selectedMonth
+    );
+    setSelectedMonthBilling(selectedBilling);
+  }, [selectedMonth, periodicalBilling]);
 
-  const handleMonthClick = (event, activeElements) => {
-    if (activeElements && activeElements.length > 0) {
-      const selectedIndex = activeElements[0].index;
-      const selectedBilling = periodicalBilling[selectedIndex];
-      setSelectedMonthBilling(selectedBilling);
-    } else {
-      setSelectedMonthBilling(null);
-    }
+  const handleMonthChange = (event) => {
+    setSelectedMonth(event.target.value);
   };
 
   const yourPeriodicalBillingData = {
-    labels: periodicalBilling.map((billingItem) => billingItem.period_name),
+    labels: ['Amount Billed', 'Amount Paid', 'Amount Due'],
     datasets: [
       {
-        label: 'Periodical Billing',
-        data: periodicalBilling.map(() =>
-          faker.datatype.number({ min: 100, max: 400 })
-        ),
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-        borderColor: 'rgb(255, 99, 132)',
-        borderWidth: 1,
+        data: [
+          selectedMonthBilling?.amount_billed || 0,
+          selectedMonthBilling?.amount_paid || 0,
+          selectedMonthBilling?.amount_due || 0,
+        ],
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.5)',
+          'rgba(54, 162, 235, 0.5)',
+          'rgba(255, 206, 86, 0.5)',
+        ],
+        borderColor: [
+          'rgb(255, 99, 132)',
+          'rgb(54, 162, 235)',
+          'rgb(255, 206, 86)',
+        ],
+        borderWidth: 5,
       },
     ],
   };
 
   const chartOptions = {
     responsive: true,
-    onHover: handleMonthClick, // Add hover event handler
     plugins: {
       // ... (other plugin configurations)
     },
   };
 
   return (
-    <>
-      <div className="row">
-        {allStatistics.map((item) => (
-          <div className="col-sm-6 col-md-6 col-lg-6 col-xl-3" key={item.id}>
-            {/* ... (your statistic items) */}
-          </div>
-        ))}
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        height: 'auto',
+      }}
+    >
+      <div style={{ height: '200%' }}>
+        <Doughnut
+          options={chartOptions}
+          data={yourPeriodicalBillingData}
+          height={200}
+        />
       </div>
-      <div>
-        <h1>Periodical Billing</h1>
-        <Line options={chartOptions} data={yourPeriodicalBillingData} />
+      <div className="row m-2">
+        <select
+          value={selectedMonth}
+          onChange={handleMonthChange}
+          className="form-control"
+          style={{ width: '100%', padding: '8px' }}
+        >
+          {periodicalBilling.map((billingItem) => (
+            <option key={billingItem.period_id} value={billingItem.period_name}>
+              {billingItem.period_name}
+            </option>
+          ))}
+        </select>
       </div>
+
       <div>
         {selectedMonthBilling && (
-          <div>
-            <h2>Selected Month: {selectedMonthBilling.period_name}</h2>
-            <p>Amount Billed: {selectedMonthBilling.amount_billed_as_currency}</p>
-            <p>Amount Paid: {selectedMonthBilling.amount_paid_as_currency}</p>
-            <p>Amount Due: {selectedMonthBilling.amount_due_as_currency}</p>
-            {/* Add other billing details */}
+          <div className="row">
+            <div className="col-lg-4">
+              <input
+                type="text"
+                className="form-control"
+                readOnly
+                value={`Amount Billed: ${selectedMonthBilling.amount_billed_as_currency}`}
+              />
+            </div>
+            <div className="col-lg-4">
+              <input
+                type="text"
+                className="form-control"
+                readOnly
+                value={`Amount Paid: ${selectedMonthBilling.amount_paid_as_currency}`}
+              />
+            </div>
+            <div className="col-lg-4">
+              <input
+                type="text"
+                className="form-control"
+                readOnly
+                value={`Amount Due: ${selectedMonthBilling.amount_due_as_currency}`}
+              />
+            </div>
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 };
 
-export default AdminSummaryComponent;
+export default StatisticsChart;

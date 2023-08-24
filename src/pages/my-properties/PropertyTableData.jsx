@@ -20,11 +20,7 @@ const PropertyTableData = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   // decoding jwt from token
-  const tokenFromLocalStorage = localStorage.getItem('token');
-  const useScope = localStorage.getItem('useScope');
-  const decodedToken = jwtDecode(tokenFromLocalStorage);
-  const landlordId = decodedToken.sub;
-
+ 
   const fetchData = async () => {
     try {
       setIsLoading(true);
@@ -35,15 +31,25 @@ const PropertyTableData = () => {
         Authorization: `Bearer ${tokenFromCookie}`,
         'Content-Type': 'application/json',
       };
-
       let url = '';
+      let tenantId = '';
+      let landlordId = '';
+    
+      if (typeof window !== 'undefined') { // Check if running in browser environment
+        const useScope = localStorage.getItem('useScope');
+        const tokenFromLocalStorage = localStorage.getItem('token');
+        const decodedToken = jwtDecode(tokenFromLocalStorage);
+        tenantId = decodedToken.sub;
+        landlordId = decodedToken.sub;
+    
 
-      if (localStorage.getItem('useScope') === 'am-admin') {
+      if (useScope === 'am-admin') {
         url =
           'https://cloudagent.co.ke/backend/api/v1/properties?filter=&page=&limit=999999999999999999999999999999999&sortField=updated_at&sortDirection=desc&whereField=&whereValue=';
-      } else if (localStorage.getItem('useScope') === 'am-landlord') {
+      } else if (useScope === 'am-landlord') {
         url = `https://cloudagent.co.ke/backend/api/v1/landlords/${landlordId}/properties?filter=&page=0&limit=999999999999999999999999999999999999999999999&sortField=&sortDirection=&whereField=&whereValue=`;
       }
+    }
       if (url) {
         const response = await axios.get(url, {
           headers: headers,
@@ -173,7 +179,7 @@ const PropertyTableData = () => {
                   <h2>Property Management</h2>
 
                   <div className="row">
-                    {localStorage.getItem('useScope') === 'am-admin' && (
+                  {typeof window !== 'undefined' && localStorage.getItem('useScope')  === 'am-admin' && (
                       <div className="col-lg-4">
                         <div className="my_profile_setting_input">
                           <button
@@ -282,7 +288,7 @@ const PropertyTableData = () => {
                                     >
                                       <span className="flaticon-view"></span>
                                     </li>
-                                    {localStorage.getItem('useScope') ===
+                                    {typeof window !== 'undefined' && localStorage.getItem('useScope') ===
                                       'am-admin' && (
                                       <li
                                         className="list-inline-item"

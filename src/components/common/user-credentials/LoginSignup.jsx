@@ -33,15 +33,18 @@ const LoginSignup = () => {
 
       if (response.ok) {
         const data = await response.json(); // Read the response body once
-        localStorage.setItem('token', data.access_token);
-        if (data.scope === 'am-landlord' || data.scope === 'am-tenant') {
-          localStorage.setItem('useScope', data.scope);
-        } else {
-          localStorage.setItem('useScope', 'am-admin');
+        if (typeof window !== 'undefined' && window.localStorage) {
+          // localStorage logic here
+          localStorage.setItem('token', data.access_token);
+          if (data.scope === 'am-landlord' || data.scope === 'am-tenant') {
+            localStorage.setItem('useScope', data.scope);
+          } else {
+            localStorage.setItem('useScope', 'am-admin');
+          }
+          localStorage.setItem('userFirstName', data.first_name);
+          localStorage.setItem('userSecondName', data.last_name);
         }
-        localStorage.setItem('userFirstName', data.first_name);
-        localStorage.setItem('userSecondName',data.last_name)
-        
+
         const userScope = data.scope
           ? data.scope.split(' ')
           : ['view-dashboard'];
@@ -61,7 +64,6 @@ const LoginSignup = () => {
           duration: 5,
           type: 'error',
         });
-       
       }
     } catch (error) {
       console.error('Error:', error);
@@ -201,9 +203,9 @@ const LoginSignup = () => {
                       Remember me
                     </label>
 
-                    <a className="btn-fpswd float-end" href="/ForgotPassword">
-                      Lost your password?
-                    </a>
+                    <Link href="/ForgotPassword">
+                      <a className="btn-fpswd float-end">Lost your password?</a>
+                    </Link>
                   </div>
                   {/* End remember me checkbox */}
 
@@ -214,9 +216,9 @@ const LoginSignup = () => {
 
                   <p className="text-center">
                     Dont have an account?{' '}
-                    <a className="text-thm" href="/register">
-                      Register
-                    </a>
+                    <Link href="/register">
+                      <a className="text-thm">Register</a>
+                    </Link>
                   </p>
                 </form>
               </div>
@@ -260,9 +262,9 @@ const LoginSignup = () => {
 
                   <p className="text-center">
                     Already have an account?{' '}
-                    <a className="text-thm" href="/login">
-                      Log In
-                    </a>
+                    <Link href="/login">
+                      <a className="text-thm">Log In</a>
+                    </Link>
                     <div></div>
                   </p>
                 </form>

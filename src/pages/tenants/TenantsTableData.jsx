@@ -182,12 +182,12 @@ const TenantsTableData = () => {
             <div className="my_dashboard_review mb40">
               <div className="favorite_item_list">
                 <div className="container">
-                {localStorage.getItem('useScope') === 'am-admin' && (
+                {typeof window !== 'undefined' && localStorage.getItem('useScope') === 'am-admin' && (
                   <h2>Tenants Management</h2>
                 )}
                  
                   <div className="border-dark">
-                     {localStorage.getItem('useScope') === 'am-admin' && (
+                  {typeof window !== 'undefined' && localStorage.getItem('useScope') === 'am-admin' && (
                     <div className="row">
                       <div className="col-lg-4">
                         <div className="my_profile_setting_input">
@@ -212,7 +212,7 @@ const TenantsTableData = () => {
                       </div>
                     </div>
                      )}
-                      {localStorage.getItem('useScope') === 'am-admin' && (
+                     {typeof window !== 'undefined' && localStorage.getItem('useScope')  === 'am-admin' && (
                     <h1>Tenants Table</h1>
                       )}
                     <div className="table-responsive">

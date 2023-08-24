@@ -363,7 +363,7 @@ const InvoiceDetails = () => {
                     </div>
                   </div>
                 </div>
-                {localStorage.getItem('useScope') === 'am-admin' && (
+                {typeof window !== 'undefined' && localStorage.getItem('useScope') === 'am-admin' && (
                 <button
                   type="button"
                   className="btn btn-danger"

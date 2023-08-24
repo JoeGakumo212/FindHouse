@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useEffect,useState } from 'react';
 import { useSession } from 'next-auth/react';
+
 import {
   isParentPageActive,
   isSinglePageActive,
@@ -8,6 +10,15 @@ import {
 
 const SidebarMenu = () => {
   const route = useRouter();
+  const [useScope, setUseScope] = useState('');
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Your localStorage related code
+      // For example:
+      const storedUseScope = localStorage.getItem('useScope');
+      setUseScope(storedUseScope || '');
+    }
+  }, []);
 
   const myProperties = [
     {
@@ -61,9 +72,9 @@ const SidebarMenu = () => {
           </Link>
         </li>
         {/* End header */}
-        {(localStorage.getItem('useScope') === 'am-landlord' ||
-          localStorage.getItem('useScope') === 'am-admin' ||
-          localStorage.getItem('useScope') === 'am-tenant') && (
+        {(useScope === 'am-landlord' ||
+          useScope === 'am-admin' ||
+          useScope === 'am-tenant') && (
           <>
             <li className="title">
               <span>Main</span>
@@ -85,7 +96,7 @@ const SidebarMenu = () => {
               </ul>
             </li>
 
-            {localStorage.getItem('useScope') === 'am-admin' && (
+            {useScope === 'am-admin' && (
               <li
                 className={`treeview ${
                   isSinglePageActive('/my-landlords', route.pathname)
@@ -102,8 +113,8 @@ const SidebarMenu = () => {
               </li>
             )}
             {/* End Main */}
-            {(localStorage.getItem('useScope') === 'am-landlord' ||
-              localStorage.getItem('useScope') === 'am-admin') && (
+            {(useScope === 'am-landlord' ||
+             useScope === 'am-admin') && (
               <li
                 className={`treeview ${
                   isParentPageActive(myProperties, route.pathname)
@@ -119,7 +130,7 @@ const SidebarMenu = () => {
               </li>
             )}
             {/* end properties */}
-            {localStorage.getItem('useScope') === 'am-admin' && (
+            {useScope=== 'am-admin' && (
               <li
                 className={`treeview ${
                   isSinglePageActive(
@@ -167,8 +178,8 @@ const SidebarMenu = () => {
             </li>
 
             {/* Invoice navigation item, only accessible to landlords and admins */}
-            {(localStorage.getItem('useScope') === 'am-landlord' ||
-              localStorage.getItem('useScope') === 'am-admin') && (
+            {(useScope === 'am-landlord' ||
+              useScope === 'am-admin') && (
               <li
                 className={`treeview ${
                   isSinglePageActive('/invoices/Invoice', route.pathname)
@@ -185,7 +196,7 @@ const SidebarMenu = () => {
               </li>
             )}
 
-            {localStorage.getItem('useScope') === 'am-admin' && (
+            {useScope === 'am-admin' && (
               <li
                 className={`treeview ${
                   isSinglePageActive('/Utility', route.pathname) ? 'active' : ''

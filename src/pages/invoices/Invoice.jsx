@@ -16,12 +16,6 @@ const InvoiceTableData = () => {
   const router = useRouter();
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
-// decoding jwt from token
-const tokenFromLocalStorage = localStorage.getItem('token');
-const useScope = localStorage.getItem('useScope');
-const decodedToken = jwtDecode(tokenFromLocalStorage);
-
-const landlordId =decodedToken.sub;
 
 
   const fetchData = async () => {
@@ -35,16 +29,23 @@ const landlordId =decodedToken.sub;
       };
 
 
-      
       let url = '';
-
-      if (localStorage.getItem('useScope') === 'am-admin') {
-        url ='https://cloudagent.co.ke/backend/api/v1/invoices?filter=&page=0&limit=9999999999999999999999999999999999999999999999999999&sortField=updated_at&sortDirection=desc&whereField=&whereValue=';
-      }else if (localStorage.getItem('useScope')==='am-landlord'){
-
+      let tenantId = '';
+      let landlordId = '';
+    
+      if (typeof window !== 'undefined') { // Check if running in browser environment
+        const useScope = localStorage.getItem('useScope');
+        const tokenFromLocalStorage = localStorage.getItem('token');
+        const decodedToken = jwtDecode(tokenFromLocalStorage);
+        tenantId = decodedToken.sub;
+        landlordId = decodedToken.sub;
+    
+      if (useScope === 'am-admin') { 
+         url ='https://cloudagent.co.ke/backend/api/v1/invoices?filter=&page=0&limit=9999999999999999999999999999999999999999999999999999&sortField=updated_at&sortDirection=desc&whereField=&whereValue=';
+      }else if (useScope ==='am-landlord'){
         url=`https://cloudagent.co.ke/backend/api/v1/landlords/${landlordId}/invoices?filter=&page=0&limit=9999999999999999999999999999999999999999999999999999999999999&sortField=&sortDirection=&whereField=&whereValue=`;
       }
-
+    }
       if (url) {
         const response = await axios.get(url, {
           headers: headers,
