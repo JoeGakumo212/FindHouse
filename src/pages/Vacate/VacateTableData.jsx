@@ -24,48 +24,47 @@ const VacateTableData = () => {
     router.push(`/Vacate/${vacateNoticeId}`);
   };
 
-   
-
   const fetchData = async () => {
     try {
       const cookies = parseCookies();
       const tokenFromCookie = cookies.access_token;
-     
+
       const headers = {
         Authorization: `Bearer ${tokenFromCookie}`,
         'Content-Type': 'application/json',
       };
-          const page = currentPage - 1; // Subtract 1 from currentPage to align with 0-based indexing
-      
-          let url = '';
-          let tenantId = '';
-          let landlordId = '';
-        
-          if (typeof window !== 'undefined') { // Check if running in browser environment
-            const useScope = localStorage.getItem('useScope');
-            const tokenFromLocalStorage = localStorage.getItem('token');
-            const decodedToken = jwtDecode(tokenFromLocalStorage);
-            tenantId = decodedToken.sub;
-            landlordId = decodedToken.sub;
+      const page = currentPage - 1; // Subtract 1 from currentPage to align with 0-based indexing
 
-      if (useScope === 'am-admin') {
-        url =`https://cloudagent.co.ke/backend/api/v1/vacation_notices?filter=&limit=999999999999999999999999999999999999999&sortField=updated_at&sortDirection=desc&whereField=&whereValue=`;
-      } else if (useScope === 'am-tenant') {
-        console.log('Tenant ID to return vacate notices:', tenantId);
-        url = `https://cloudagent.co.ke/backend/api/v1/tenants/${tenantId}/notices?filter=&page=0&limit=0&sortField=&sortDirection=&whereField=&whereValue=`;
-      }else if (useScope  ==='am-landlord'){
-        url=`https://cloudagent.co.ke/backend/api/v1/landlords/${landlordId}/notices?filter=&page=0&limit=0&sortField=&sortDirection=&whereField=&whereValue=`;
+      let url = '';
+      let tenantId = '';
+      let landlordId = '';
+
+      if (typeof window !== 'undefined') {
+        // Check if running in browser environment
+        const useScope = localStorage.getItem('useScope');
+        const tokenFromLocalStorage = localStorage.getItem('token');
+        const decodedToken = jwtDecode(tokenFromLocalStorage);
+        tenantId = decodedToken.sub;
+        landlordId = decodedToken.sub;
+
+        if (useScope === 'am-admin') {
+          url = `https://cloudagent.co.ke/backend/api/v1/vacation_notices?filter=&limit=999999999999999999999999999999999999999&sortField=updated_at&sortDirection=desc&whereField=&whereValue=`;
+        } else if (useScope === 'am-tenant') {
       
+          url = `https://cloudagent.co.ke/backend/api/v1/tenants/${tenantId}/notices?filter=&page=0&limit=0&sortField=&sortDirection=&whereField=&whereValue=`;
+        } else if (useScope === 'am-landlord') {
+          url = `https://cloudagent.co.ke/backend/api/v1/landlords/${landlordId}/notices?filter=&page=0&limit=0&sortField=&sortDirection=&whereField=&whereValue=`;
+        }
       }
-    }
       if (url) {
         const response = await axios.get(url, {
           headers: headers,
         });
 
-      setVacateNotices(response.data.data);    
+        setVacateNotices(response.data.data);
 
-      setTotalPages(Math.ceil(response.data.total / pageSize)); }
+        setTotalPages(Math.ceil(response.data.total / pageSize));
+      }
     } catch (error) {
       console.error('API Error:', error);
     }
@@ -164,10 +163,54 @@ const VacateTableData = () => {
     }
     setCurrentPage(page);
   };
-
+  // handle pagination
   const renderPagination = () => {
     const pages = [];
-    for (let i = 1; i <= totalPages; i++) {
+    const maxVisiblePages = 5; // Set the maximum number of visible page links
+
+    // Calculate the start and end page indices
+    let startPage = Math.max(currentPage - Math.floor(maxVisiblePages / 2), 1);
+    const endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
+
+    // Ensure that we display enough pages to the right if there's not enough to the left
+    if (totalPages - endPage < startPage - 1) {
+      startPage = Math.max(totalPages - maxVisiblePages + 1, 1);
+    }
+
+    if (currentPage > 1) {
+      pages.push(
+        <li key="prev" className="page-item">
+          <a
+            className="page-link"
+            href="#"
+            onClick={() => handlePageChange(currentPage - 1)}
+          >
+            Previous
+          </a>
+        </li>
+      );
+    }
+
+    if (startPage > 1) {
+      pages.push(
+        <li key="1" className="page-item">
+          <a className="page-link" href="#" onClick={() => handlePageChange(1)}>
+            1
+          </a>
+        </li>
+        // Add an ellipsis here if needed
+      );
+    }
+
+    if (startPage > 2) {
+      pages.push(
+        <li key="ellipsis-left" className="page-item">
+          <span className="page-link">...</span>
+        </li>
+      );
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
       pages.push(
         <li
           key={i}
@@ -179,32 +222,49 @@ const VacateTableData = () => {
         </li>
       );
     }
+
+    if (endPage < totalPages - 1) {
+      pages.push(
+        <li key="ellipsis-right" className="page-item">
+          <span className="page-link">...</span>
+        </li>
+      );
+    }
+
+    if (endPage < totalPages) {
+      pages.push(
+        <li key={totalPages} className="page-item">
+          <a
+            className="page-link"
+            href="#"
+            onClick={() => handlePageChange(totalPages)}
+          >
+            {totalPages}
+          </a>
+        </li>
+      );
+    }
+
+    if (currentPage < totalPages) {
+      pages.push(
+        <li key="next" className="page-item">
+          <a
+            className="page-link"
+            href="#"
+            onClick={() => handlePageChange(currentPage + 1)}
+          >
+            Next
+          </a>
+        </li>
+      );
+    }
     return (
       <nav aria-label="Page navigation example">
-        <ul className="pagination justify-content-center">
-          <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-            <a
-              className="page-link"
-              href="#"
-              onClick={() => handlePageChange(currentPage - 1)}
-            >
-              Previous
-            </a>
-          </li>
-          {pages}
-          <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-            <a
-              className="page-link"
-              href="#"
-              onClick={() => handlePageChange(currentPage + 1)}
-            >
-              Next
-            </a>
-          </li>
-        </ul>
+        <ul className="pagination justify-content-center">{pages}</ul>
       </nav>
     );
   };
+  // end
   return (
     <>
       {/* <!-- Main Header Nav --> */}
@@ -236,18 +296,19 @@ const VacateTableData = () => {
 
                   <div className="border-dark">
                     <div className="row">
-                    {typeof window !== 'undefined' && localStorage.getItem('useScope') === 'am-admin' && (
-                      <div className="col-lg-4">
-                        <div className="my_profile_setting_input">
-                          <button
-                            className="btn btn1 float-start"
-                            onClick={handleAddVacate}
-                          >
-                            Add Vacate Notice
-                          </button>
-                        </div>
-                      </div>
-                    )}
+                      {typeof window !== 'undefined' &&
+                        localStorage.getItem('useScope') === 'am-admin' && (
+                          <div className="col-lg-4">
+                            <div className="my_profile_setting_input">
+                              <button
+                                className="btn btn1 float-start"
+                                onClick={handleAddVacate}
+                              >
+                                Add Vacate Notice
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       <div className="col-lg-8">
                         <div className="my_profile_setting_input form-group">
                           <input
@@ -322,19 +383,21 @@ const VacateTableData = () => {
                                     >
                                       <span className="flaticon-view"></span>
                                     </li>
-                                    {typeof window !== 'undefined' && localStorage.getItem('useScope') === 'am-admin' && (
-                                    <li
-                                      className="list-inline-item"
-                                      data-toggle="tooltip"
-                                      data-placement="top"
-                                      title="Edit Notice"
-                                      onClick={() =>
-                                        handleEditNotice(notice.id)
-                                      }
-                                    >
-                                      <span className="flaticon-edit"></span>
-                                    </li>
-                                    )}
+                                    {typeof window !== 'undefined' &&
+                                      localStorage.getItem('useScope') ===
+                                        'am-admin' && (
+                                        <li
+                                          className="list-inline-item"
+                                          data-toggle="tooltip"
+                                          data-placement="top"
+                                          title="Edit Notice"
+                                          onClick={() =>
+                                            handleEditNotice(notice.id)
+                                          }
+                                        >
+                                          <span className="flaticon-edit"></span>
+                                        </li>
+                                      )}
                                   </ul>
                                 </td>
                               </tr>
@@ -351,7 +414,11 @@ const VacateTableData = () => {
                     </div>
                   </div>
 
-                  {renderPagination()}
+                  <div className="row">
+                    <div className="col-md-12">
+                      {renderPagination()} {/* Render the pagination links */}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

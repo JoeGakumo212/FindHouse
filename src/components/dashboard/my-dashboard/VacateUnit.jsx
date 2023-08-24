@@ -28,7 +28,7 @@ const VacantUnitsTable = () => {
 
         setVacantUnits(response.data.data);
         setTotalPages(Math.ceil(response.data.data.length / pageSize));
-        console.log('Vacant data', response.data.data);
+       
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -44,54 +44,72 @@ const VacantUnitsTable = () => {
   const renderPagination = () => {
     if (!showAll) {
       const pages = [];
-      for (let i = 1; i <= totalPages; i++) {
+      const maxVisiblePages = 5; // Set the maximum number of visible page links
+      const startPage = Math.max(currentPage - Math.floor(maxVisiblePages / 2), 1);
+      const endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
+  
+      if (currentPage > 1) {
         pages.push(
-          <li
-            key={i}
-            className={`page-item ${currentPage === i ? 'active' : ''}`}
-          >
-            <a
-              className="page-link"
-              href="#"
-              onClick={() => handlePageChange(i)}
-            >
+          <li key="prev" className="page-item">
+            <a className="page-link" href="#" onClick={() => handlePageChange(currentPage - 1)}>
+              Previous
+            </a>
+          </li>
+        );
+      }
+  
+      if (startPage > 1) {
+        pages.push(
+          <li key="1" className="page-item">
+            <a className="page-link" href="#" onClick={() => handlePageChange(1)}>
+              1
+            </a>
+          </li>
+          // You can add an ellipsis or separator here if needed
+        );
+      }
+  
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(
+          <li key={i} className={`page-item ${currentPage === i ? 'active' : ''}`}>
+            <a className="page-link" href="#" onClick={() => handlePageChange(i)}>
               {i}
             </a>
           </li>
         );
       }
+  
+      if (endPage < totalPages) {
+        // You can add an ellipsis or separator here if needed
+        pages.push(
+          <li key={totalPages} className="page-item">
+            <a className="page-link" href="#" onClick={() => handlePageChange(totalPages)}>
+              {totalPages}
+            </a>
+          </li>
+        );
+      }
+  
+      if (currentPage < totalPages) {
+        pages.push(
+          <li key="next" className="page-item">
+            <a className="page-link" href="#" onClick={() => handlePageChange(currentPage + 1)}>
+              Next
+            </a>
+          </li>
+        );
+      }
+  
       return (
         <nav aria-label="Page navigation example">
           <ul className="pagination justify-content-center">
-            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-              <a
-                className="page-link"
-                href="#"
-                onClick={() => handlePageChange(currentPage - 1)}
-              >
-                Previous
-              </a>
-            </li>
             {pages}
-            <li
-              className={`page-item ${
-                currentPage === totalPages ? 'disabled' : ''
-              }`}
-            >
-              <a
-                className="page-link"
-                href="#"
-                onClick={() => handlePageChange(currentPage + 1)}
-              >
-                Next
-              </a>
-            </li>
           </ul>
         </nav>
       );
     }
   };
-
+  
   return (
     <div>
       <div className="table-responsive">
@@ -138,7 +156,13 @@ const VacantUnitsTable = () => {
       >
         {showAll ? 'Show Paginated Data' : 'Show All Vacant Units'}
       </button>
-      {showAll ? null : renderPagination()}
+      <div className="row">
+  <div className="col-md-12">
+    {showAll ? null : renderPagination()}
+  </div>
+</div>
+
+     
     </div>
   );
 };

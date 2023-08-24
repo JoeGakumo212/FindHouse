@@ -95,14 +95,79 @@ const PropertyTableData = () => {
 
   const renderPagination = () => {
     const pages = [];
-    for (let i = 1; i <= totalPages; i++) {
+    const maxVisiblePages = 5; // Set the maximum number of visible page links
+  
+    // Calculate the start and end page indices
+    let startPage = Math.max(currentPage - Math.floor(maxVisiblePages / 2), 1);
+    const endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
+  
+    // Ensure that we display enough pages to the right if there's not enough to the left
+    if (totalPages - endPage < startPage - 1) {
+      startPage = Math.max(totalPages - maxVisiblePages + 1, 1);
+    }
+  
+    if (currentPage > 1) {
       pages.push(
-        <li
-          key={i}
-          className={`page-item ${currentPage === i ? 'active' : ''}`}
-        >
+        <li key="prev" className="page-item">
+          <a className="page-link" href="#" onClick={() => handlePageChange(currentPage - 1)}>
+            Previous
+          </a>
+        </li>
+      );
+    }
+  
+    if (startPage > 1) {
+      pages.push(
+        <li key="1" className="page-item">
+          <a className="page-link" href="#" onClick={() => handlePageChange(1)}>
+            1
+          </a>
+        </li>
+        // Add an ellipsis here if needed
+      );
+    }
+  
+    if (startPage > 2) {
+      pages.push(
+        <li key="ellipsis-left" className="page-item">
+          <span className="page-link">...</span>
+        </li>
+      );
+    }
+  
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <li key={i} className={`page-item ${currentPage === i ? 'active' : ''}`}>
           <a className="page-link" href="#" onClick={() => handlePageChange(i)}>
             {i}
+          </a>
+        </li>
+      );
+    }
+  
+    if (endPage < totalPages - 1) {
+      pages.push(
+        <li key="ellipsis-right" className="page-item">
+          <span className="page-link">...</span>
+        </li>
+      );
+    }
+  
+    if (endPage < totalPages) {
+      pages.push(
+        <li key={totalPages} className="page-item">
+          <a className="page-link" href="#" onClick={() => handlePageChange(totalPages)}>
+            {totalPages}
+          </a>
+        </li>
+      );
+    }
+  
+    if (currentPage < totalPages) {
+      pages.push(
+        <li key="next" className="page-item">
+          <a className="page-link" href="#" onClick={() => handlePageChange(currentPage + 1)}>
+            Next
           </a>
         </li>
       );
@@ -110,33 +175,12 @@ const PropertyTableData = () => {
     return (
       <nav aria-label="Page navigation example">
         <ul className="pagination justify-content-center">
-          <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-            <a
-              className="page-link"
-              href="#"
-              onClick={() => handlePageChange(currentPage - 1)}
-            >
-              Previous
-            </a>
-          </li>
           {pages}
-          <li
-            className={`page-item ${
-              currentPage === totalPages ? 'disabled' : ''
-            }`}
-          >
-            <a
-              className="page-link"
-              href="#"
-              onClick={() => handlePageChange(currentPage + 1)}
-            >
-              Next
-            </a>
-          </li>
         </ul>
       </nav>
     );
   };
+  
 
   const handleEditUnit = (propertyId) => {
     // Navigate to the dynamic route with the propertyId
