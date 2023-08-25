@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState ,useEffect} from 'react';
 import { useRouter } from 'next/router';
 import { signIn } from 'next-auth/react';
 import { toast, ToastContainer } from 'react-nextjs-toast';
@@ -13,6 +13,15 @@ const LoginSignup = () => {
   const [showImage, setShowImage] = useState(true);
 
   const router = useRouter();
+  const [rememberMe, setRememberMe] = useState(false); 
+
+  useEffect(() => {
+    // Check for stored credentials and update the state
+    const storedEmail = localStorage.getItem('rememberedEmail');
+    const storedPassword = localStorage.getItem('rememberedPassword');
+    if (storedEmail) setEmail(storedEmail);
+    if (storedPassword) setPassword(storedPassword);
+  }, []);
 
   const { push } = useRouter();
   const handleSubmit = async (event) => {
@@ -44,6 +53,14 @@ const LoginSignup = () => {
           localStorage.setItem('userFirstName', data.first_name);
           localStorage.setItem('userSecondName', data.last_name);
         }
+        // Store or remove credentials based on Remember Me checkbox
+      if (rememberMe) {
+        localStorage.setItem('rememberedEmail', email);
+        localStorage.setItem('rememberedPassword', password);
+      } else {
+        localStorage.removeItem('rememberedEmail');
+        localStorage.removeItem('rememberedPassword');
+      }
 
         const userScope = data.scope
           ? data.scope.split(' ')
@@ -190,18 +207,19 @@ const LoginSignup = () => {
                   {/* End input-group */}
 
                   <div className="form-group form-check custom-checkbox mb-3">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      value=""
-                      id="remeberMe"
-                    />
-                    <label
-                      className="form-check-label form-check-label"
-                      htmlFor="remeberMe"
-                    >
-                      Remember me
-                    </label>
+            <input
+              className="form-check-input"
+              type="checkbox"
+              value={rememberMe}
+              id="remeberMe"
+              onChange={(e) => setRememberMe(e.target.checked)}
+            />
+            <label
+              className="form-check-label form-check-label"
+              htmlFor="remeberMe"
+            >
+              Remember me
+            </label>
 
                     <Link href="/ForgotPassword">
                       <a className="btn-fpswd float-end">Lost your password?</a>

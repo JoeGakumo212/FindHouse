@@ -2,8 +2,8 @@ import React from 'react';
 
 const LoadingSpinner = () => {
   return (
-    <div className="loading-spinner">
-      <div className="spinner">Loading...</div>
+    <div className="loading-spinner" style={{ backgroundColor: 'lightpurple' }}>
+      <div className="spinner">Processing, please wait...</div>
     </div>
   );
 }

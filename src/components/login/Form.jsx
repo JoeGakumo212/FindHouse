@@ -1,12 +1,7 @@
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { css } from '@emotion/react';
 import LoadingSpinner from './LoadingSpinner';
-import { useHistory, useLocation } from 'react-router-dom';
-import 'react-toastify/dist/ReactToastify.css';
-import { NotificationContainer } from 'react-notification-alert';
-import 'react-notification-alert/dist/animate.css';
 import { toast, ToastContainer } from 'react-nextjs-toast';
 import { signIn } from 'next-auth/react';
 
@@ -15,8 +10,18 @@ const Form = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false); // New state for Remember Me
   const [userRole, setUserRole] = useState('');
   const router = useRouter();
+
+  useEffect(() => {
+    // Check for stored credentials and update the state
+    const storedEmail = localStorage.getItem('rememberedEmail');
+    const storedPassword = localStorage.getItem('rememberedPassword');
+    if (storedEmail) setEmail(storedEmail);
+    if (storedPassword) setPassword(storedPassword);
+  }, []);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
@@ -40,13 +45,20 @@ const Form = () => {
         localStorage.setItem('useScope', 'am-admin');
       }
       localStorage.setItem('userFirstName', data.first_name);
-      console.log('scope', data.scope);
-      const userScope = data.scope ? data.scope.split(' ') : ['view-dashboard'];
+
+      // Store or remove credentials based on Remember Me checkbox
+      if (rememberMe) {
+        localStorage.setItem('rememberedEmail', email);
+        localStorage.setItem('rememberedPassword', password);
+      } else {
+        localStorage.removeItem('rememberedEmail');
+        localStorage.removeItem('rememberedPassword');
+      }
+
+      setUserRole(data.scope ? data.scope.split(' ')[0] : '');
       setLoading(false);
       toast.notify(`Logged In successfully`);
-      const firstName = data.first_name;
-      setUserRole(userScope[0]);
-
+      
       router.push({
         pathname: '/my-dashboard',
       });
@@ -58,8 +70,6 @@ const Form = () => {
         duration: 5,
         type: 'error',
       });
-      toast.notify(errorData.message);
-      console.log(errorData.message);
     }
   };
   return (
@@ -118,8 +128,9 @@ const Form = () => {
             <input
               className="form-check-input"
               type="checkbox"
-              value=""
+              value={rememberMe}
               id="remeberMe"
+              onChange={(e) => setRememberMe(e.target.checked)}
             />
             <label
               className="form-check-label form-check-label"
